@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="at_evaluation_content" name="Evaluation Content">
+            <t t-call="website.layout">
+                <form t-attf-action="/evaluation/#{exam.slug}" method="get" class="form-horizontal mt32"
+                      enctype="multipart/form-data">
+                    <div class="wrap">
+                        <div class="container">
+                            <div class="mt16 mb16">
+                                <h1 class="text-center">
+                                    <t t-esc="exam.name"/>
+                                </h1>
+                            </div>
+                            <div class="mt16 mb16">
+                                <div id="content">
+                                    <t t-raw="exam.content"/>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-lg" style="margin-top: 20px;">Iniciar evaluación</button>
+                        </div>
+                    </div>
+                </form>
+            </t>
+        </template>
+        <template id="at_evaluation_question_page" name="Evaluation">
+            <t t-call="website.layout">
+                <form action="/evaluation/results" method="post" class="form-horizontal mt32"
+                      enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="wrap">
+                        <div class="container">
+                            <div class="mt16 mb16">
+                                <h1 class="text-center">
+                                    <t t-esc="exam.name"/>
+                                </h1>
+                                <h3 class="text-center" id="timer"></h3>
+                            </div>
+                            <t t-set="question_index" t-value="1"/>
+                            <t t-foreach="questions" t-as="question_result">
+                                <t t-set="question" t-value="question_result.question"/>
+                                <div class="form-group">
+                                    <div>
+                                        <t t-if="question.question_type == 'multi_choice'">
+                                            <h3 style="display:flex;">
+                                                <t t-esc="question_index"/>) &#160;<t t-raw="question.question"/>
+                                                <t t-if="question.num_correct &gt; 1">
+                                                    <span>(select<t t-esc="question.num_correct"/>)
+                                                    </span>
+                                                </t>
+                                            </h3>
+                                            <t t-foreach="question.question_options" t-as="option">
+                                                <t t-if="question.num_correct == 1">
+                                                    <input type="radio" t-attf-name="question#{question.id}"
+                                                           t-attf-value="#{option.id}" required="True"/>
+                                                    <t t-esc="option.option"/>
+                                                    <br/>
+                                                </t>
+                                                <t t-if="question.num_correct &gt; 1">
+                                                    <input type="checkbox"
+                                                           t-attf-name="question#{question.id}option#{option.id}"
+                                                           t-attf-value="#{option.id}"/>
+                                                    <t t-esc="option.option"/>
+                                                    <br/>
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </div>
+                                </div>
+                                <t t-set="question_index" t-value="question_index+1"/>
+                            </t>
+                            <div class="form-group">
+                                <div class="col-md-7 col-sm-8">
+                                    <input type="hidden" name="token" t-attf-value="#{token}"/>
+                                    <button class="btn btn-primary btn-lg">Finalizar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div>
+                    <script type="text/javascript">
+                        var countDownDate = new Date().getTime();
+                        countDownDate = countDownDate + (
+                        <t t-esc="exam.time"/>
+                        * 60000);
+                        var x = setInterval(function() {
+                        var now = new Date().getTime();
+                        var distance = countDownDate - now;
+                        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        document.getElementById("timer").innerHTML = "Tiempo restante " + hours + "h " + minutes + "m " + seconds + "s ";
+                        if (0 > distance) {
+                        clearInterval(x);
+                        window.close();
+                        }
+                        }, 1000);
+                    </script>
+                </div>
+            </t>
+        </template>
+        <template id="at_evaluation_results" name="Evaluation Results">
+            <t t-call="website.layout">
+                <div class="wrap">
+                    <div class="container">
+                        <div class="mt16 mb16">
+                            <h1 class="text-center">Resultados</h1>
+                        </div>
+                        <div class="mt16 mb16">
+                            <h2 class="text-center text-center">
+                                <t t-esc="correct_count"/>
+                                /
+                                <t t-esc="question_count"/>
+                                <br/>
+                                <t t-esc="percent"/>%
+                            </h2>
+                            <t t-if="exam_result.evaluation_id.show_correct_questions == True">
+                                <style>
+                                    td, th {
+                                    padding: 5px;
+                                    }
+                                </style>
+                                <table>
+                                    <tr>
+                                        <th>Pregunta</th>
+                                        <th>Resultado</th>
+                                    </tr>
+                                    <t t-foreach="exam_result.results" t-as="question_result">
+                                        <tr>
+                                            <td>
+                                                <t t-raw="question_result.question.question"/>
+                                            </td>
+                                            <td>
+                                                <t t-if="question_result.correct == True">
+                                                    <p style="color:green;">Correcta</p>
+                                                </t>
+                                                <t t-if="question_result.correct == False">
+                                                    <p style="color:red;">Incorrecta</p>
+                                                </t>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </t>
+                            <button class="btn btn-primary btn-lg" onclick="self.close()">Terminar</button>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</openerp>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_generate_holiday_wizard" model="ir.ui.view">
+        <field name="name">hr_holiday.generate_holiday_wizard.form</field>
+        <field name="model">hr_holiday.generate_holiday_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Public Leave">
+                <group>
+                    <field name="employee_ids" widget="many2many_tags"/>
+                </group>
+
+                <button class="btn-primary" type="object"
+                        name="search_missing_employees"
+                        string="Search Missing Employees"
+                        help="Search for employees that don't have the public holiday"
+                />
+                <footer>
+                    <button class="btn-primary" type="object"
+                            name="generate_leaves" string="Create Leave for Selected Employees"/>
+                    <button class="btn-default" special="cancel" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

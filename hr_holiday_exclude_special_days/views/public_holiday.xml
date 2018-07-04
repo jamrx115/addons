@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_public_holiday" model="ir.ui.view">
+        <field name="name">hr.public_holiday.form</field>
+        <field name="model">hr.public_holiday</field>
+        <field name="arch" type="xml">
+            <form string="Create a Public Holiday">
+                <header>
+                    <button name="create_leaves" string="Generate Leave Entries"
+                            groups="base.group_system,hr.group_hr_manager"
+                            help="Generate leave entries for selected employees"
+                            type="object" class="oe_highlight" attrs="{'invisible' : [('state', '=', 'done')] }"/>
+                    <button name="open_generate_wizard" string="Generate for New Employees"
+                            groups="base.group_system,hr.group_hr_manager"
+                            help="Generate this leave for new employees"
+                            type="object" class="oe_highlight" attrs="{'invisible' : [('state', '=', 'draft')] }"/>
+                    <button name="remove_leaves" string="Remove Leave Entries"
+                            groups="base.group_system,hr.group_hr_manager"
+                            help="Remove the leave entries from selected employees"
+                            type="object" attrs="{'invisible' : [('state', '=', 'draft')] }"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group col="4">
+                        <field name="date" attrs="{'readonly' : [('state', '=', 'done')] }" />
+                        <field name="name" attrs="{'readonly' : [('state', '=', 'done')] }"/>
+                        <field name="holiday_status_id" domain="[('is_public_holiday', '=', True)]"/>
+                    </group>
+                    <group>
+                        <field name="company_ids" widget="many2many_tags" attrs="{'readonly' : [('state', '=', 'done')] }" />
+                        <field name="tag_ids" widget="many2many_tags" attrs="{'readonly' : [('state', '=', 'done')] }"/>
+                    </group>
+                    <group>
+                        <field name="employee_ids" widget="many2many_tags" attrs="{'readonly' : [('state', '=', 'done')] }" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_public_holiday_tree" model="ir.ui.view">
+        <field name="name">hr.public_holiday.tree</field>
+        <field name="model">hr.public_holiday</field>
+        <field name="arch" type="xml">
+            <tree string="Public Holidays" decoration-danger="state=='draft'">
+                <field name="date" />
+                <field name="name" />
+                <field name="state"/>
+                <field name="employee_ids" widget="many2many_tags" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="public_holiday_action" model="ir.actions.act_window">
+        <field name="name">Public Holidays</field>
+        <field name="res_model">hr.public_holiday</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <menuitem name="Public Holidays" id="public_holiday_config" sequence="10"
+        parent="hr_holidays.menu_hr_holidays_configuration" action="public_holiday_action"/>
+</odoo>

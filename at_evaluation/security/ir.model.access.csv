@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+at_access_evaluation_emp,hr.employee.evaluation.emp,at_evaluation.model_at_evaluation,base.group_user,1,0,0,0
+at_access_evaluation_result_emp,hr.employee.evaluation.result.emp,at_evaluation.model_at_evaluation_result,base.group_user,1,1,1,0
+at_access_evaluation_result_question_emp,hr.employee.evaluation.result.question.emp,at_evaluation.model_at_evaluation_result_question,base.group_user,1,1,1,0
+at_access_evaluation_question_emp,hr.employee.evaluation.question.emp,at_evaluation.model_at_evaluation_question,base.group_user,1,0,0,0
+at_access_evaluation_question_option_emp,hr.employee.evaluation.question.option.emp,at_evaluation.model_at_evaluation_question_option,base.group_user,1,0,0,0

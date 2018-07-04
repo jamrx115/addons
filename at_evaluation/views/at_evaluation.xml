@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Vista de formulario para crear la evaluación -->
+        <record model="ir.ui.view" id="at_evaluation_form_view">
+            <field name="name">AT Evaluation Form View</field>
+            <field name="model">at.evaluation</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button t-if="record.id != null" name="view_quiz" type="object" string="Ver evaluación"/>
+                    </header>
+                    <group>
+                        <field name="name"/>
+                        <field name="departments" widget="many2many_tags"/>
+                        <field name="content" widget="html"/>
+                        <field name="time"/>
+                        <field name="approval_percentage"/>
+                        <field name="show_correct_questions"/>
+                        <field name="fill_mode"/>
+                        <field name="fill_mode_random_number" attrs="{'invisible':[('fill_mode','!=','random')]}"/>
+                        <field name="questions">
+                            <tree>
+                                <field name="question"/>
+                                <field name="question_type"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Vista de tabla -->
+        <record model="ir.ui.view" id="at_evaluation_tree_view">
+            <field name="name">AT Evaluation Tree View</field>
+            <field name="model">at.evaluation</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="at_evaluation_question_form_view">
+            <field name="name">AT Evaluation Question Form View</field>
+            <field name="model">at.evaluation.question</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="question"/>
+                        <field name="question_rendered"/>
+                        <field name="question_type"/>
+                        <field name="question_options" context="{'question_id':active_id}">
+                            <tree editable="bottom">
+                                <field name="option"/>
+                                <field name="correct"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="at_admin_evaluation_action">
+            <field name="name">Administración de evaluaciones</field>
+            <field name="res_model">at.evaluation</field>
+            <field name="view_type">form</field>
+            <field name="groups">group_evaluation_manager</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">View Online Exam</p>
+            </field>
+        </record>
+
+        <record id="hr_kanban_view_employees" model="ir.ui.view">
+            <field name="name">at.evaluation.kanban</field>
+            <field name="model">at.evaluation</field>
+            <field name="priority">10</field>
+            <field name="arch" type="xml">
+                <kanban class="o_hr_employee_kanban" create="false">
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_details">
+                                <strong>
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_button">
+                                    <button name="view_quiz" type="object" class="btn btn-sm btn-success">
+                                        Iniciar
+                                    </button>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="at_evaluation_action">
+            <field name="name">Evaluaciones</field>
+            <field name="res_model">at.evaluation</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">View Online Exam</p>
+            </field>
+        </record>
+
+        <menuitem id="at_training" name="Entrenamiento" parent="hr.menu_hr_root" sequence="10"/>
+        <menuitem id="at_evaluation" name="Evaluaciones" parent="at_training" sequence="10"
+                  action="at_evaluation_action"/>
+        <menuitem id="at_evaluation_menu" name="Administración de evaluaciones" parent="at_training"
+                  action="at_admin_evaluation_action" groups="group_evaluation_manager"
+                  sequence="20"/>
+    </data>
+</openerp>

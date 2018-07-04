@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Public Holiday: add the first one on install, but don't replace it on update -->
+    <record id="holiday_status_public" model="hr.holidays.status">
+        <field name="name" eval="'Public Holidays '+time.strftime('%Y')"/>
+        <field name="limit" eval="False"/>
+        <field name="color_name">lightblue</field>
+        <field name="is_public_holiday">True</field>
+    </record>
+</odoo>
