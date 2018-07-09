@@ -18,6 +18,7 @@ class ciberc_employee(models.Model):
     x_hide_state = fields.Boolean(string='Hide', compute="_compute_hide_country_id")
     x_hide_city = fields.Boolean(string='Hide', compute="_compute_hide_state_id")
 
+    x_pais_reside = fields.Many2one("res.country", string="País residencia", ondelete='restrict')
     x_pais_nace = fields.Many2one("res.country", string="País nacimiento", ondelete='restrict')
     x_birth_state_id = fields.Many2one("res.country.state", string='Estado/Departamento', ondelete='restrict')
     x_birth_city_id = fields.Many2one("ciberc.city", string='Ciudad', ondelete='restrict')

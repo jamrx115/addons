@@ -5,9 +5,11 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='x_pais_reside']" position="after">
+            <xpath expr="//field[@name='country_id']" position="after">
                 <field name="x_hide_state" invisible="1"/>
                 <field name="x_hide_city" invisible="1"/>
+                <field name="x_pais_reside" options="{'no_quick_create': True, 'no_create_edit' : True}"
+                       attrs="{'invisible':[('x_hide_state', '=', True)]}"/>
                 <field name="x_state_id" options="{'no_quick_create': True, 'no_create_edit' : True}"
                        attrs="{'invisible':[('x_hide_state', '=', True)]}"/>
                 <field name="x_city_id" options="{'no_quick_create': True, 'no_create_edit' : True}"
