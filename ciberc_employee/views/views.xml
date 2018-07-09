@@ -1,5 +1,6 @@
-<odoo>
+<openerp>
 
+    <!-- Residencia empleado -->
     <record id="hr_employee_view_form" model="ir.ui.view">
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
@@ -15,5 +16,94 @@
         </field>
     </record>
 
+    <!-- Nacimiento empleado -->
+    <record id="hr_employeetwo_view_form" model="ir.ui.view">
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='x_lugar_nacimiento']" position="after">
+                <field name="x_pais_nace"/>
+                <field name="x_hide_birth_state" invisible="1"/>
+                <field name="x_hide_birth_city" invisible="1"/>
+                <field name="x_birth_state_id" options="{'no_quick_create': True, 'no_create_edit' : True}"
+                       attrs="{'invisible':[('x_hide_birth_state', '=', True)]}"/>
+                <field name="x_birth_city_id" options="{'no_quick_create': True, 'no_create_edit' : True}"
+                       attrs="{'invisible':[('x_hide_birth_city', '=', True)]}"/>
+            </xpath>
+        </field>
+    </record>
 
-</odoo>
+    <!-- Estados/Departamentos -->
+
+    <record id="states_view_tree" model="ir.ui.view">
+        <field name="model">res.country.state</field>
+        <field name="arch" type="xml">
+            <tree default_order='name'>
+                <field name="name"></field>
+                <field name="code"></field>
+                <field name="country_id"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="states_view_form" model="ir.ui.view">
+        <field name="model">res.country.state</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"></field>
+                    <field name="code"></field>
+                    <field name="country_id"></field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_list_states">
+            <field name="name">Estados/Departamentos</field>
+            <field name="res_model">res.country.state</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name="help" type="html">
+                <p class="oe_view_nocontent_create">Crea tu ciudad</p>
+            </field>-->
+    </record>
+
+    <menuitem id="menu_states" name="Estados/Departamentos" parent="hr.menu_hr_root" sequence="10" action="action_list_states" groups="base.group_system,base.group_no_one"/>
+
+    <!-- Ciudades -->
+
+    <record id="cities_view_tree" model="ir.ui.view">
+        <field name="model">ciberc.city</field>
+        <field name="arch" type="xml">
+            <tree default_order='name'>
+                <field name="name"></field>
+                <field name="code"></field>
+                <field name="state_id"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="cities_view_form" model="ir.ui.view">
+        <field name="model">ciberc.city</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"></field>
+                    <field name="code"></field>
+                    <field name="state_id"></field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_list_cities">
+            <field name="name">Ciudades</field>
+            <field name="res_model">ciberc.city</field>
+            <field name="view_mode">tree,form</field>
+            <!--<field name="help" type="html">
+                <p class="oe_view_nocontent_create">Crea tu ciudad</p>
+            </field>-->
+    </record>
+
+    <menuitem id="menu_cities" name="Ciudades" parent="hr.menu_hr_root" sequence="10" action="action_list_cities" groups="base.group_system,base.group_no_one"/>
+</openerp>

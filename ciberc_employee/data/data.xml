@@ -1,0 +1,89 @@
+<odoo>
+    <data>
+        <!-- ********** Estados ********** -->
+
+        <!-- Argentina -->
+
+
+        <!-- Colombia -->
+
+        <!-- <record model="res.country.state" id="col_state_item1">
+            <field name="name">Cauca</field>
+            <field name="code">CA</field>
+            <field name="country_id">50</field>
+            <field name="id">5000</field>
+        </record> -->
+
+        <!-- ********** Ciudades ********** -->
+
+        <!-- Argentina -->
+
+        <!-- <record model="ciberc.city" id="arg_city_item01">
+            <field name="name">Buenos Aires C.A</field>
+            <field name="code">BA</field>
+            <field name="state_id">552</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item02">
+            <field name="name">Córdoba</field>
+            <field name="code">CO</field>
+            <field name="state_id">557</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item03">
+            <field name="name">Rosario</field>
+            <field name="code">RO</field>
+            <field name="state_id">572</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item04">
+            <field name="name">La Plata</field>
+            <field name="code">LP</field>
+            <field name="state_id">553</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item05">
+            <field name="name">San Miguél de Tucumán</field>
+            <field name="code">SM</field>
+            <field name="state_id">575</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item06">
+            <field name="name">Mar del Plata</field>
+            <field name="code">MP</field>
+            <field name="state_id">553</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item07">
+            <field name="name">Salta</field>
+            <field name="code">SA</field>
+            <field name="state_id">568</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item08">
+            <field name="name">Lanús</field>
+            <field name="code">LA</field>
+            <field name="state_id">553</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item09">
+            <field name="name">Santa Fe</field>
+            <field name="code">SF</field>
+            <field name="state_id">572</field>
+        </record>
+
+        <record model="ciberc.city" id="arg_city_item10">
+            <field name="name">Mendoza</field>
+            <field name="code">ME</field>
+            <field name="state_id">564</field>
+        </record>-->
+
+        <!-- Colombia -->
+
+        <!-- <record model="ciberc.city" id="arg_city_item01">
+            <field name="name">Popayán</field>
+            <field name="code">PO</field>
+            <field name="state_id">5000</field>
+        </record> -->
+    </data>
+</odoo>
