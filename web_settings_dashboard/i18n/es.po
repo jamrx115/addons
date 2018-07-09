@@ -48,15 +48,15 @@ msgstr "(Versión Community)"
 #. openerp-web
 #: code:addons/web_settings_dashboard/static/src/xml/dashboard.xml:165
 #, python-format
-msgid "Activate the developer mode"
-msgstr "Activar modo desarrollador"
+msgid "Activate the editor mode"
+msgstr "Activar modo editor"
 
 #. module: web_settings_dashboard
 #. openerp-web
 #: code:addons/web_settings_dashboard/static/src/xml/dashboard.xml:167
 #, python-format
-msgid "Activate the developer mode (with assets)"
-msgstr "Activar modo desarrollador (con assets)"
+msgid "Activate the editor mode (with assets)"
+msgstr "Activar modo editor (con assets)"
 
 #. module: web_settings_dashboard
 #. openerp-web
