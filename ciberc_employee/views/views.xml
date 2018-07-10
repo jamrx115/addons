@@ -8,8 +8,7 @@
             <xpath expr="//field[@name='country_id']" position="after">
                 <field name="x_hide_state" invisible="1"/>
                 <field name="x_hide_city" invisible="1"/>
-                <field name="x_pais_reside" options="{'no_quick_create': True, 'no_create_edit' : True}"
-                       attrs="{'invisible':[('x_hide_state', '=', True)]}"/>
+                <field name="x_pais_reside" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
                 <field name="x_state_id" options="{'no_quick_create': True, 'no_create_edit' : True}"
                        attrs="{'invisible':[('x_hide_state', '=', True)]}"/>
                 <field name="x_city_id" options="{'no_quick_create': True, 'no_create_edit' : True}"
