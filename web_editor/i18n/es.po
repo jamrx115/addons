@@ -102,8 +102,8 @@ msgstr "Añadir"
 #. openerp-web
 #: code:addons/web_editor/static/src/xml/editor.xml:111
 #, python-format
-msgid "Add an image URL"
-msgstr "Añadir una URL de imágen"
+msgid "Add an URL"
+msgstr "Añadir una URL"
 
 #. module: web_editor
 #: model:ir.ui.view,arch_db:web_editor.snippets
@@ -1334,15 +1334,15 @@ msgstr "Lista sin ordenar"
 #. openerp-web
 #: code:addons/web_editor/static/src/xml/editor.xml:96
 #, python-format
-msgid "Upload an image"
-msgstr "Subir una imagen"
+msgid "Upload"
+msgstr "Subir"
 
 #. module: web_editor
 #. openerp-web
 #: code:addons/web_editor/static/src/xml/editor.xml:103
 #, python-format
-msgid "Upload image without optimization"
-msgstr "Subir imagen sin optimización"
+msgid "Upload without optimization"
+msgstr "Subir sin optimización"
 
 #. module: web_editor
 #. openerp-web
