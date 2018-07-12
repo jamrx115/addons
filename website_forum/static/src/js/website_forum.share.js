@@ -7,7 +7,7 @@ var base = require('web_editor.base');
 var SocialShare = require('website.share');
 var website = require('website.website');
 var qweb = core.qweb;
-ajax.loadXML('/website_forum/static/src/xml/website_forum_share_templates.xml', qweb);
+//ajax.loadXML('/website_forum/static/src/xml/website_forum_share_templates.xml', qweb);
 
 
 if(!$('.website_forum').length) {
