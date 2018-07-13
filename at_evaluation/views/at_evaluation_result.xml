@@ -59,7 +59,7 @@
             <field name="name">AT Evaluation Result Tree View</field>
             <field name="model">at.evaluation.result</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree create="false">
                     <field name="create_date" string="Hora de finalización"/>
                     <field name="evaluation_id"/>
                     <field name="user_id"/>
