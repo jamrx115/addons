@@ -21,7 +21,7 @@ class etq_results(models.Model):
     score = fields.Char(string="Puntaje", compute="_compute_score")
     results = fields.One2many('at.evaluation.result.question', 'result_id', string="Resultados", readonly=True)
     token = fields.Char(string="Token")
-    state = fields.Selection([('incomplete', 'Incomplete'), ('complete', 'Complete')], string="Estado")
+    state = fields.Selection([('incomplete', 'Incompleto'), ('complete', 'Completo')], string="Estado")
     approved = fields.Char(string="Aprobado?")
 
     @api.one

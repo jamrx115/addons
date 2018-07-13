@@ -23,7 +23,7 @@ class AtEvaluationExam(models.Model):
     slug = fields.Char(string="Slug", compute="slug_me", store="True")
     show_correct_questions = fields.Boolean(string="Mostrar preguntas correctas?")
     questions = fields.One2many('at.evaluation.question', 'evaluation_id', string="Preguntas",required=True)
-    fill_mode = fields.Selection([('all', 'All Questions'), ('random', 'Random')], string="Modo de llenado", default="all")
+    fill_mode = fields.Selection([('all', 'Todas las preguntas'), ('random', 'Random')], string="Modo de llenado", default="all")
     fill_mode_random_number = fields.Integer(string="Número de preguntas aleatorias")
 
     @api.onchange('fill_mode')
@@ -63,7 +63,7 @@ class AtQuestion(models.Model):
     image = fields.Binary(string="Imagen")
     question = fields.Html(string="Pregunta")
     question_rendered = fields.Html(string="Visualizaciòn de pregunta", compute="render_question")
-    question_type = fields.Selection([('multi_choice', 'Multiple Choice')],default="multi_choice", string="Tipo de pregunta")
+    question_type = fields.Selection([('multi_choice', 'Selección múltiple')],default="multi_choice", string="Tipo de pregunta")
     question_options = fields.One2many('at.evaluation.question.option', 'question_id', string="Selección múltiple")
     num_options = fields.Integer(string="Opciones", compute="calc_options")
     num_correct = fields.Integer(string="Correcta opción", compute="calc_correct")
