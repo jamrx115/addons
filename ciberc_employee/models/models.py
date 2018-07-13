@@ -105,7 +105,7 @@ class ciberc_employee(models.Model):
                 self.x_identificacion = ""
                 return {
                     'warning': {'title': _('Error'),
-                                'message': 'Formato de número de identifiación no valido, sólo debe incluir números y guion (si aplica), longitud máxima de caracteres 20', }
+                                'message': 'Formato de número de identificación no valido, debe incluir términos alfanúmeros y guion (si aplica), longitud máxima de caracteres 20', }
                 }
 
     @api.multi
@@ -117,7 +117,7 @@ class ciberc_employee(models.Model):
                 self.x_nit = ""
                 return {
                     'warning': {'title': _('Error'),
-                                'message': 'Formato de número de identifiación no valido, sólo debe incluir números y guion (si aplica), longitud máxima de caracteres 20', }
+                                'message': 'Formato de número de identificación no valido, debe incluir términos alfanúmeros y guion (si aplica), longitud máxima de caracteres 20', }
                 }
 
     @api.multi
@@ -129,5 +129,5 @@ class ciberc_employee(models.Model):
                 self.x_cedula_extranjeria = ""
                 return {
                     'warning': {'title': _('Error'),
-                                'message': 'Formato de número de identifiación no valido, sólo debe incluir números y guion (si aplica), longitud máxima de caracteres 20', }
+                                'message': 'Formato de número de identificación no valido, debe incluir términos alfanúmeros y guion (si aplica), longitud máxima de caracteres 20', }
                 }
