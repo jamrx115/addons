@@ -18,7 +18,7 @@
             <field name="arch" type="xml">
                 <form>
                     <group>
-                        <field name="create_date" string="Finish Time"/>
+                        <field name="create_date" string="Hora de Finalización"/>
                         <field name="state"/>
                         <field name="evaluation_id"/>
                         <field name="user_id"/>

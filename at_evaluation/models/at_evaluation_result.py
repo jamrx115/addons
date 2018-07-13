@@ -16,7 +16,7 @@ class etq_results(models.Model):
     _name = "at.evaluation.result"
     _description = "Evaluation Result"
 
-    evaluation_id = fields.Many2one('at.evaluation', string="Evalución", readonly=True)
+    evaluation_id = fields.Many2one('at.evaluation', string="Evaluación", readonly=True)
     user_id = fields.Many2one('res.users', string="Usuario")
     score = fields.Char(string="Puntaje", compute="_compute_score")
     results = fields.One2many('at.evaluation.result.question', 'result_id', string="Resultados", readonly=True)
