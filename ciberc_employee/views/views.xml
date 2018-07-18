@@ -34,7 +34,7 @@
         </field>
     </record>
 
-    <!-- Estados/Departamentos -->
+    <!-- Listado Estados/Departamentos -->
 
     <record id="states_view_tree" model="ir.ui.view">
         <field name="model">res.country.state</field>
@@ -65,13 +65,13 @@
             <field name="res_model">res.country.state</field>
             <field name="view_mode">tree,form</field>
             <!--<field name="help" type="html">
-                <p class="oe_view_nocontent_create">Crea tu ciudad</p>
+                <p class="oe_view_nocontent_create">Crea tu estado/departamento</p>
             </field>-->
     </record>
 
     <menuitem id="menu_states" name="Estados/Departamentos" parent="hr.menu_hr_root" sequence="10" action="action_list_states" groups="base.group_system,base.group_no_one"/>
 
-    <!-- Ciudades -->
+    <!-- Listado Ciudades -->
 
     <record id="cities_view_tree" model="ir.ui.view">
         <field name="model">ciberc.city</field>
@@ -107,4 +107,29 @@
     </record>
 
     <menuitem id="menu_cities" name="Ciudades" parent="hr.menu_hr_root" sequence="10" action="action_list_cities" groups="base.group_system,base.group_no_one"/>
+
+    <!-- Usuario -->
+    <record id="view_users_simplified_form" model="ir.ui.view">
+        <field name="name">Add firstname and surnames</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_simple_form"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="required">False</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='email']" position="before">
+                    <group>
+                        <field name="lastname"
+                            attrs="{'required': [('firstname', '=', True)]}"/>
+                        <field name="firstname"
+                            attrs="{'required': [('lastname', '=', True)]}"/>
+                    </group>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
 </openerp>
