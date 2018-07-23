@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="view_database_tree" inherit_id="hr_recruitment.crm_case_tree_view_job">
+            <data>
+                <xpath expr="//field[@name='partner_name']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                    <attribute name="no_label">1</attribute>
+                    <attribute name="required">0</attribute>
+                </xpath>
+                <xpath expr="//field[@name='partner_name']" position="after">
+                    <field name="firstname"/>
+                    <field name="lastname"/>
+                </xpath>
+            </data>
+        </template>
+    </data>
+</openerp>
