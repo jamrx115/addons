@@ -22,7 +22,7 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='x_lugar_nacimiento']" position="after">
+            <xpath expr="//field[@name='birthday']" position="after">
                 <field name="x_pais_nace"/>
                 <field name="x_hide_birth_state" invisible="1"/>
                 <field name="x_hide_birth_city" invisible="1"/>
