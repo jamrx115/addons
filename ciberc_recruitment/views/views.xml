@@ -14,6 +14,12 @@
                     <field name="firstname"/>
                     <field name="lastname"/>
                 </xpath>
+                <xpath expr="//field[@name='reference']" position="after">
+                    <field name="x_interest_country" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                </xpath>
+                <xpath expr="//field[@name='x_fo_asociado']" position="before">
+                    <field name="x_residence_country" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                </xpath>
             </data>
         </field>
     </record>
