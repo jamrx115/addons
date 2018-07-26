@@ -24,14 +24,14 @@ class ciberc_employee(models.Model):
     ], string='Marital Status', groups='hr.group_hr_user')
 
     x_state_id = fields.Many2one("res.country.state", string='Estado/Departamento', ondelete='restrict')
-    x_city_id = fields.Many2one("ciberc.city", string='Ciudad', ondelete='restrict')
+    x_city_id = fields.Many2one("ciberc.city", string='Ciudad de Residencia', ondelete='restrict')
     x_hide_state = fields.Boolean(string='Hide', compute="_compute_hide_country_id")
     x_hide_city = fields.Boolean(string='Hide', compute="_compute_hide_state_id")
 
-    x_pais_reside = fields.Many2one("res.country", string="País residencia", ondelete='restrict')
-    x_pais_nace = fields.Many2one("res.country", string="País nacimiento", ondelete='restrict')
+    x_pais_reside = fields.Many2one("res.country", string="País de Residencia", ondelete='restrict')
+    x_pais_nace = fields.Many2one("res.country", string="País de Nacimiento", ondelete='restrict')
     x_birth_state_id = fields.Many2one("res.country.state", string='Estado/Departamento', ondelete='restrict')
-    x_birth_city_id = fields.Many2one("ciberc.city", string='Ciudad', ondelete='restrict')
+    x_birth_city_id = fields.Many2one("ciberc.city", string='Ciudad de Nacimiento', ondelete='restrict')
     x_hide_birth_state = fields.Boolean(string='Hide', compute="_compute_hide_birth_country_id")
     x_hide_birth_city = fields.Boolean(string='Hide', compute="_compute_hide_birth_state_id")
 
