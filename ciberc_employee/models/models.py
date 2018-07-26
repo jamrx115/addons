@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 import re
 
+# clase creada por alltic que crea ciudades
 class ciberc_cities(models.Model):
     _name = "ciberc.city"
 
@@ -10,6 +11,7 @@ class ciberc_cities(models.Model):
     code = fields.Char(string='Código',)
     state_id = fields.Many2one("res.country.state", string='Estado/Departamento', ondelete='restrict',required=True)
 
+#clase creada por alltic que modifica empleado base
 class ciberc_employee(models.Model):
     _inherit = 'hr.employee'
 
