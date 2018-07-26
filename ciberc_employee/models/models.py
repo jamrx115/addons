@@ -13,6 +13,14 @@ class ciberc_cities(models.Model):
 class ciberc_employee(models.Model):
     _inherit = 'hr.employee'
 
+    marital = fields.Selection([
+        ('single', 'Single'),
+        ('married', 'Married'),
+        ('widower', 'Widower'),
+        ('divorced', 'Divorced'),
+        ('unmarried', 'Unmarried')
+    ], string='Marital Status', groups='hr.group_hr_user')
+
     x_state_id = fields.Many2one("res.country.state", string='Estado/Departamento', ondelete='restrict')
     x_city_id = fields.Many2one("ciberc.city", string='Ciudad', ondelete='restrict')
     x_hide_state = fields.Boolean(string='Hide', compute="_compute_hide_country_id")
