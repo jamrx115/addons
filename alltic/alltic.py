@@ -43,10 +43,9 @@ class ApplicantCode(models.Model):
                 vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos (CE)')], limit=1).ids[0]
         if vals.get('x_esta_aprobacion'):
             if vals.get('x_esta_aprobacion') == 'aprobado':
-                vals['stage_id'] = 6
-	if vals.get('x_bolsa_de_empleo'):
-            vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Bolsa de empleo')], limit=1).ids[
-                0]
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos Vo. Bo.')], limit=1).ids[0]
+        if vals.get('x_bolsa_de_empleo'):
+            vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Bolsa de empleo')], limit=1).ids[0]
         if vals.get('x_candidatura_esp'):
             vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Vacantes activas')], limit=1).ids[0]
         return super(ApplicantCode, self).create(vals)
