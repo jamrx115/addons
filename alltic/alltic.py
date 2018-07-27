@@ -51,5 +51,17 @@ class ApplicantCode(models.Model):
             vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Vacantes activas')], limit=1).ids[0]
         return super(ApplicantCode, self).create(vals)
 
+    @api.multi
+    def write(self, vals):
+        if vals.get('x_tipo_de_cliente'):
+            if vals.get('x_tipo_de_cliente') == 'cliente_interno':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos (CI)')], limit=1).ids[0]
 
+            if vals.get('x_tipo_de_cliente') == 'cliente_externo':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos (CE)')], limit=1).ids[0]
 
+        if vals.get('x_esta_aprobacion'):
+            if vals.get('x_esta_aprobacion') == 'aprobado':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos Vo. Bo.')], limit=1).ids[0]
+
+        return super(ApplicantCode, self).write(vals)
