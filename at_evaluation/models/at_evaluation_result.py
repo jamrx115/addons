@@ -18,7 +18,7 @@ class etq_results(models.Model):
 
     evaluation_id = fields.Many2one('at.evaluation', string="Evaluación", readonly=True)
     user_id = fields.Many2one('res.users', string="Usuario")
-    score = fields.Char(string="Puntaje", compute="_compute_score")
+    score = fields.Char(string="Puntaje", compute="_compute_score", store=True)
     results = fields.One2many('at.evaluation.result.question', 'result_id', string="Resultados", readonly=True)
     token = fields.Char(string="Token")
     state = fields.Selection([('incomplete', 'Incompleto'), ('complete', 'Completo')], string="Estado")
