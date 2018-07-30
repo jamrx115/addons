@@ -2,6 +2,25 @@
 
 from odoo import models, fields, api, _
 import re
+import logging
+
+_logger = logging.getLogger(__name__)
+
+# clase creada por alltic que modifica x_code
+class EmployeeCode(models.Model):
+    _inherit = 'hr.employee'
+
+    _sql_constraints = [
+        ('employee_code_unique', 'UNIQUE(x_code)', 'El código ingresado ya fue asignado')
+    ]
+
+    _logger.debug('------------------------------- Employee Code')
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('x_code'):
+            vals['x_code'] = self.env['ir.sequence'].next_by_code('hr.employee.code')
+        return super(EmployeeCode, self).create(vals)
 
 # clase creada por alltic que crea ciudades
 class ciberc_cities(models.Model):

@@ -2,7 +2,54 @@
 
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+import logging
 
+_logger = logging.getLogger(__name__)
+
+# clase creada por alltic que modifica el modelo Candidato
+class ApplicantCode(models.Model):
+    _inherit = 'hr.applicant'
+
+    _sql_constraints = [
+        ('applicant_code_unique', 'UNIQUE(x_code_applicant)', 'El código ingresado ya fue asignado')
+    ]
+
+    _logger.debug('------------------------------- Applicant Code')
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('x_code_applicant') and not (vals.get('x_bolsa_de_empleo') or vals.get('x_candidatura_esp')):
+            vals['x_code_applicant'] = self.env['ir.sequence'].next_by_code('hr.applicant.code')
+        if vals.get('x_tipo_de_cliente'):
+            if vals.get('x_tipo_de_cliente') == 'cliente_interno':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos (CI)')], limit=1).ids[0]
+            if vals.get('x_tipo_de_cliente') == 'cliente_externo':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos (CE)')], limit=1).ids[0]
+        if vals.get('x_esta_aprobacion'):
+            if vals.get('x_esta_aprobacion') == 'aprobado':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos Vo. Bo.')], limit=1).ids[0]
+        if vals.get('x_bolsa_de_empleo'):
+            vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Bolsa de empleo')], limit=1).ids[0]
+        if vals.get('x_candidatura_esp'):
+            vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Vacantes activas')], limit=1).ids[0]
+        return super(ApplicantCode, self).create(vals)
+
+    @api.multi
+    def write(self, vals):
+        if vals.get('x_tipo_de_cliente'):
+            if vals.get('x_tipo_de_cliente') == 'cliente_interno':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos (CI)')], limit=1).ids[0]
+
+            if vals.get('x_tipo_de_cliente') == 'cliente_externo':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos (CE)')], limit=1).ids[0]
+
+        if vals.get('x_esta_aprobacion'):
+            if vals.get('x_esta_aprobacion') == 'aprobado':
+                vals['stage_id'] = self.env['hr.recruitment.stage'].search([('name', '=', 'Requerimientos Vo. Bo.')], limit=1).ids[0]
+
+        return super(ApplicantCode, self).write(vals)
+
+# clase creada por alltic que modifica el modelo Candidato
 class ciberc_applicant(models.Model):
     _inherit = 'hr.applicant'
 
