@@ -97,6 +97,7 @@ class MyController(http.Controller):
             exam_result.approved = 'Si'
         else:
             exam_result.approved = 'No'
+	exam_result.score = percent	
         exam_result.state = "complete"
         return request.render('at_evaluation.at_evaluation_results',{'exam_result': exam_result, 'question_count': question_count,
                                'correct_count': correct_count, 'percent': percent})
