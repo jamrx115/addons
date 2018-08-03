@@ -28,10 +28,11 @@ class etq_results(models.Model):
     @api.depends('results')
     def _compute_score(self):
         num_questions = self.env['at.evaluation.result.question'].search_count([('result_id', '=', self.id)])
-        correct_questions = self.env['at.evaluation.result.question'].search_count(
+	correct_questions = self.env['at.evaluation.result.question'].search_count(
             [('result_id', '=', self.id), ('correct', '=', True)])
-        self.score = str(correct_questions) + "/" + str(num_questions) + " " + str(
-            float(float(correct_questions) / float(num_questions)) * 100) + "%"
+	if(num_questions):
+	        self.score = str(correct_questions) + "/" + str(num_questions) + " " + str(
+        	    float(float(correct_questions) / float(num_questions)) * 100) + "%"
 
 
 class etq_result_question(models.Model):
