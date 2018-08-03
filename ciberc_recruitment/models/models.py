@@ -56,7 +56,7 @@ class ciberc_applicant(models.Model):
     firstname = fields.Char("Nombres")
     lastname  = fields.Char("Apellidos")
 
-    x_interest_country = fields.Many2one("res.country", string='País de Interés', ondelete='restrict')
+    x_interest_country = fields.Many2one("x_pais_interes", string='País de Interés', ondelete='restrict')
     x_residence_country = fields.Many2one("res.country", string='País de Residencia', ondelete='restrict')
 
     @api.multi
