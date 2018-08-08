@@ -47,8 +47,8 @@ class Job(models.Model):
     department_id = fields.Many2one('hr.department', string='Department')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.user.company_id)
     state = fields.Selection([
-        ('recruit', 'Recruitment in Progress'),
-        ('open', 'Not Recruiting')
+        ('recruit', 'Reclutamiento en curso'),
+        ('open', 'No reclutando')
     ], string='Status', readonly=True, required=True, track_visibility='always', copy=False, default='recruit', help="Set whether the recruitment process is open or closed for this job position.")
 
     _sql_constraints = [
