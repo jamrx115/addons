@@ -86,3 +86,43 @@ class BveView(models.Model):
             'view_id': tree_view.id,
             'state': 'created'
         })
+
+class MailThread(models.AbstractModel):
+    _inherit = 'mail.thread'
+
+    @api.model
+    def get_empty_list_help(self, help):
+        """ Override of BaseModel.get_empty_list_help() to generate an help message
+        that adds alias information. """
+        model = self._context.get('empty_list_help_model')
+        res_id = self._context.get('empty_list_help_id')
+        catchall_domain = self.env['ir.config_parameter'].sudo().get_param("mail.catchall.domain")
+        document_name = self._context.get('empty_list_help_document_name', _('document'))
+        add_arrow = not help or help.find("oe_view_nocontent_create") == -1
+        alias = None
+
+        if catchall_domain and model and res_id:  # specific res_id -> find its alias (i.e. section_id specified)
+            record = self.env[model].sudo().browse(res_id)
+            # check that the alias effectively creates new records
+            if record.alias_id and record.alias_id.alias_name and \
+                    record.alias_id.alias_model_id and \
+                    record.alias_id.alias_model_id.model == self._name and \
+                    record.alias_id.alias_force_thread_id == 0:
+                alias = record.alias_id
+        if not alias and catchall_domain and model:  # no res_id or res_id not linked to an alias -> generic help message, take a generic alias of the model
+            Alias = self.env['mail.alias']
+            aliases = Alias.search([
+                ("alias_parent_model_id.model", "=", model),
+                ("alias_name", "!=", False),
+                ('alias_force_thread_id', '=', False),
+                ('alias_parent_thread_id', '=', False)], order='id ASC')
+            if aliases and len(aliases) == 1:
+                alias = aliases[0]
+
+        if add_arrow:
+            return "<p class='oe_view_nocontent_create'>%(dyn_help)s</p>%(static_help)s" % {
+                'static_help': help or '',
+                'dyn_help': _("Click here to add new %s") % document_name,
+            }
+
+        return help
