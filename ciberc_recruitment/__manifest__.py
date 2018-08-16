@@ -23,7 +23,7 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/hr_recruitment_security.xml',
         'views/views.xml',
         'views/qweb_templates.xml',
     ]
