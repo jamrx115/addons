@@ -16,12 +16,12 @@ class EmployeeCode(models.Model):
 
     _logger.debug('------------------------------- Employee Code')
 
-    code = fields.Char(string='Código de Empleado', size=5, copy=True, readonly = True, store=True)
+    #code = fields.Char(string='Código de Empleado', size=5, copy=True, readonly = True, store=True)
 
     @api.model
     def create(self, vals):
-        if not vals.get('code'):
-            vals['code'] = self.env['ir.sequence'].next_by_code('hr.employee.code')
+        if not vals.get('x_code'):
+            vals['x_code'] = self.env['ir.sequence'].next_by_code('hr.employee.code')
         return super(EmployeeCode, self).create(vals)
 
 # clase creada por alltic que crea ciudades
