@@ -126,3 +126,17 @@ class MailThread(models.AbstractModel):
             }
 
         return help
+
+# clase creada por alltic que modifica x_code
+class JobCode(models.Model):
+    _inherit = 'hr.job'
+
+    _sql_constraints = [
+        ('job_code_unique', 'UNIQUE(x_code)', 'El código ingresado ya fue asignado')
+    ]
+
+    @api.model
+    def create(self, vals):
+        if not vals.get('x_code'):
+            vals['x_code'] = self.env['ir.sequence'].next_by_code('hr.job.code')
+        return super(JobCode, self).create(vals)

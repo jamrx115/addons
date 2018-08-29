@@ -19,11 +19,10 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','bi_view_editor', 'mail'],
+    'depends': ['base','bi_view_editor', 'mail', 'hr'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/bi_view_editor.xml',
+        'views/views.xml',
     ]
 }

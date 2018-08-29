@@ -1,0 +1,18 @@
+<openerp>
+
+    <!-- code job -->
+    <data noupdate="1">
+
+        <!--  -->
+        <record id="seq_hr_job" model="ir.sequence">
+            <field name="name">Código Puesto de Trabajo</field>
+            <field name="code">hr.job.code</field>
+            <field name="prefix">PC </field>
+            <field name="number_next_actual" eval="1"/>
+            <field name="number_increment" eval="1"/>
+            <field name="padding">2</field>
+        </record>
+
+    </data>
+
+</openerp>
