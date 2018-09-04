@@ -167,4 +167,5 @@ class ciberc_employee(models.Model):
     def _onchange_user(self):
         #self.work_email = self.user_id.email
         #self.name = self.user_id.name
-        self.image = self.user_id.image
+        #self.image = self.user_id.image
+        pass
