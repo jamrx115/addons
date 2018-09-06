@@ -36,14 +36,42 @@ class ciberc_cities(models.Model):
 class ciberc_employee(models.Model):
     _inherit = 'hr.employee'
 
+    #Se sobre escribió para agregar el campo unmarried
     marital = fields.Selection([
         ('single', 'Single'),
         ('married', 'Married'),
         ('widower', 'Widower'),
         ('divorced', 'Divorced'),
         ('unmarried', 'Unmarried')
-    ], string='Marital Status', groups='hr.group_hr_user')
+    ], string='Marital Status', groups='hr.group_hr_user,base.group_user')
 
+    #Se sobre escriben estos campos para agregarles permisos de acceso al grupo "empleado"
+    birthday = fields.Date('Date of Birth', groups='hr.group_hr_user,base.group_user')
+    ssnid = fields.Char('SSN No', help='Social Security Number', groups='hr.group_hr_user,base.group_user')
+    sinid = fields.Char('SIN No', help='Social Insurance Number', groups='hr.group_hr_user,base.group_user')
+    identification_id = fields.Char(string='Identification No', groups='hr.group_hr_user,base.group_user')
+    gender = fields.Selection([
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other')
+    ], groups='hr.group_hr_user,base.group_user')
+    marital = fields.Selection([
+        ('single', 'Single'),
+        ('married', 'Married'),
+        ('widower', 'Widower'),
+        ('divorced', 'Divorced')
+    ], string='Marital Status', groups='hr.group_hr_user,base.group_user')
+    bank_account_id = fields.Many2one('res.partner.bank', string='Bank Account Number',
+        domain="[('partner_id', '=', address_home_id)]", help='Employee bank salary account', groups='hr.group_hr_user,base.group_user')
+    passport_id = fields.Char('Passport No', groups='hr.group_hr_user,base.group_user')
+    children = fields.Integer(string='Number of Children', groups='hr.group_hr_user,base.group_user')
+    medic_exam = fields.Date(string='Medical Examination Date', groups='hr.group_hr_user,base.group_user')
+    place_of_birth = fields.Char('Place of Birth', groups='hr.group_hr_user,base.group_user')
+    vehicle = fields.Char(string='Company Vehicle', groups='hr.group_hr_user,base.group_user')
+    vehicle_distance = fields.Integer(string='Home-Work Dist.', help="In kilometers", groups='hr.group_hr_user,base.group_user')
+    
+
+    # Campos agregados para complementar el modulo 
     x_state_id = fields.Many2one("res.country.state", string='Estado/Departamento', ondelete='restrict')
     x_city_id = fields.Many2one("ciberc.city", string='Ciudad de Residencia', ondelete='restrict')
     x_hide_state = fields.Boolean(string='Hide', compute="_compute_hide_country_id")
