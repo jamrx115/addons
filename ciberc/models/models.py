@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, tools, _
 import re
 import logging
 
@@ -140,3 +140,13 @@ class JobCode(models.Model):
         if not vals.get('x_code'):
             vals['x_code'] = self.env['ir.sequence'].next_by_code('hr.job.code')
         return super(JobCode, self).create(vals)
+
+#
+class LoginUserEmail(models.Model):
+    _inherit = ['res.users']
+    
+    @api.onchange('login')
+    def on_change_login(self):
+        if self.login and tools.single_email_re.match(self.login):
+            #self.email = self.login
+            pass
