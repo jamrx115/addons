@@ -191,9 +191,16 @@ class ciberc_employee(models.Model):
                                 'message': 'Formato de número de identificación no valido, debe incluir términos alfanúmeros y guion (si aplica), longitud máxima de caracteres 20', }
                 }
 
+    # sobre escritura de métodos
     @api.onchange('user_id')
     def _onchange_user(self):
         #self.work_email = self.user_id.email
         #self.name = self.user_id.name
         #self.image = self.user_id.image
+        pass
+
+    @api.onchange('address_id')
+    def _onchange_address(self):
+        #self.work_phone = self.address_id.phone
+        #self.mobile_phone = self.address_id.mobile
         pass
