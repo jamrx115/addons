@@ -3,10 +3,10 @@
     'name': "CIBERC - General custom module",
 
     'summary': """
-        Campos adicionales a varios modelos (bi_view_editor)""",
+        Campos adicionales a varios modelos (bi_view_editor, task projects and timesheet)""",
 
     'description': """
-        Campos adicionales a varios modelos (bi_view_editor)
+        Campos adicionales a varios modelos (bi_view_editor, task projects and timesheet)
     """,
 
     'author': "Alltic SAS",
@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','bi_view_editor', 'mail', 'hr', 'hr_contract', 'analytic'],
+    'depends': ['base','bi_view_editor', 'mail', 'hr', 'hr_contract', 'project','hr_timesheet', 'analytic'],
 
     # always loaded
     'data': [
