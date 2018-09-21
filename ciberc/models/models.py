@@ -150,3 +150,13 @@ class LoginUserEmail(models.Model):
         if self.login and tools.single_email_re.match(self.login):
             #self.email = self.login
             pass
+
+# actualización a partes de horas
+class AccountAnalyticLine(models.Model):
+    _inherit = ['account.analytic.line']
+
+    @api.model
+    def _default_user(self):
+        return self.env.context.get('user_id', self.env.user.id)
+
+    user_id = fields.Many2one('res.users', string='User', default=_default_user, domain=lambda self: [('id', '=', self.env.uid)])
