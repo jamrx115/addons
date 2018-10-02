@@ -45,6 +45,6 @@
         </record>
 
         <menuitem id="menu_hr_leave_global_settings" name="Settings"
-            parent="hr_holidays.menu_hr_holidays_root" sequence="96" action="action_hr_leave_configuration" groups="base.group_system"/>
+            parent="hr_holidays.menu_hr_holidays_root" sequence="100" action="action_hr_leave_configuration" groups="base.group_system"/>
     </data>
 </odoo>

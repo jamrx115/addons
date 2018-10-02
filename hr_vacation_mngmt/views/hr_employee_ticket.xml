@@ -116,6 +116,6 @@
             parent="hr_holidays.menu_hr_holidays_root"
             action="action_hr_flight_tickets"
             groups="hr_holidays.group_hr_holidays_manager"
-            sequence="5"/>
+            sequence="100"/>
     </data>
 </odoo>
