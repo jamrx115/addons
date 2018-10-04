@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 class ReportLeavesnewFieldbyDepartment(models.TransientModel):
     _inherit = 'hr.holidays.summary.dept'
 
-    date_to = fields.Date(string='To', required=True, default=lambda *a: time.strftime('%Y-%m-01'))
+    date_to = fields.Date(string='Hasta', required=True, default=lambda *a: time.strftime('%Y-%m-01'))
 
 #clase creada por alltic que calcula datos para reporte de ausencias por fechas
 class ReportLeavesbyDepartment(models.AbstractModel):
