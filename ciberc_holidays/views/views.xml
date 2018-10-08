@@ -1,6 +1,6 @@
 <openerp>
 
-    <!-- Diferencias vista reporte departamentos -->
+    <!-- Nuevo campo a: reporte departamentos -->
     <record id="view_hr_holidays_summary_dept_updated" model="ir.ui.view">
         <field name="model">hr.holidays.summary.dept</field>
         <field name="inherit_id" ref="hr_holidays.view_hr_holidays_summary_dept"/>
@@ -11,7 +11,7 @@
         </field>
     </record>
 
-    <!-- Nuevos campos vista-lista tipos de ausencias -->
+    <!-- Nuevo campos a: lista tipos de ausencias -->
     <record id="view_holiday_status_normal_tree_updated" model="ir.ui.view">
         <field name="model">hr.holidays.status</field>
         <field name="inherit_id" ref="hr_holidays.view_holiday_status_normal_tree"/>
@@ -19,6 +19,99 @@
             <xpath expr="//field[@name='limit']" position="after">
                 <field name="color_name" />
             </xpath>
+        </field>
+    </record>
+
+    <!-- Ocultando -->
+    <record id="edit_holiday_status_form_updated" model="ir.ui.view">
+        <field name="model">hr.holidays.status</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+        <field name="arch" type="xml">
+            <data>
+                <field name="double_validation" position="replace"/>
+                <field name="categ_id" position="replace"/>
+            </data>
+        </field>
+    </record>
+
+    <record id="edit_holiday_new_invisible" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='holiday_type']" position="replace">
+                    <field name="holiday_type" string="Mode" invisible="1" context="{'employee_id':employee_id}"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <record id="view_holiday_allocation_tree_updated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday_allocation_tree"/>
+        <field name="arch" type="xml">
+            <data>
+                <field name="holiday_type" position="replace"/>
+                <field name="category_id" position="replace"/>
+            </data>
+        </field>
+    </record>
+
+    <record id="view_holiday_employee_updated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday_employee"/>
+        <field name="arch" type="xml">
+            <data>
+                <button name="toggle_payslip_status" position="replace"/>
+                <field name="report_note" position="replace"/>
+            </data>
+        </field>
+    </record>
+
+    <!-- remove from odoo notebook or field pending_tasks (inherit view "Leave Request") -->
+    <!-- remove from odoo button book_ticket (inherit view "Leave Request") -->
+    <!-- remove from odoo menuitem hr_leave_request_aliasing.menu_hr_leave_global_settings -->
+    <!-- remove from odoo menuitem hr_vacation_mngmt.menu_hr_flight_tickets -->
+
+    <!-- Reorganizando campos -->
+    <record id="edit_holiday_new_updated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='notes']" position="replace">
+                    <div attrs="{'invisible': [('type', '=', 'add')]}">
+                        <separator string="Comentarios empleado" />
+                        <field name="notes" nolabel="1" colspan="4" placeholder="Add a reason..."/>
+                    </div>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <!-- Cambios en atributos: visible para administradores -->
+    <record id="edit_holiday_new_visible" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+        <field name="groups_id" eval="[(6, 0, [ref('hr_holidays.group_hr_holidays_manager'), ref('hr_holidays.group_hr_holidays_user')])]" />
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='holiday_type']" position="attributes">
+                    <attribute name="invisible" eval="0"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <record id="view_holiday_allocation_tree_stringupdated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday_allocation_tree"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='number_of_days']" position="replace">
+                    <field name="number_of_days" sum="Remaining Days"/>
+                </xpath>
+            </data>
         </field>
     </record>
 

@@ -25,7 +25,7 @@ class ReportLeavesbyDepartment(models.AbstractModel):
         en_date = fields.Date.from_string(end_date)
         return {
             'start_date': fields.Date.to_string(st_date),
-            'end_date': fields.Date.to_string(en_date),
+            'end_date': fields.Date.to_string(en_date), # 59
             'holiday_type': 'Confirmed and Approved' if holiday_type == 'both' else holiday_type
         }
 
@@ -33,8 +33,8 @@ class ReportLeavesbyDepartment(models.AbstractModel):
         res = []
         start_date = fields.Date.from_string(start_date)
         end_date = fields.Date.from_string(end_date)
-        number_days = ((end_date-start_date).days+1)
-        for x in range(0, number_days):
+        number_days = ((end_date-start_date).days)+1
+        for x in range(0, number_days): # 60
             color = '#ababab' if start_date.strftime('%a') == 'Sat' or start_date.strftime('%a') == 'Sun' else ''
             res.append({'day_str': start_date.strftime('%a'), 'day': start_date.day , 'color': color})
             start_date = start_date + relativedelta(days=1)
@@ -44,7 +44,7 @@ class ReportLeavesbyDepartment(models.AbstractModel):
         # it works for geting month name between two dates.
         res = []
         start_date = fields.Date.from_string(start_date)
-        end_date = fields.Date.from_string(end_date)
+        end_date = fields.Date.from_string(end_date) # 59
         while start_date <= end_date:
             last_date = start_date + relativedelta(day=1, months=+1, days=-1)
             if last_date > end_date:
@@ -58,9 +58,9 @@ class ReportLeavesbyDepartment(models.AbstractModel):
         res = []
         count = 0
         start_date = fields.Date.from_string(start_date)
-        end_date = fields.Date.from_string(end_date)
-        number_days = (end_date-start_date).days
-        for index in range(0, number_days):
+        end_date = fields.Date.from_string(end_date) # 59
+        number_days = ((end_date-start_date).days)+1
+        for index in range(0, number_days): # 60
             current = start_date + timedelta(index)
             res.append({'day': current.day, 'color': ''})
             if current.strftime('%a') == 'Sat' or current.strftime('%a') == 'Sun':
@@ -79,11 +79,12 @@ class ReportLeavesbyDepartment(models.AbstractModel):
             date_from = fields.Datetime.context_timestamp(holiday, date_from).date()
             date_to = fields.Datetime.from_string(holiday.date_to)
             date_to = fields.Datetime.context_timestamp(holiday, date_to).date()
-            for index in range(0, ((date_to - date_from).days + 1)):
+            for index in range(0, ((date_to - date_from).days + 1)): # 60
                 if date_from >= start_date and date_from <= end_date:
                     res[(date_from-start_date).days]['color'] = holiday.holiday_status_id.color_name
+                    count += 1
                 date_from += timedelta(1)
-            count += abs(holiday.number_of_days)
+            # count += abs(holiday.number_of_days)
         self.sum = count
         return res
 
