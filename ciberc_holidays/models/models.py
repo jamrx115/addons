@@ -218,3 +218,9 @@ class CodeLeaveTypePayroll(models.Model):
                     else data['number_of_hours'] / 8.0
                 res.append(data)
         return res
+
+#clase creada por alltic que crea valor anual para job
+class CodeHoliday(models.Model):
+    _inherit = 'hr.contract'
+
+    annual_holiday = fields.Integer('Días libres anuales', help='Vacaciones para contrato laboral y días libres para prestación de servicios')

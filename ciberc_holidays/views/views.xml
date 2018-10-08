@@ -22,6 +22,17 @@
         </field>
     </record>
 
+    <!-- Nuevo campos a: contrato -->
+    <record id="hr_contract_form_inherit_updated" model="ir.ui.view">
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_payroll.hr_contract_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='struct_id']" position="after">
+                <field name="annual_holiday" />
+            </xpath>
+        </field>
+    </record>
+
     <!-- Tipos de ausencias -->
     <record id="edit_holiday_status_form_updated" model="ir.ui.view">
         <field name="model">hr.holidays.status</field>
