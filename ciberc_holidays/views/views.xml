@@ -22,18 +22,24 @@
         </field>
     </record>
 
-    <!-- Ocultando -->
+    <!-- Tipos de ausencias -->
     <record id="edit_holiday_status_form_updated" model="ir.ui.view">
         <field name="model">hr.holidays.status</field>
         <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
         <field name="arch" type="xml">
             <data>
+                <!-- Ocultando -->
                 <field name="double_validation" position="replace"/>
                 <field name="categ_id" position="replace"/>
+                <!-- nuevo campo código -->
+                <xpath expr="//field[@name='limit']" position="after">
+                    <field name="code"/>
+                </xpath>
             </data>
         </field>
     </record>
 
+    <!-- Ocultando -->
     <record id="edit_holiday_new_invisible" model="ir.ui.view">
         <field name="model">hr.holidays</field>
         <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
