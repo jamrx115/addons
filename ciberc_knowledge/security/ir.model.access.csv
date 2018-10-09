@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ciberc_knowledge_user,ciberc.knowledge.user,model_ciberc_knowledge,group_ciberc_knowledge_user,1,1,1,0
+access_ciberc_knowledge_user2,ciberc.knowledge.user,model_ciberc_approver_knowledge,group_ciberc_knowledge_user,1,1,1,0
+access_ciberc_knowledge_user3,ciberc.knowledge.user,model_ciberc_evaluation_knowledge,group_ciberc_knowledge_user,1,1,1,0
+access_ciberc_knowledge_user4,ciberc.knowledge.user,base.model_res_users,group_ciberc_knowledge_user,1,1,1,0
+access_ciberc_knowledge_user5,ciberc.knowledge.user,hr.model_hr_department,group_ciberc_knowledge_user,1,1,1,0
+access_ciberc_knowledge_user6,ciberc.knowledge.user,base.model_res_country,group_ciberc_knowledge_user,1,1,1,0
+access_ciberc_knowledge_user7,ciberc.knowledge.user,base.model_res_currency,group_ciberc_knowledge_user,1,1,1,0
+access_ciberc_knowledge_user8,ciberc.knowledge.user,analytic.model_account_analytic_account,group_ciberc_knowledge_user,1,1,1,0
+access_ciberc_knowledge_user9,ciberc.knowledge.user,base.model_res_partner,group_ciberc_knowledge_user,1,1,1,0

@@ -1,0 +1,270 @@
+
+<openerp>
+    <data>
+        <!-- ............................ CREACIÓN DE LAS VISTAS ..................................... -->
+        <!-- Creación de la vista  form evaluación de desempeño-->
+        <record id="performance_form" model="ir.ui.view">
+            <field name="model">ciberc.performance</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button string="Devolver" name="action_back_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea devolver la solicitud a 'primer semestre'?" attrs="{'invisible': [('state','!=','finalizada')]}"/>
+                        <button string="Segundo semestre" name="action_segundo_semestre" type="object" class="oe_highlight" confirm="¿Seguro que desea colocar la evaluación de desempeño en segundo semestre?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','segundo')]}"/>
+                        <button string="Finalizar" name="action_end_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea dar por finalizada la evaluacion de desempeño?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','primer')]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="borrador,primer,segundo,finalizada"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="date" required="True"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="name" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True"/>
+                            </group>
+                            <group>
+                                <field name="evaluator_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True"/>
+                            </group>
+                            <group>
+                                <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True"/>
+                            </group>
+
+                        </group>
+                        <notebook>
+                            <page string="Objetivos de rendimiento">
+                                <field name="performance_goal_id" nolabel="1" mode="tree"  widget="one2many_list">
+                                    <tree string="objetivos de rendimiento" editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <!--<field name="goal" options="{&quot;no_open&quot;: True}" widget="many2many"/>-->
+                                        <field name="goal_id" options="{&quot;no_create&quot;: True}"/>
+                                        <field name="first_semester"/>
+                                        <field name="second_semester"/>
+                                        <field name="score"/>
+                                        <field name="comments_employee"/>
+                                        <field name="comments_evaluator"/>
+                                        <field name="personal_goal_id"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                        <notebook>
+                            <page string="Objetivos de desarrollo personal">
+                                <field name="evolution_personal_goal_id" widget="many2many"/>
+                            </page>
+                        </notebook>
+                        <br/><br/>
+                        <label for="comments_extra"/><br/>
+                        <field name="comments_extra"/><br/><br/>
+                        <label for="general_rating" attrs="{'invisible': [('state','=','borrador')]}"/><br/>
+                        <field name="general_rating" attrs="{'invisible': [('state','=','borrador')]}"/><br/><br/>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <!-- Creación de la vista  tree  evaluación de desempeño-->
+        <record id="performance_tree" model="ir.ui.view">
+            <field name="model">ciberc.performance</field>
+            <field name="arch" type="xml">
+                <tree string="performance"  colors="green:state== 'finalizada'">
+                    <field name="name"/>
+                    <field name="department_id"/>
+                    <field name="date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+         <!-- Creación de la vista  form objetivos -->
+        <record id="performance_goals_form" model="ir.ui.view">
+            <field name="model">ciberc.goals</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" required="True"/>
+                            </group>
+                            <group>
+                                <field name="main_goal_related_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True"/>
+                            </group>
+                        </group>
+                        <label for="description"/><br/>
+                        <field name="description"/><br/>
+                        <label for="departments_ids"/><br/>
+                        <field name="departments_ids" widget="many2many_tags" required="True"/><br/>
+                        <label for="goal"/><br/>
+                        <field name="goal"/><br/>
+                        <group string="Parametros de control">
+                            <field name="goal_min"/>
+                            <field name="goal_max"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <!-- Creación de la vista  tree objetivos -->
+        <record id="performance_goals_tree" model="ir.ui.view">
+            <field name="model">ciberc.goals</field>
+            <field name="arch" type="xml">
+                <tree string="performance goals">
+                    <field name="name"/>
+                    <field name="main_goal_related_id"/>
+                </tree>
+            </field>
+        </record>
+
+         <!-- Creación de la vista  form objetivos principales-->
+        <record id="performance_main_goals_form" model="ir.ui.view">
+            <field name="model">ciberc.main.goals</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <label for="name"/><br/>
+                        <field name="name" required="True"/><br/><br/>
+                        <label for="description"/><br/>
+                        <field name="description"/><br/><br/>
+                        <label for="goal"/><br/>
+                        <field name="goal"/><br/><br/>
+                        <label for="comments"/><br/>
+                        <field name="comments"/><br/><br/>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <!-- Creación de la vista  tree objetivos principales-->
+        <record id="performance_main_goals_tree" model="ir.ui.view">
+            <field name="model">ciberc.main.goals</field>
+            <field name="arch" type="xml">
+                <tree string="performance main goals">
+                    <field name="name" required="True"/>
+                    <field name="goal"/>
+                </tree>
+            </field>
+        </record>
+        <!-- Creación de la vista  tree objetivos personales-->
+        <record id="performance_personal_goals_tree" model="ir.ui.view">
+            <field name="model">ciberc.personal.goals</field>
+            <field name="arch" type="xml">
+                <tree string="performance personal goals">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name" required="True"/>
+                    <field name="scope"/>
+                    <field name="date" widget="date"/>
+                    <field name="comments"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Creación de la vista  form objetivos personales-->
+        <record id="performance_personal_goals_form" model="ir.ui.view">
+            <field name="model">ciberc.personal.goals</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="name" required="True"/>
+                        <field name="date"/>
+                        <field name="scope"/>
+                        <field name="comments"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- ............................ CREACIÓN DE LAS ACCIONES ..................................... -->
+       
+
+
+        <!-- Creación de la acción (Evaluación de desempeño) -->
+        <record model="ir.actions.act_window" id="action_evaluacion_desempeno">
+            <field name="name">Evaluación de desempeño</field>
+            <field name="res_model">ciberc.performance</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Pulse para crear una evaluación de desempeño</p>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_evaluacion_desempeno_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="performance_tree"/>
+            <field name="act_window_id" ref="action_evaluacion_desempeno"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_evaluacion_desempeno_form">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="performance_form"/>
+            <field name="act_window_id" ref="action_evaluacion_desempeno"/>
+        </record>
+
+        <!-- Creación de la acción (Objetivos) -->
+        <record model="ir.actions.act_window" id="action_goals">
+            <field name="name">Objetivos específicos</field>
+            <field name="res_model">ciberc.goals</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Pulse para crear objetivos organizacionales por áreas</p>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_evaluacion_desempeno_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="performance_goals_tree"/>
+            <field name="act_window_id" ref="action_goals"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_evaluacion_desempeno_form">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="performance_goals_form"/>
+            <field name="act_window_id" ref="action_goals"/>
+        </record>
+
+        <!-- Creación de la acción (Objetivos principales) -->
+        <record model="ir.actions.act_window" id="action__main_goals">
+            <field name="name">Objetivos estrategia generales</field>
+            <field name="res_model">ciberc.main.goals</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Pulse para crear objetivos organizacionales principales</p>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_evaluacion_desempeno_tree">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="performance_main_goals_tree"/>
+            <field name="act_window_id" ref="action__main_goals"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_evaluacion_desempeno_form">
+            <field name="sequence" eval="2"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="performance_main_goals_form"/>
+            <field name="act_window_id" ref="action__main_goals"/>
+        </record>
+
+        <!-- ............................ CREACIÓN DE LOS MENÚS ..................................... -->
+        
+        <menuitem id="menu_performance_main" name="Desempeño" sequence="3" groups="base.group_user"/>
+        <menuitem id="menu_performance" name="Desempeño" parent="ciberc_performance.menu_performance_main" sequence="1" groups="base.group_user"/>
+        <menuitem id="menu_performance_evaluation" name="Evaluación de desempeño" parent="ciberc_performance.menu_performance" sequence="2" action="action_evaluacion_desempeno" groups="base.group_user"/>
+        <menuitem id="menu_performance_goals" name="Objetivos específicos" parent="ciberc_performance.menu_performance" sequence="3" action="action_goals" groups="ciberc_performance.group_ciberc_perfomance_admin,ciberc_performance.group_ciberc_perfomance_manager"/>
+        <menuitem id="menu_performance_main_goals" name="Objetivos estrategia generales" parent="ciberc_performance.menu_performance" sequence="4" action="action__main_goals" groups="ciberc_performance.group_ciberc_perfomance_admin"/>
+    </data>
+</openerp>
