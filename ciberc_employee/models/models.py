@@ -36,15 +36,6 @@ class ciberc_cities(models.Model):
 class ciberc_employee(models.Model):
     _inherit = 'hr.employee'
 
-    #Se sobre escribió para agregar el campo unmarried
-    marital = fields.Selection([
-        ('single', 'Single'),
-        ('married', 'Married'),
-        ('widower', 'Widower'),
-        ('divorced', 'Divorced'),
-        ('unmarried', 'Unmarried')
-    ], string='Marital Status', groups='hr.group_hr_user,base.group_user')
-
     #Se sobre escriben estos campos para agregarles permisos de acceso al grupo "empleado"
     birthday = fields.Date('Date of Birth', groups='hr.group_hr_user,base.group_user')
     ssnid = fields.Char('SSN No', help='Social Security Number', groups='hr.group_hr_user,base.group_user')
@@ -59,7 +50,8 @@ class ciberc_employee(models.Model):
         ('single', 'Single'),
         ('married', 'Married'),
         ('widower', 'Widower'),
-        ('divorced', 'Divorced')
+        ('divorced', 'Divorced'),
+        ('unmarried', 'Unmarried')
     ], string='Marital Status', groups='hr.group_hr_user,base.group_user')
     bank_account_id = fields.Many2one('res.partner.bank', string='Bank Account Number',
         domain="[('partner_id', '=', address_home_id)]", help='Employee bank salary account', groups='hr.group_hr_user,base.group_user')
