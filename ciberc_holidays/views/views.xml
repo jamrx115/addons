@@ -102,11 +102,54 @@
                         <field name="notes" nolabel="1" colspan="4" placeholder="Add a reason..."/>
                     </div>
                 </xpath>
+
+                <!-- quitando opcion quick create y quick edit -->
+
+                <xpath expr="//field[@name='holiday_status_id']" position="attributes">
+                    <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <xpath expr="//field[@name='employee_id']" position="attributes">
+                    <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <xpath expr="//field[@name='department_id']" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="options">{'no_open':True}</attribute>
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
             </data>
         </field>
     </record>
 
-    <!-- Cambios en atributos: visible para administradores -->
+    <!-- Herencia grupos -->
+    <record id="edit_holiday_new_domaingroup" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+        <field name="groups_id" eval="[(6, 0, [ref('hr_holidays.group_hr_holidays_manager')])]" />
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='employee_id']" position="attributes">
+                    <attribute name="domain">[('department_id.member_ids.user_id', '=', uid)]</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <record id="edit_holiday_new_domaingroupadmin" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+        <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]" />
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='employee_id']" position="attributes">
+                    <attribute name="domain">[]</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <!-- Cambios en atributos: visible para aprobadores -->
     <record id="edit_holiday_new_visible" model="ir.ui.view">
         <field name="model">hr.holidays</field>
         <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
