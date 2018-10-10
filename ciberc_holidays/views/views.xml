@@ -16,6 +16,9 @@
         <field name="model">hr.holidays.status</field>
         <field name="inherit_id" ref="hr_holidays.view_holiday_status_normal_tree"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='limit']" position="before">
+                <field name="code" />
+            </xpath>
             <xpath expr="//field[@name='limit']" position="after">
                 <field name="color_name" />
             </xpath>
@@ -44,7 +47,7 @@
                 <field name="categ_id" position="replace"/>
                 <!-- nuevo campo código -->
                 <xpath expr="//field[@name='limit']" position="after">
-                    <field name="code"/>
+                    <field name="code" required="1"/>
                 </xpath>
             </data>
         </field>

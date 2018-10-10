@@ -135,7 +135,7 @@ class ReportLeavesbyDepartment(models.AbstractModel):
 class CodeLeaveType(models.Model):
     _inherit = 'hr.holidays.status'
 
-    code = fields.Char('Código para regla salarial', required=True)
+    code = fields.Char('Código para regla salarial')
 
     @api.multi
     @api.onchange('code')
