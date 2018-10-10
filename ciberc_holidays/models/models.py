@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-import re
-import time
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
+
 import logging
+import time
+import re
 
 _logger = logging.getLogger(__name__)
 
@@ -134,7 +135,19 @@ class ReportLeavesbyDepartment(models.AbstractModel):
 class CodeLeaveType(models.Model):
     _inherit = 'hr.holidays.status'
 
-    code = fields.Char('Código para regla salarial')
+    code = fields.Char('Código para regla salarial', required=True)
+
+    @api.multi
+    @api.onchange('code')
+    def _check_code(self):
+        if self.code:
+            pattern = "^[A-Z0-9]{3,6}$"
+            if re.match(pattern, self.code) == None:
+                self.code = ""
+                return {
+                    'warning': {'title': 'Error',
+                                'message': 'Formato de código no valido, debe incluir términos alfanúmeros y guion (si aplica), longitud 3 a 6 caracteres', }
+                }
 
 #clase creada por alltic que trabaja con el codigo para regla salarial
 class CodeLeaveTypePayroll(models.Model):
