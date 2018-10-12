@@ -3,10 +3,10 @@
     'name': "CIBERC - Holidays custom module",
 
     'summary': """
-        Campos adicionales al modelo de ausencias""",
+        Personalizaciones al modelo de ausencias""",
 
     'description': """
-        Campos adicionales al modelo de ausencias
+        Personalizaciones al modelo de ausencias
     """,
 
     'author': "Alltic SAS",
