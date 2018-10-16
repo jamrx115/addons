@@ -118,10 +118,7 @@
                             <field name="payslip_status" groups="hr_holidays.group_hr_holidays_manager" attrs="{'invisible':[('type','=','add')]}" widget="toggle_button"/>
                         </group>
                         <field name="notes" nolabel="1" colspan="4" placeholder="Add a reason..." attrs="{'invisible': [('type', '=', 'remove')]}"/>
-                        <div groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user" attrs="{'invisible':[('state','=','draft')]}">
-                            <separator string="Comment by Manager"/>
-                            <field name="report_note" placeholder="e.g. Report to the next month..."/>
-                        </div>
+                        <field name="report_note" placeholder="e.g. Report to the next month..." groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user" attrs="{'invisible':[('state','=','draft')]}"/>
                     </group>
                 </sheet>
                 <div class="oe_chatter">
