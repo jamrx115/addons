@@ -122,12 +122,31 @@
         <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
         <field name="arch" type="xml">
             <data>
-                <!--Ocultando-->
-                <field name="double_validation" position="replace"/>
-                <field name="categ_id" position="replace"/>
-                <!--nuevo campo código -->
-                <xpath expr="//field[@name='limit']" position="after">
+                <!-- nuevo campo código -->
+                <xpath expr="//field[@name='name']" position="after">
                     <field name="code" required="1"/>
+                </xpath>
+                <!-- Ocultando -->
+                <field name="categ_id" position="replace"/>
+                <!-- Reorganizando -->
+                <field name="color_name" position="replace"/>
+                <xpath expr="//field[@name='code']" position="after">
+                    <field name="color_name"/>
+                </xpath>
+
+                <field name="company_id" position="replace"/>
+                <xpath expr="//field[@name='color_name']" position="after">
+                    <field name="company_id"/>
+                </xpath>
+
+                <field name="double_validation" position="replace"/>
+                <xpath expr="//field[@name='active']" position="before">
+                    <field name="double_validation"/>
+                </xpath>
+
+                <field name="limit" position="replace"/>
+                <xpath expr="//field[@name='active']" position="before">
+                    <field name="limit"/>
                 </xpath>
             </data>
         </field>
