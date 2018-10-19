@@ -85,7 +85,6 @@
                 <!-- ocultando posibilidad de crear y editar otros modelos -->
                 <xpath expr="//field[@name='holiday_status_id']" position="attributes">
                     <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
-                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
                 </xpath>
                 <xpath expr="//field[@name='employee_id']" position="attributes">
                     <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
