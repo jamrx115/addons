@@ -99,6 +99,21 @@
                     <attribute name="options">{'no_open':True}</attribute>
                     <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
                 </xpath>
+                <!-- boton estado apĺazado -->
+                <xpath expr="//button[@name='action_refuse']" position="before">
+                    <button string="Aplazar" type="object" name="action_postponed" states="validate1"/>
+                </xpath>
+                <!-- modificación botones -->
+                <xpath expr="//button[@name='action_refuse']" position="attributes">
+                    <attribute name="states">confirm,validate1, validate</attribute>
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_approve']" position="attributes">
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_validate']" position="attributes">
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
             </data>
         </field>
     </record>

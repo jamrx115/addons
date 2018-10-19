@@ -11,6 +11,26 @@ import re
 
 _logger = logging.getLogger(__name__)
 
+#clase creada por alltic que modifica las ausencias
+class HolidaysUpdated(models.Model):
+    _inherit = 'hr.holidays'
+
+    state = fields.Selection([
+        ('draft', 'To Submit'),
+        ('confirm', 'To Approve'),
+        ('refuse', 'Refused'),
+        ('validate1', 'Second Approval'),
+        ('delay', 'Postponed'),
+        ('validate', 'Approved'),
+        ('cancel', 'Cancelled')
+    ], string='Status', readonly=True, track_visibility='onchange', copy=False, default='draft')
+
+    @api.multi
+    def action_postponed(self):
+        if self.filtered(lambda holiday: holiday.state != 'validate1'):
+            raise UserError('La solicitud de ausencia debe estar en estado "pre aprobada" para poder aplazarla.')
+        return self.write({'state': 'delay'})
+
 #clase creada por alltic que agrega fecha fin para reporte
 class ReportLeavesnewFieldbyDepartment(models.TransientModel):
     _inherit = 'hr.holidays.summary.dept'
