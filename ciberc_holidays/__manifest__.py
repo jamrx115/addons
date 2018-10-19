@@ -19,11 +19,12 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','hr_holidays', 'hr_payroll', 'hr_contract'],
+    'depends': ['base','hr','hr_holidays', 'hr_payroll', 'hr_contract', 'mail'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/views.xml',
+        'views/mail_templates.xml',
     ]
 }
