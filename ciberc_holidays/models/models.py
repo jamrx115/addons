@@ -28,6 +28,7 @@ class HolidaysUpdated(models.Model):
 
     @api.multi
     def action_postponed(self):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
         if self.filtered(lambda holiday: holiday.state != 'validate1'):
             raise UserError('La solicitud de ausencia debe estar en estado "pre aprobada" para poder aplazarla.')
         template = self.env.ref('ciberc_holidays.postponed_template')
@@ -36,6 +37,7 @@ class HolidaysUpdated(models.Model):
 
     @api.multi
     def action_confirm(self):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
         if self.filtered(lambda holiday: holiday.state != 'draft'):
             raise UserError('La solicitud de ausencia debe estar en estado "Borrador" para enviarla.')
         template = self.env.ref('ciberc_holidays.confirm_template')
@@ -46,7 +48,9 @@ class HolidaysUpdated(models.Model):
     def action_approve(self):
         # if double_validation: this method is the first approval approval
         # if not double_validation: this method calls action_validate() below
-        if not self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+
+        if not is_approver:
             raise UserError('Solamente un jefe de departamento o superior  puede aprobar la solicitud.')
 
         manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
@@ -63,7 +67,8 @@ class HolidaysUpdated(models.Model):
 
     @api.multi
     def action_validate(self):
-        if not self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+        if not is_approver:
             raise UserError('Solamente un jefe de departamento o superior puede aprobar la solicitud.')
 
         manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
@@ -115,7 +120,8 @@ class HolidaysUpdated(models.Model):
 
     @api.multi
     def action_refuse(self):
-        if not self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+        if not is_approver:
             raise UserError('Solamente  un jefe de departamento o superior puede rechazar la solicitud.')
 
         manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
