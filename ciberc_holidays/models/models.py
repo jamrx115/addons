@@ -52,7 +52,7 @@ class HolidaysUpdated(models.Model):
             # If a category that created several holidays, cancel all related
             holiday.linked_request_ids.action_refuse()
             
-            template = self.env.ref('ciberc_holidays.reject_template')
+            template = self.env.ref('ciberc_holidays.refuse_template')
             self.env['mail.template'].browse(template.id).send_mail(self.id)
 
         self._remove_resource_leave()
