@@ -1,18 +1,18 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_ciberc_performance_user,ciberc.performance.user,model_ciberc_performance,group_ciberc_perfomance_user,1,1,1,0
+access_ciberc_performance_user,ciberc.performance.user,model_ciberc_performance,group_ciberc_perfomance_user,1,1,0,0
 access_ciberc_performance_user2,ciberc.performance.line.user,model_ciberc_performance_line,group_ciberc_perfomance_user,1,1,0,0
-access_ciberc_performance_user3,ciberc.main.goals.user,model_ciberc_main_goals,group_ciberc_perfomance_user,1,1,0,0
-access_ciberc_performance_user4,ciberc.goals.user,model_ciberc_goals,group_ciberc_perfomance_user,1,1,0,0
-access_ciberc_performance_user5,ciberc.personal.goals.user,model_ciberc_personal_goals,group_ciberc_perfomance_user,1,1,0,0
+access_ciberc_performance_user3,ciberc.main.goals.user,model_ciberc_main_goals,group_ciberc_perfomance_user,1,0,0,0
+access_ciberc_performance_user4,ciberc.goals.user,model_ciberc_goals,group_ciberc_perfomance_user,1,0,0,0
+access_ciberc_performance_user5,ciberc.personal.goals.user,model_ciberc_personal_goals,group_ciberc_perfomance_user,1,1,1,0
 access_ciberc_performance_user6,res.users.user,base.model_res_users,group_ciberc_perfomance_user,1,1,0,0
 access_ciberc_performance_user7,hr.department.user,hr.model_hr_department,group_ciberc_perfomance_user,1,1,0,0
-
+access_ciberc_performance_user8,ciberc.personal.main.goals.user,model_ciberc_personal_main_goals,group_ciberc_perfomance_user,1,1,0,0
 
 access_ciberc_performance_manager,ciberc.performance.manager,model_ciberc_performance,group_ciberc_perfomance_manager,1,1,1,1
 access_ciberc_performance_manager2,ciberc.performance.line.manager,model_ciberc_performance_line,group_ciberc_perfomance_manager,1,1,1,1
-access_ciberc_performance_manager3,ciberc.main.goals.manager,model_ciberc_main_goals,group_ciberc_perfomance_manager,1,1,0,0
+access_ciberc_performance_manager3,ciberc.main.goals.manager,model_ciberc_main_goals,group_ciberc_perfomance_manager,1,0,0,0
 access_ciberc_performance_manager4,ciberc.goals.manager,model_ciberc_goals,group_ciberc_perfomance_manager,1,1,1,1
 access_ciberc_performance_manager5,ciberc.personal_goals.manager,model_ciberc_personal_goals,group_ciberc_perfomance_manager,1,1,1,1
-
+access_ciberc_performance_manager8,ciberc.personal.main.goals.manager,model_ciberc_personal_main_goals,group_ciberc_perfomance_manager,1,1,1,1
 
 access_ciberc_performance_admin,ciberc.performance.admin,model_ciberc_main_goals,group_ciberc_perfomance_admin,1,1,1,1

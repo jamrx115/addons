@@ -8,56 +8,67 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button string="Devolver" name="action_back_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea devolver la solicitud a 'primer semestre'?" attrs="{'invisible': [('state','!=','finalizada')]}"/>
-                        <button string="Segundo semestre" name="action_segundo_semestre" type="object" class="oe_highlight" confirm="¿Seguro que desea colocar la evaluación de desempeño en segundo semestre?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','segundo')]}"/>
-                        <button string="Finalizar" name="action_end_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea dar por finalizada la evaluacion de desempeño?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','primer')]}"/>
+                        <button string="Devolver" name="action_back_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea devolver la solicitud a 'primer semestre'?" attrs="{'invisible': [('state','!=','finalizada')]}" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin"/>
+                        <button string="Segundo semestre" name="action_segundo_semestre" type="object" class="oe_highlight" confirm="¿Seguro que desea colocar la evaluación de desempeño en segundo semestre?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','segundo')]}" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin"/>
+                        <button string="Finalizar" name="action_end_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea dar por finalizada la evaluacion de desempeño?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','primer')]}" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin"/>
                         <field name="state" widget="statusbar" statusbar_visible="borrador,primer,segundo,finalizada"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
-                                <field name="date" required="True"/>
+                                <field name="date" required="True" readonly="1"/>
                             </group>
                         </group>
                         <group>
                             <group>
-                                <field name="name" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True"/>
+                                <field name="name" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True" readonly="1"/>
                             </group>
                             <group>
-                                <field name="evaluator_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True"/>
+                                <field name="evaluator_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True" readonly="1"/>
                             </group>
                             <group>
-                                <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True"/>
+                                <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True" readonly="1"/>
                             </group>
 
                         </group>
                         <notebook>
                             <page string="Objetivos de rendimiento">
-                                <field name="performance_goal_id" nolabel="1" mode="tree"  widget="one2many_list">
+                                <field name="performance_goal_id" nolabel="1" mode="tree"  widget="one2many_list" options="{&quot;no_open&quot;: True}">
                                     <tree string="objetivos de rendimiento" editable="bottom">
                                         <field name="sequence" widget="handle"/>
                                         <!--<field name="goal" options="{&quot;no_open&quot;: True}" widget="many2many"/>-->
-                                        <field name="goal_id" options="{&quot;no_create&quot;: True}"/>
-                                        <field name="first_semester"/>
-                                        <field name="second_semester"/>
-                                        <field name="score"/>
+                                        <field name="goal_id" options="{&quot;no_create&quot;: True}" readonly="1"/>
+                                        <field name="main_goal_id" readonly="1" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                                        <field name="first_semester" readonly="1"/>
+                                        <field name="second_semester" readonly="1"/>
+                                        <field name="score" readonly="1"/>
+                                        <field name="personal_goal"/>
                                         <field name="comments_employee"/>
-                                        <field name="comments_evaluator"/>
-                                        <field name="personal_goal_id"/>
+                                        <field name="comments_evaluator" readonly="1"/>
                                     </tree>
                                 </field>
                             </page>
                         </notebook>
                         <notebook>
                             <page string="Objetivos de desarrollo personal">
-                                <field name="evolution_personal_goal_id" widget="many2many"/>
+                                <field name="evolution_personal_goal_id" nolabel="1" mode="tree"  widget="one2many_list">
+                                    <tree string="objetivos de desarrollo personal" editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="main_personal_goal" options="{&quot;no_open&quot;: True}"/>
+                                        <field name="scope"/>
+                                        <field name="date"/>
+                                        <field name="comments"/>
+
+                                    </tree>
+                                </field>
                             </page>
                         </notebook>
                         <br/><br/>
                         <label for="comments_extra"/><br/>
-                        <field name="comments_extra"/><br/><br/>
+                        <field name="comments_extra" readonly="1"/><br/><br/>
                         <label for="general_rating" attrs="{'invisible': [('state','=','borrador')]}"/><br/>
-                        <field name="general_rating" attrs="{'invisible': [('state','=','borrador')]}"/><br/><br/>
+                        <field name="general_rating" attrs="{'invisible': [('state','=','borrador')]}" readonly="1"/><br/><br/>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
@@ -90,7 +101,7 @@
                                 <field name="name" required="True"/>
                             </group>
                             <group>
-                                <field name="main_goal_related_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True"/>
+                                <field name="main_goal_related_id" options="{&quot;no_create&quot;: True}" required="True"/>
                             </group>
                         </group>
                         <label for="description"/><br/>
@@ -118,6 +129,7 @@
                 <tree string="performance goals">
                     <field name="name"/>
                     <field name="main_goal_related_id"/>
+                    <field name="goal"/>
                 </tree>
             </field>
         </record>
@@ -178,10 +190,57 @@
                         <field name="date"/>
                         <field name="scope"/>
                         <field name="comments"/>
+                        <field name="main_personal_goal" options="{&quot;no_open&quot;: True}"/>
                     </group>
                 </form>
             </field>
         </record>
+
+        <!-- ............................ CREACIÓN DE LAS HERENCIAS READONLY ..................................... -->
+
+        <!--herencia que permite la edición de los campos para los grupos de acceso iguales o superiores (desempeño/responsable)-->
+        <record id="ciberc_perfomance_read_only" model="ir.ui.view">
+            <field name="name">herencia read only objetivos de rendimiento</field>
+            <field name="model">ciberc.performance</field>
+            <field name="inherit_id" ref="ciberc_performance.performance_form" />
+            <field name="groups_id" eval="[(6, 0, [ref('ciberc_performance.group_ciberc_perfomance_manager') ])]" />                
+            <field name="arch" type="xml">                                   
+                <field name="date" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="name" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="evaluator_id" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="department_id" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="goal_id" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="first_semester" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="second_semester" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="score" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="comments_evaluator" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="comments_extra" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+                <field name="general_rating" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
+            </field>
+        </record>
+
 
         <!-- ............................ CREACIÓN DE LAS ACCIONES ..................................... -->
        
@@ -261,7 +320,7 @@
 
         <!-- ............................ CREACIÓN DE LOS MENÚS ..................................... -->
         
-        <menuitem id="menu_performance_main" name="Desempeño" sequence="3" groups="base.group_user"/>
+        <menuitem id="menu_performance_main" name="Desarrollo de talento humano" sequence="3" groups="base.group_user"/>
         <menuitem id="menu_performance" name="Desempeño" parent="ciberc_performance.menu_performance_main" sequence="1" groups="base.group_user"/>
         <menuitem id="menu_performance_evaluation" name="Evaluación de desempeño" parent="ciberc_performance.menu_performance" sequence="2" action="action_evaluacion_desempeno" groups="base.group_user"/>
         <menuitem id="menu_performance_goals" name="Objetivos específicos" parent="ciberc_performance.menu_performance" sequence="3" action="action_goals" groups="ciberc_performance.group_ciberc_perfomance_admin,ciberc_performance.group_ciberc_perfomance_manager"/>

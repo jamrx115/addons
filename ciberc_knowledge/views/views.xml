@@ -1,14 +1,13 @@
 
 <openerp>
     <data>
-        
             <!-- ............................ CREACIÓN DE LAS VISTAS ..................................... -->
 
             <!-- Creación de la vista  tree de la solicitud-->
             <record id="knowledge_request_tree" model="ir.ui.view">
                 <field name="model">ciberc.knowledge</field>
                 <field name="arch" type="xml">
-                    <tree string="knowledge">
+                    <tree string="knowledge" colors="red:state== 'rechazada';red:state== 'aplazada'">
                         <field name="name"/>
                         <field name="department_id"/>
                         <field name="date"/>
@@ -25,16 +24,27 @@
                 <field name="arch" type="xml">
                     <form>
                         <header>
-                            <button string="Validar" name="action_valid_exam" type="object" class="oe_highlight" confirm="¿Seguro que desea validar técnicamente al colaborador?" attrs="{'invisible': [('state','!=','validacion')]}"/>
-                            <button string="No validar" name="action_no_valid_exam" type="object" confirm="¿Seguro que desea no validar técnicamente al colaborador?" attrs="{'invisible': [('state','!=','validacion')]}"/>
-                            <button string="VoBo" name="action_vobo" type="object" class="oe_highlight" confirm="¿Seguro desea darle el visto bueno a la solicitud del colaborador?" attrs="{'invisible': [('state','!=','jefe')]}"/>
-                            <button string="Pendiente aprobación" name="action_pendiente_aprobacion" type="object" class="oe_highlight" confirm="¿Seguro que desea enviar la capaciación para aprobación de alta gerencia?" attrs="{'invisible': [('state','!=','talento')]}"/>
-                            <button string="Aprobar" name="action_aprobar" type="object" class="oe_highlight" confirm="¿Seguro que desea aprobar la solicitud?" attrs="{'invisible': [('state','!=','pendiente')]}"/>
-                            <button string="En proceso" name="action_en_proceso" type="object" class="oe_highlight" confirm="¿Seguro que desea colocar en estado 'En proceso' la solicitud?" attrs="{'invisible': [('state','!=','aprobada')]}"/>
-                            <button string="Terminada" name="action_terminada" type="object" class="oe_highlight" confirm="¿Seguro que desea dar por terminada la solicitud?" attrs="{'invisible': [('state','!=','proceso')]}"/>
-                            <button string="Devolver a borrador" name="action_devolver" type="object" class="oe_highlight" confirm="¿Seguro que desea devolver a estado inicial la solicitud que fue aplazada?" attrs="{'invisible': [('state','!=','aplazada')]}"/>
-                            <button string="Rechazar" name="action_rechazar" type="object" confirm="¿Seguro que desea rechazar la solicitud?" attrs="{'invisible': ['|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada')]}"/>
-                            <button string="Aplazar" name="action_aplazar" type="object"  confirm="¿Seguro que desea aplazar la solicitud?"  attrs="{'invisible': ['|','|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada'),('state','=','jefe')]}"/>
+                            <button string="Validar" name="action_valid_exam" type="object" class="oe_highlight" confirm="¿Seguro que desea validar técnicamente al colaborador?" attrs="{'invisible': [('state','!=','validacion')]}" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="No validar" name="action_no_valid_exam" type="object" confirm="¿Seguro que desea no validar técnicamente al colaborador?" attrs="{'invisible': [('state','!=','validacion')]}" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="VoBo" name="action_vobo" type="object" class="oe_highlight" confirm="¿Seguro desea darle el visto bueno a la solicitud del colaborador?" attrs="{'invisible': [('state','!=','jefe')]}" groups="ciberc_knowledge.group_ciberc_knowledge_boss,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="Pendiente aprobación" name="action_pendiente_aprobacion" type="object" class="oe_highlight" confirm="¿Seguro que desea enviar la capacitación para aprobación de alta gerencia?" attrs="{'invisible': [('state','!=','talento')]}" groups="ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="Aprobar" name="action_aprobar" type="object" class="oe_highlight" confirm="¿Seguro que desea aprobar la solicitud?" attrs="{'invisible': [('state','!=','pendiente')]}" groups="ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="En proceso" name="action_en_proceso" type="object" class="oe_highlight" confirm="¿Seguro que desea colocar en estado 'En proceso' la solicitud?" attrs="{'invisible': [('state','!=','aprobada')]}" groups="ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="Terminada" name="action_terminada" type="object" class="oe_highlight" confirm="¿Seguro que desea dar por terminada la solicitud?" attrs="{'invisible': [('state','!=','proceso')]}" groups="ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="Constancia de capacitación" name="action_request_documents" type="object" confirm="¿Seguro que desea solicitar los soportes de la capacitación al colaborador?" attrs="{'invisible': [('state','!=','proceso')]}" groups="ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="Devolver" name="action_devolver" type="object" class="oe_highlight" confirm="¿Seguro que desea devolver a estado inicial la solicitud que fue aplazada?" attrs="{'invisible': [('state','!=','aplazada')]}" groups="ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+
+                            <button string="Rechazar" name="action_rechazar" type="object" confirm="¿Seguro que desea rechazar la solicitud?" attrs="{'invisible': ['|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada')]}" groups="ciberc_knowledge.group_ciberc_knowledge_boss,ciberc_knowledge.group_ciberc_knowledge_admin,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management"/>
+
+                            <button string="Aplazar" name="action_aplazar" type="object"  confirm="¿Seguro que desea aplazar la solicitud?"  attrs="{'invisible': ['|','|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada'),('state','=','jefe')]}" groups="ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_admin,ciberc_knowledge.group_ciberc_knowledge_management"/>
                         </header>
                         <header>
                             <field name="state" widget="statusbar" statusbar_colors='{"rechazada": "red"}' statusbar_visible="solicitud,validacion,jefe,talento,pendiente,aprobada,proceso,rechazada,aplazada,terminada"/>
@@ -46,51 +56,52 @@
                                 <div attrs="{'invisible':[('state','=','validacion')]}">
                                     <label for="reason"/><br/>
                                     <field name="reason"/><br/>
-                                    <field name="reason_detail" attrs="{'invisible':[('reason','=',True)]}" placeholder="Especifique ..."/><br/><br/>
+                                    <field name="reason_detail" attrs="{'invisible':[('reason','=',False)]}" placeholder="Especifique ..."/><br/><br/>
                                     <div attrs="{'invisible':['|',('state','=','jefe')]}">
-	                                    <label for="supplier_id"/><br/>
-	                                    <field name="supplier_id"  options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/><br/> 
-	                                    <label for="final_cost" style="width:200pt"/>
-	                                    <label for="currency_three_id" style="margin-left:20pt"/><br/>
-	                                    <field name="final_cost" style="width:200pt"/>
-	                                    <field name="currency_three_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" style="margin-left:20pt" /><br/><br/>
-	                                    <label for="deferment"/><br/>
-	                                    <field name="deferment"/><br/><br/> 
+	                                    <label for="supplier_id" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/><br/>
+	                                    <field name="supplier_id"  options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/><br/><br/> 
+	                                    <label for="final_cost" style="width:200pt" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+	                                    <label for="currency_three_id" style="margin-left:20pt" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/><br/>
+	                                    <field name="final_cost" style="width:200pt" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/>
+	                                    <field name="currency_three_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" style="margin-left:20pt" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/><br/><br/>
+	                                    <label for="deferment" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/><br/>
+	                                    <field name="deferment" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/><br/><br/> 
 	                                    <label for="deferment_date" attrs="{'invisible':[('deferment','=',False)]}"/><br/>
 	                                    <field name="deferment_date" attrs="{'invisible':[('deferment','=',False)]}"/><br/><br/>
 	                                </div>
                                 </div>
                                 <div>
-	                                <label for="tecnical_details"/><br/>
-	                                <field name="tecnical_details"/><br/><br/>
+	                                <label for="tecnical_details" attrs="{'invisible':['|','&amp;','&amp;','&amp;','&amp;',('exam_name_id','!=',38),('exam_name_id','!=',39),('exam_name_id','!=',40),('exam_name_id','!=',41),('exam_name_id','!=',42),('knowledge_application','!=','examen')]}"/><br/>
+	                                <field name="tecnical_details" attrs="{'invisible':['|','&amp;','&amp;','&amp;','&amp;',('exam_name_id','!=',38),('exam_name_id','!=',39),('exam_name_id','!=',40),('exam_name_id','!=',41),('exam_name_id','!=',42),('knowledge_application','!=','examen')]}"/><br/><br/>
 	                            </div>
                             </div>
                             <br/>
                             <br/>
+                            <!--.......................   -->
                             <label for="date"/><br/>
-                            <field name="date"/><br/><br/>
+                            <field name="date" required="1"/><br/><br/>
                             <div>
                                 <label for="name" style="width:180pt"/>
                                 <label for="department_id" style="margin-left:30pt;width:180pt"/><br/>
-                                <field name="name" style="width:180pt;display:inline-block"/>
-                                <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" style="width:180pt;margin-left:30pt;display:inline-block"/><br/>
+                                <field name="name" style="width:180pt;display:inline-block" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="1"/>
+                                <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" style="width:180pt;margin-left:30pt;display:inline-block" required="1"/><br/><br/>
                             </div>
                             <label for="approver_id"/><br/>
-                            <field name="approver_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/><br/>
+                            <field name="approver_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="1"/><br/><br/>
                             <label for="country_id"/><br/>
-                            <field name="country_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/><br/>
+                            <field name="country_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="1"/><br/><br/>
                             <label for="email"/><br/>
-                            <field name="email"/><br/><br/>
+                            <field name="email" required="1"/><br/><br/>
                             <label for="knowledge"/><br/>
-                            <field name="knowledge"/><br/><br/>
+                            <field name="knowledge" required="1"/><br/><br/>
                             <label for="kind_knowledge"/><br/>
-                            <field name="kind_knowledge"/><br/><br/>
+                            <field name="kind_knowledge" required="1"/><br/><br/>
                             <label for="knowledge_application"/><br/>
-                            <field name="knowledge_application"/><br/>
+                            <field name="knowledge_application" required="1"/><br/>
                             <field name="knowledge_application_details" attrs="{'invisible':[('knowledge_application','!=','otro')]}" placeholder="Especifique ..."/><br/><br/>
                             <div attrs="{'invisible':['|',('knowledge_application','=','examen'),('knowledge_application','=',False)]}">
                                 <label for="knowledge_topic"/><br/>
-                                <field name="knowledge_topic"/><br/><br/>
+                                <field name="knowledge_topic" attrs="{'required':[('knowledge_application','!=','examen')]}"/><br/><br/>
                             </div>
                             <div style="margin-left:10px;padding: 10px;border-left: 3px solid #eeeeee">
                                 <label for="knowledge_time" style="width:350pt"/><br/>
@@ -108,12 +119,13 @@
                                 <field name="currency_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" style="margin-left:20pt"/><br/><br/>
                             </div>
                             <label for="excuse"/><br/>
-                            <field name="excuse"/><br/>
+                            <field name="excuse" required="1"/><br/>
                             <field name="excuse_details" attrs="{'invisible':[('excuse','!=','otro')]}" placeholder="Especifique ..."/><br/><br/>
+                            <!-- Sección del examen -->
                             <div attrs="{'invisible':[('knowledge_application','!=','examen')]}" style="background-color:#eeeeee;padding: 20pt">
                                 <h2 style="color:#728FCC; font-weight:bold">Datos del examen</h2><br/>
                                 <label for="exam_name_id"/><br/>
-                                <field name="exam_name_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/><br/>
+                                <field name="exam_name_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" attrs="{'required':[('knowledge_application','=','examen')]}"/><br/><br/>
                                 <label for="partner"/><br/>
                                 <field name="partner"/><br/><br/>
                                 <label for="code_exam"/><br/>
@@ -135,9 +147,9 @@
                                 <label for="place"/><br/>
                                 <field name="place"/><br/><br/>
                                 <label for="user"/><br/>
-                                <field name="user"/>
+                                <field name="user"/><br/><br/>
                                 <label for="password"/><br/>
-                                <field name="password"/>
+                                <field name="password"/><br/><br/>
                                 <label for="pin"/><br/>
                                 <field name="pin"/>
                             </div>
@@ -145,6 +157,10 @@
                             <label for="cost_centre_id"/><br/>
                             <field name="cost_centre_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/><br/>
                         </sheet>
+                        <div class="oe_chatter">
+                            <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                            <field name="message_ids" widget="mail_thread"/>
+                        </div>
                     </form>
                 </field>
             </record>
@@ -167,9 +183,9 @@
                     <form>
                         <sheet>
                             <group>
-                                <field name="name" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
-                                <field name="email"/>
-                                <field name="user_odoo"/>
+                                <field name="name" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="1"/>
+                                <field name="email" required="1"/>
+                                <field name="user_odoo" required="1"/>
                             </group>
                         </sheet>
                     </form>
@@ -183,8 +199,9 @@
                 <field name="arch" type="xml">
                     <tree string="knowledge request">
                         <field name="name"/>
+                        <field name="date"/>
                         <field name="department_id"/>
-                        <field name="evaluator_id"/>
+                        <field name="knowledge_topic_evaluation"/>
                     </tree>
                 </field>
             </record>
@@ -194,23 +211,728 @@
                 <field name="arch" type="xml">
                     <form>
                         <sheet>
-                            <br/>
-                            <label for="date"/><br/>
-                            <field name="date"/><br/><br/>
-                            <label for="name"/><br/>
-                            <field name="name" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/><br/>                            
-                            <label for="department_id"/><br/>
-                            <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/><br/>
-                            <label for="knowledge_topic_evaluation"/><br/>
-                            <field name="knowledge_topic_evaluation"/><br/><br/>
+                            <br/><br/>
+                            <h1 style="color:#728FCC; font-weight:bold; text-align:center;">Evaluación del impacto de la capacitación</h1><br/>
+                            <group>
+                                <group>
+                                    <field name="date" required="1"/>
+                                    <field name="knowledge_topic_evaluation" required="1"/>
+                                </group>
+                                <group>
+                                    <field name="name" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="1"/>
+                                    <field name="job_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="1"/>                   
+                                    <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="1"/>
+                                </group>
+                            </group>
+                            <div style="background-color:#eeeeee;padding: 20pt">
+                                <p> Las preguntas adjuntas le permiten expresar su opinión con relación a la aplicación de los conocimientos adquiridos en esta capitación.<br/><br/>
+                                Lea cada punto cuidadosamente y responda con toda sinceridad ya que esto permite obtener la información adecuada para mejorar futuras capacitaciones o cursos de formación.<br/><br/>
+                                Marque la opción que crea conveniente<br/>
+                                </p>
+                            </div>
+                            <h1 style="color:#728FCC; font-weight:bold; text-align:center;">CUESTIONARIO</h1><br/>
+                            <label for="question1"/><br/><br/>
+                            <field name="question1" widget="radio" options="{'horizontal': true}" style="background-color:#eeeeee;padding:10px 10px 10px 10px"/><br/>
+                            <field name="question1_details"/><br/><br/>
+                            <label for="question2"/><br/><br/>
+
+                            <field name="question2" widget="radio" options="{'horizontal': true}" style="background-color:#eeeeee;padding:10px 10px 10px 10px"/><br/>
+                            <field name="question2_details"/><br/><br/>
+                            <label for="question3"/><br/><br/>
+
+                            <field name="question3" widget="radio"  options="{'horizontal': true}" style="background-color:#eeeeee;padding:10px 10px 10px 10px"/><br/>
+                            <field name="question3_details" placeholder="Si su respuesta es menor del 50% explique si las razones para ello están relacionadas con factores de la capacitación o con el ambiente de trabajo"/><br/><br/>
+                            <label for="question4"/><br/><br/>
+
+                            <field name="question4" widget="radio"  options="{'horizontal': true}" style="background-color:#eeeeee;padding:10px 10px 10px 10px"/><br/>
+                            <field name="question4_details"/><br/><br/>
+                            <label for="question5"/><br/><br/>
+
+                            <field name="question5" widget="radio"  options="{'horizontal': true}" style="background-color:#eeeeee;padding:10px 10px 10px 10px"/><br/>
+                            <field name="question5_details"/><br/><br/>
+                            
+                            <label for="question6"/><br/><br/>
+                            <field name="question6" widget="radio"  options="{'horizontal': true}" style="background-color:#eeeeee;padding:10px 10px 10px 10px"/><br/>
+                            <field name="question6_details"/><br/><br/>
                             <label for="applied"/><br/>
-                            <field name="applied"/><br/><br/>
-                            <label for="evaluator_id"/><br/>
-                            <field name="evaluator_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/><br/>
+                            <field name="applied" placeholder="Explique cómo aplicará estos nuevos conocimientos en su día a día laboral"/><br/><br/>
+                            <label for="observations"/><br/>
+                            <field name="observations"/><br/><br/>
                         </sheet>
+                        <div class="oe_chatter">
+                            <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                            <field name="message_ids" widget="mail_thread"/>
+                        </div>
                     </form>
                 </field>
             </record>
+            <!-- ........................................................................................................................... CREACIÓN DE LAS HERENCIAS READONLY ............................................................................................................................................................................................ -->
+        
+            <!--herencia para el grupo usuario -->
+            <record id="ciberc_knowledge_read_only_user" model="ir.ui.view">
+                <field name="name">herencia read only solicitud de capacitacion user</field>
+                <field name="model">ciberc.knowledge</field>
+                <field name="inherit_id" ref="ciberc_knowledge.knowledge_request_form" />
+                <field name="groups_id" eval="[(6, 0, [ref('ciberc_knowledge.group_ciberc_knowledge_user') ])]" />                
+                <field name="arch" type="xml">
+                    <field name="date" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>                                   
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="department_id" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="approver_id" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="country_id" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="email" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="kind_knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_application" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_application_details" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')],'invisible':[('knowledge_application','!=','otro')]}</attribute>
+                    </field>
+                    <field name="knowledge_topic" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')],'required':[('knowledge_application','!=','examen')]}</attribute>
+                    </field>
+                    <field name="knowledge_start" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_end" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_time" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_id" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="excuse" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="excuse_details" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')],'invisible':[('excuse','!=','otro')]}</attribute>
+                    </field>
+                    <field name="cost_centre_id" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="reason" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="reason_detail" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')],'invisible':[('reason','=',False)]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')],'invisible':[('deferment','=',False)]}</attribute>
+                    </field>
+                    <field name="tecnical_details" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')],'invisible':['|','&amp;','&amp;','&amp;','&amp;',('exam_name_id','!=',38),('exam_name_id','!=',39),('exam_name_id','!=',40),('exam_name_id','!=',41),('exam_name_id','!=',42),('knowledge_application','!=','examen')]}</attribute>
+                    </field>
+                    <field name="exam_name_id" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')],'required':[('knowledge_application','=','examen')]}</attribute>
+                    </field>
+                    <field name="partner" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="code_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="cost_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_two_id" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="date_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="schedule_start" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="schedule_end" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="place" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="user" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="password" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="pin" position="attributes">
+                       <attribute name="attrs">{'readonly':[('state','!=','solicitud')]}</attribute>
+                    </field>
+                </field>
+            </record>
+
+            <!--herencia para el grupo servicios avanzados -->
+            <record id="ciberc_knowledge_read_only_services" model="ir.ui.view">
+                <field name="name">herencia read only solicitud de capacitacion servicios avanzados</field>
+                <field name="model">ciberc.knowledge</field>
+                <field name="inherit_id" ref="ciberc_knowledge.knowledge_request_form" />
+                <field name="groups_id" eval="[(6, 0, [ref('ciberc_knowledge.group_ciberc_knowledge_services') ])]" />                
+                <field name="arch" type="xml">
+                    <field name="date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>                                   
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="department_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="approver_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="country_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="email" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="kind_knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_application" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_application_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')],'invisible':[('knowledge_application','!=','otro')]}</attribute>
+                    </field>
+                    <field name="knowledge_topic" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')],'required':[('knowledge_application','!=','examen')]}</attribute>
+                    </field>
+                    <field name="knowledge_start" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_end" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_time" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="excuse" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="excuse_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')],'invisible':[('excuse','!=','otro')]}</attribute>
+                    </field>
+                    <field name="cost_centre_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="reason" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="reason_detail" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')],'invisible':[('reason','=',False)]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','validacion'),('state','!=','talento')],'invisible':[('deferment','=',False)]}</attribute>
+                    </field>
+                    <field name="tecnical_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="exam_name_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')],'required':[('knowledge_application','=','examen')]}</attribute>
+                    </field>
+                    <field name="partner" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="code_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="cost_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_two_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="date_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="schedule_start" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="schedule_end" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="place" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="user" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="password" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="pin" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="supplier_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="final_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_three_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="deferment" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','validacion'),('state','!=','talento'),('state','!=','solicitud')]}</attribute>
+                    </field>                              
+                </field>
+            </record>
+
+            <!--herencia para el grupo jefe -->
+            <record id="ciberc_knowledge_read_only_services" model="ir.ui.view">
+                <field name="name">herencia read only solicitud de capacitacion jefe</field>
+                <field name="model">ciberc.knowledge</field>
+                <field name="inherit_id" ref="ciberc_knowledge.knowledge_request_form" />
+                <field name="groups_id" eval="[(6, 0, [ref('ciberc_knowledge.group_ciberc_knowledge_boss') ])]" />                
+                <field name="arch" type="xml">
+                    <button name="action_rechazar" position="attributes">
+                       <attribute name="attrs">{'invisible': ['|','|','|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','talento'),('state','=','pendiente'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada')]}</attribute>
+                    </button> 
+                    <field name="date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>                                   
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="department_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="approver_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="country_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="email" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="kind_knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_application" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_application_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')],'invisible':[('knowledge_application','!=','otro')]}</attribute>
+                    </field>
+                    <field name="knowledge_topic" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')],'required':[('knowledge_application','!=','examen')]}</attribute>
+                    </field>
+                    <field name="knowledge_start" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_end" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_time" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="excuse" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="excuse_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')],'invisible':[('excuse','!=','otro')]}</attribute>
+                    </field>
+                    <field name="cost_centre_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="reason" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="reason_detail" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')],'invisible':[('reason','=',False)]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','validacion'),('state','!=','talento')],'invisible':[('deferment','=',False)]}</attribute>
+                    </field>
+                    <field name="tecnical_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="exam_name_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')],'required':[('knowledge_application','=','examen')]}</attribute>
+                    </field>
+                    <field name="partner" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="code_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="cost_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_two_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="date_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="schedule_start" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="schedule_end" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="place" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="user" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="password" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="pin" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="supplier_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="final_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_three_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="deferment" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','jefe'),('state','!=','solicitud')]}</attribute>
+                    </field>                              
+                </field>
+            </record>
+
+            <!--herencia para el grupo talento humano -->
+            <record id="ciberc_knowledge_read_only_human_resources" model="ir.ui.view">
+                <field name="name">herencia read only solicitud de capacitacion talento humano</field>
+                <field name="model">ciberc.knowledge</field>
+                <field name="inherit_id" ref="ciberc_knowledge.knowledge_request_form" />
+                <field name="groups_id" eval="[(6, 0, [ref('ciberc_knowledge.group_ciberc_knowledge_human_resources') ])]" />                
+                <field name="arch" type="xml">
+                    <button name="action_rechazar" position="attributes">
+                       <attribute name="attrs">{'invisible': ['|','|','|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','jefe'),('state','=','pendiente'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada')]}</attribute>
+                    </button>
+                    <button name="action_aplazar" position="attributes">
+                       <attribute name="attrs">{'invisible': ['|','|','|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','jefe'),('state','=','pendiente'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada')]}</attribute>
+                    </button>
+                    <field name="date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>                                   
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="department_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="approver_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="country_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="email" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="kind_knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="knowledge_application" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="knowledge_application_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','talento'),('state','!=','solicitud')],'invisible':[('knowledge_application','!=','otro')]}</attribute>
+                    </field>
+                    <field name="knowledge_topic" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','talento'),('state','!=','solicitud')],'required':[('knowledge_application','!=','examen')]}</attribute>
+                    </field>
+                    <field name="knowledge_start" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="knowledge_end" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="knowledge_time" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="knowledge_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="currency_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="excuse" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="excuse_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','talento'),('state','!=','solicitud')],'invisible':[('excuse','!=','otro')]}</attribute>
+                    </field>
+                    <field name="cost_centre_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="reason" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="reason_detail" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','talento'),('state','!=','solicitud')],'invisible':[('reason','=',False)]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','validacion'),('state','!=','talento')],'invisible':[('deferment','=',False)]}</attribute>
+                    </field>
+                    <field name="tecnical_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="exam_name_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','talento'),('state','!=','solicitud')],'required':[('knowledge_application','=','examen')]}</attribute>
+                    </field>
+                    <field name="partner" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="code_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="cost_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="currency_two_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="date_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="schedule_start" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="schedule_end" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="place" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="user" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="password" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="pin" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="supplier_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="final_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="currency_three_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="deferment" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;','&amp;',('state','!=','talento'),('state','!=','solicitud'),('state','!=','aplazada')]}</attribute>
+                    </field>                              
+                </field>
+            </record>
+
+            <!--herencia para el grupo alta gerencia -->
+            <record id="ciberc_knowledge_read_only_management" model="ir.ui.view">
+                <field name="name">herencia read only solicitud de capacitacion alta gerencia</field>
+                <field name="model">ciberc.knowledge</field>
+                <field name="inherit_id" ref="ciberc_knowledge.knowledge_request_form" />
+                <field name="groups_id" eval="[(6, 0, [ref('ciberc_knowledge.group_ciberc_knowledge_management') ])]" />                
+                <field name="arch" type="xml">
+                    <button name="action_rechazar" position="attributes">
+                       <attribute name="attrs">{'invisible': ['|','|','|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','jefe'),('state','=','talento'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada')]}</attribute>
+                    </button>
+                    <button name="action_aplazar" position="attributes">
+                       <attribute name="attrs">{'invisible': ['|','|','|','|','|','|','|','|',('state','=','solicitud'),('state','=','validacion'),('state','=','jefe'),('state','=','talento'),('state','=','aprobada'),('state','=','proceso'),('state','=','rechazada'),('state','=','aplazada'),('state','=','terminada')]}</attribute>
+                    </button>
+                    <field name="date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>                                   
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="department_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="approver_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="country_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="email" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="kind_knowledge" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_application" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_application_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')],'invisible':[('knowledge_application','!=','otro')]}</attribute>
+                    </field>
+                    <field name="knowledge_topic" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')],'required':[('knowledge_application','!=','examen')]}</attribute>
+                    </field>
+                    <field name="knowledge_start" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_end" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_time" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="knowledge_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="name" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="excuse" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="excuse_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')],'invisible':[('excuse','!=','otro')]}</attribute>
+                    </field>
+                    <field name="cost_centre_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="reason" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="reason_detail" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')],'invisible':[('reason','=',False)]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','validacion'),('state','!=','talento')],'invisible':[('deferment','=',False)]}</attribute>
+                    </field>
+                    <field name="tecnical_details" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="exam_name_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')],'required':[('knowledge_application','=','examen')]}</attribute>
+                    </field>
+                    <field name="partner" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="code_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="cost_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_two_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="date_exam" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="schedule_start" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="schedule_end" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="place" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="user" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="password" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="pin" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="supplier_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="final_cost" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="currency_three_id" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="deferment" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>
+                    <field name="deferment_date" position="attributes">
+                       <attribute name="attrs">{'readonly':['&amp;',('state','!=','pendiente'),('state','!=','solicitud')]}</attribute>
+                    </field>                              
+                </field>
+            </record>
+
 
             <!-- ............................ CREACIÓN DE LAS ACCIONES ..................................... -->
 
@@ -237,9 +959,6 @@
                 <field name="view_id" ref="knowledge_request_form"/>
                 <field name="act_window_id" ref="action_knowledge_submenu"/>
             </record>
-
-
-
 
 
             <!-- Creación de la acción (Aprobadores de la solicitud) -->
@@ -291,12 +1010,14 @@
             </record>
         
 
-
         <!-- ............................ CREACIÓN DE LOS MENÚS ..................................... -->
-        <menuitem id="menu_knowledge" name="Capacitación" parent="ciberc_performance.menu_performance_main" sequence="10" groups="ciberc_knowledge.group_ciberc_knowledge_user"/>
-        <menuitem id="menu_knowledge_request" name="Solicitud de capacitación" parent="ciberc_knowledge.menu_knowledge" sequence="11" action="action_knowledge_submenu" groups="ciberc_knowledge.group_ciberc_knowledge_user"/>
-        <menuitem id="menu_knowledge_evaluation" name="Evaluación de capacitación" parent="ciberc_knowledge.menu_knowledge" sequence="12" action="action_knowledge_evaluation" groups="ciberc_knowledge.group_ciberc_knowledge_user"/>
-        <menuitem id="menu_knowledge_approver" name="Aprobadores" parent="ciberc_knowledge.menu_knowledge" sequence="12" action="action_knowledge_approvers" groups="ciberc_knowledge.group_ciberc_knowledge_user"/>
+        <menuitem id="menu_knowledge" name="Capacitación" parent="ciberc_performance.menu_performance_main" sequence="10" groups="ciberc_knowledge.group_ciberc_knowledge_admin,group_ciberc_knowledge_management,group_ciberc_knowledge_human_resources,group_ciberc_knowledge_services,group_ciberc_knowledge_boss,group_ciberc_knowledge_user"/>
+
+        <menuitem id="menu_knowledge_request" name="Solicitud de capacitación" parent="ciberc_knowledge.menu_knowledge" sequence="11" action="action_knowledge_submenu" groups="ciberc_knowledge.group_ciberc_knowledge_admin,group_ciberc_knowledge_management,group_ciberc_knowledge_human_resources,group_ciberc_knowledge_services,group_ciberc_knowledge_boss,group_ciberc_knowledge_user"/>
+
+        <menuitem id="menu_knowledge_evaluation" name="Evaluación de capacitación" parent="ciberc_knowledge.menu_knowledge" sequence="12" action="action_knowledge_evaluation" groups="ciberc_knowledge.group_ciberc_knowledge_admin,group_ciberc_knowledge_management,group_ciberc_knowledge_human_resources,group_ciberc_knowledge_services,group_ciberc_knowledge_boss,group_ciberc_knowledge_user"/>
+
+        <menuitem id="menu_knowledge_approver" name="Aprobadores" parent="ciberc_knowledge.menu_knowledge" sequence="12" action="action_knowledge_approvers" groups="ciberc_knowledge.group_ciberc_knowledge_admin"/>
 
     </data>
 </openerp>

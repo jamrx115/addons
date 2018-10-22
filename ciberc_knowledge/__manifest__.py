@@ -19,13 +19,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','ciberc_performance'],
+    'depends': ['base','hr','ciberc_performance','mail'],
 
     # always loaded
     'data': [
         'security/ciberc_knowledge_security.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
+        'data/knowledge_template.xml',
         #'data/data.xml',
     ]
 }
