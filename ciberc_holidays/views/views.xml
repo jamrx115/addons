@@ -30,6 +30,51 @@
         </field>
     </record>
 
+    <!-- Vista form Ausencia nueva -->
+    <record id="edit_holiday_new_updated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
+        <field name="arch" type="xml">
+            <data>
+                <!-- holiday_type invisible -->
+                <xpath expr="//field[@name='holiday_type']" position="replace">
+                    <field name="holiday_type" string="Mode" invisible="1" context="{'employee_id':employee_id}"/>
+                </xpath>
+                <!-- payslip_status oculto -->
+                <xpath expr="//field[@name='payslip_status']" position="replace">
+                    <field name="payslip_status" groups="hr_holidays.group_hr_holidays_manager" invisible="1" widget="toggle_button"/>
+                </xpath>
+                <!-- ocultando posibilidad de crear y editar otros modelos -->
+                <xpath expr="//field[@name='holiday_status_id']" position="attributes">
+                    <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='employee_id']" position="attributes">
+                    <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <xpath expr="//field[@name='department_id']" position="attributes">
+                    <attribute name="readonly">True</attribute>
+                    <attribute name="options">{'no_open':True}</attribute>
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <!-- boton estado apĺazado -->
+                <xpath expr="//button[@name='action_refuse']" position="before">
+                    <button string="Aplazar" type="object" name="action_postponed" states="validate1"/>
+                </xpath>
+                <!-- modificación botones -->
+                <xpath expr="//button[@name='action_refuse']" position="attributes">
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_approve']" position="attributes">
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <xpath expr="//button[@name='action_validate']" position="attributes">
+                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
     <!-- Vista form Ausencia nueva - Restricción campo empleados por grupo(s) -->
     <record id="edit_holiday_new_domaingroup" model="ir.ui.view">
         <field name="model">hr.holidays</field>
@@ -67,52 +112,6 @@
             <data>
                 <xpath expr="//field[@name='holiday_type']" position="attributes">
                     <attribute name="invisible" eval="0"/>
-                </xpath>
-            </data>
-        </field>
-    </record>
-
-    <!-- Vista form Ausencia nueva -->
-    <record id="edit_holiday_new_updated" model="ir.ui.view">
-        <field name="model">hr.holidays</field>
-        <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
-        <field name="arch" type="xml">
-            <data>
-                <!-- holiday_type invisible -->
-                <xpath expr="//field[@name='holiday_type']" position="replace">
-                    <field name="holiday_type" string="Mode" invisible="1" context="{'employee_id':employee_id}"/>
-                </xpath>
-                <!-- payslip_status oculto -->
-                <xpath expr="//field[@name='payslip_status']" position="replace">
-                    <field name="payslip_status" groups="hr_holidays.group_hr_holidays_manager" invisible="1" widget="toggle_button"/>
-                </xpath>
-                <!-- ocultando posibilidad de crear y editar otros modelos -->
-                <xpath expr="//field[@name='holiday_status_id']" position="attributes">
-                    <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
-                </xpath>
-                <xpath expr="//field[@name='employee_id']" position="attributes">
-                    <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
-                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
-                </xpath>
-                <xpath expr="//field[@name='department_id']" position="attributes">
-                    <attribute name="readonly">True</attribute>
-                    <attribute name="options">{'no_open':True}</attribute>
-                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
-                </xpath>
-                <!-- boton estado apĺazado -->
-                <xpath expr="//button[@name='action_refuse']" position="before">
-                    <button string="Aplazar" type="object" name="action_postponed" states="validate1"/>
-                </xpath>
-                <!-- modificación botones -->
-                <xpath expr="//button[@name='action_refuse']" position="attributes">
-                    <attribute name="states">confirm,validate1, validate</attribute>
-                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
-                </xpath>
-                <xpath expr="//button[@name='action_approve']" position="attributes">
-                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
-                </xpath>
-                <xpath expr="//button[@name='action_validate']" position="attributes">
-                    <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
                 </xpath>
             </data>
         </field>
