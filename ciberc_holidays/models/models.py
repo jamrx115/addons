@@ -1,14 +1,150 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-import re
-import time
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
+
 import logging
+import time
+import re
 
 _logger = logging.getLogger(__name__)
+HOURS_PER_DAY = 8
+
+#clase creada por alltic que modifica las ausencias
+class HolidaysUpdated(models.Model):
+    _inherit = 'hr.holidays'
+
+    state = fields.Selection([
+        ('draft', 'To Submit'),
+        ('confirm', 'To Approve'),
+        ('refuse', 'Refused'),
+        ('validate1', 'Second Approval'),
+        ('delay', 'Postponed'),
+        ('validate', 'Approved'),
+        ('cancel', 'Cancelled')
+    ], string='Status', readonly=True, track_visibility='onchange', copy=False, default='draft')
+
+    @api.multi
+    def action_postponed(self):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+        if self.filtered(lambda holiday: holiday.state != 'validate1'):
+            raise UserError('La solicitud de ausencia debe estar en estado "pre aprobada" para poder aplazarla.')
+        template = self.env.ref('ciberc_holidays.postponed_template')
+        self.env['mail.template'].browse(template.id).send_mail(self.id)
+        return self.write({'state': 'delay'})
+
+    @api.multi
+    def action_confirm(self):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+        if self.filtered(lambda holiday: holiday.state != 'draft'):
+            raise UserError('La solicitud de ausencia debe estar en estado "Borrador" para enviarla.')
+        template = self.env.ref('ciberc_holidays.confirm_template')
+        self.env['mail.template'].browse(template.id).send_mail(self.id)
+        return self.write({'state': 'confirm'})
+
+    @api.multi
+    def action_approve(self):
+        # if double_validation: this method is the first approval approval
+        # if not double_validation: this method calls action_validate() below
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+
+        if not is_approver:
+            raise UserError('Solamente un jefe de departamento o superior  puede aprobar la solicitud.')
+
+        manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        for holiday in self:
+            if holiday.state != 'confirm':
+                raise UserError('La solicitud de ausencia debe estar enviada ("Pendiente de aprobación") para aprobarla.')
+
+            if holiday.double_validation:
+                template = self.env.ref('ciberc_holidays.aprove_template')
+                self.env['mail.template'].browse(template.id).send_mail(self.id)
+                return holiday.write({'state': 'validate1', 'manager_id': manager.id if manager else False})
+            else:
+                holiday.action_validate()
+
+    @api.multi
+    def action_validate(self):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+        if not is_approver:
+            raise UserError('Solamente un jefe de departamento o superior puede aprobar la solicitud.')
+
+        manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        for holiday in self:
+            if holiday.state not in ['confirm', 'validate1']:
+                raise UserError('La solicitud de ausencia debe estar enviada ("Pendiente de aprobación") para aprobarla.')
+            if holiday.state == 'validate1' and not holiday.env.user.has_group('hr_holidays.group_hr_holidays_manager'):
+                raise UserError('Solamente un jefe de departamento puede aplicar la segunda aprobación en solicitudes de ausencia.')
+
+            holiday.write({'state': 'validate'})
+            if holiday.double_validation:
+                holiday.write({'manager_id2': manager.id})
+                template = self.env.ref('ciberc_holidays.validate_template')
+                self.env['mail.template'].browse(template.id).send_mail(self.id)
+            else:
+                holiday.write({'manager_id': manager.id})
+                template = self.env.ref('ciberc_holidays.validate_template')
+                self.env['mail.template'].browse(template.id).send_mail(self.id)
+            if holiday.holiday_type == 'employee' and holiday.type == 'remove':
+                meeting_values = {
+                    'name': holiday.display_name,
+                    'categ_ids': [(6, 0, [holiday.holiday_status_id.categ_id.id])] if holiday.holiday_status_id.categ_id else [],
+                    'duration': holiday.number_of_days_temp * HOURS_PER_DAY,
+                    'description': holiday.notes,
+                    'user_id': holiday.user_id.id,
+                    'start': holiday.date_from,
+                    'stop': holiday.date_to,
+                    'allday': False,
+                    'state': 'open',            # to block that meeting date in the calendar
+                    'privacy': 'confidential'
+                }
+                #Add the partner_id (if exist) as an attendee
+                if holiday.user_id and holiday.user_id.partner_id:
+                    meeting_values['partner_ids'] = [(4, holiday.user_id.partner_id.id)]
+
+                meeting = self.env['calendar.event'].with_context(no_mail_to_attendees=True).create(meeting_values)
+                holiday._create_resource_leave()
+                holiday.write({'meeting_id': meeting.id})
+            elif holiday.holiday_type == 'category':
+                leaves = self.env['hr.holidays']
+                for employee in holiday.category_id.employee_ids:
+                    values = holiday._prepare_create_by_category(employee)
+                    leaves += self.with_context(mail_notify_force_send=False).create(values)
+                # TODO is it necessary to interleave the calls?
+                leaves.action_approve()
+                if leaves and leaves[0].double_validation:
+                    leaves.action_validate()
+        return True
+
+    @api.multi
+    def action_refuse(self):
+        is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+        if not is_approver:
+            raise UserError('Solamente  un jefe de departamento o superior puede rechazar la solicitud.')
+
+        manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        for holiday in self:
+            if holiday.state not in ['confirm', 'validate', 'validate1', 'delay']:
+                raise UserError(
+                    'La solicitud de ausencia debe estar enviada ("Pendiente Aprobación" ), aplazada ("Aplazada") o aprobada ("Aprobada y Confirmada") para poder rechazarla.')
+
+            if holiday.state == 'validate1':
+                holiday.write({'state': 'refuse', 'manager_id': manager.id})
+            else:
+                holiday.write({'state': 'refuse', 'manager_id2': manager.id})
+            # Delete the meeting
+            if holiday.meeting_id:
+                holiday.meeting_id.unlink()
+            # If a category that created several holidays, cancel all related
+            holiday.linked_request_ids.action_refuse()
+            
+            template = self.env.ref('ciberc_holidays.refuse_template')
+            self.env['mail.template'].browse(template.id).send_mail(self.id)
+
+        self._remove_resource_leave()
+        return True
 
 #clase creada por alltic que agrega fecha fin para reporte
 class ReportLeavesnewFieldbyDepartment(models.TransientModel):
@@ -135,6 +271,18 @@ class CodeLeaveType(models.Model):
     _inherit = 'hr.holidays.status'
 
     code = fields.Char('Código para regla salarial')
+
+    @api.multi
+    @api.onchange('code')
+    def _check_code(self):
+        if self.code:
+            pattern = "^[A-Z0-9]{3,6}$"
+            if re.match(pattern, self.code) == None:
+                self.code = ""
+                return {
+                    'warning': {'title': 'Error',
+                                'message': 'Formato de código no valido, debe incluir términos alfanúmeros y guion (si aplica), longitud 3 a 6 caracteres', }
+                }
 
 #clase creada por alltic que trabaja con el codigo para regla salarial
 class CodeLeaveTypePayroll(models.Model):

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="edit_holiday_new_expiration" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_new" />
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='notes']" position="replace"> </xpath>
+                <xpath expr="//field[@name='report_note']" position="replace"> </xpath>
+
+                <xpath expr="//sheet" position="inside">
+                    <notebook colspan="4">
+                        <page autofocus="autofocus" name='expiration' string="Vencimiento" attrs="{'invisible':[('type','!=','add')]}">
+                            <group name="validity">
+                                <group>
+                                    <field name="approval_date" readonly="1" invisible="0"/>
+                                </group>
+                                <group>
+                                </group>
+                                <group string="Vencimiento">
+                                    <field name="expiration_date"/>
+                                    <field name="expire_template_id" attrs="{'required':[('expiration_date','!=',False)]}"/>
+                                    <field name="email_notify"/>
+                                    <field name="expired" invisible="1"/>
+                                </group>
+                                <group string="Notificación" attrs="{'invisible':[('email_notify','=',False)]}">
+                                    <field name="notify_period" attrs="{'required':[('email_notify','!=',False)]}"/>
+                                    <field name="notify_template_id" attrs="{'required':[('email_notify','!=',False)]}"/>
+                                    <field name="notify_to" attrs="{'required':[('email_notify','!=',False)]}"/>
+                                    <field name="notification_sent" invisible="1"/>
+                                </group>
+                                 <!--Buttons for testing, uncomment if you want to use them:-->
+                                 <!--<button name="check_expiring" type="object" string="test check expired"-->
+                                     <!--class="oe_link oe_edit_only" groups="base.group_no_one"/>-->
+                                 <!--<button name="send_notifications" type="object" string="test send email"-->
+                                     <!--class="oe_link oe_edit_only" groups="base.group_no_one"/>-->
+                            </group>
+                        </page>
+                        <page name='notes' string="Notas">
+                            <div name="note1">
+                                <separator string="Comentarios del empleado" />
+                                <field name="notes" nolabel="1" colspan="4" placeholder="Agregar un motivo..."/>
+                            </div>
+                            <div name="note2" groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user" attrs="{'invisible':[('state','=','draft')]}">
+                                <separator string="Comentarios del aprobador"/>
+                                <field name="report_note" placeholder="e.j. Reportar al mes siguiente..."/>
+                            </div>
+                        </page>
+                    </notebook>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+</odoo>

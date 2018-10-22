@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="confirm_template" model="mail.template">
+            <field name="name">Plantilla para enviar nueva solicitud de ausencia</field>
+            <field name="email_from"></field>
+            <field name="subject"></field>
+            <field name="email_to"></field>
+            <field name="lang"></field>
+            <field name="model_id" ref="hr_holidays.model_hr_holidays"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                ]]>
+            </field>
+        </record>
+
+        <record id="approve_template" model="mail.template">
+            <field name="name">Plantilla para aprobar solicitud de ausencia</field>
+            <field name="email_from"></field>
+            <field name="subject"></field>
+            <field name="email_to"></field>
+            <field name="lang"></field>
+            <field name="model_id" ref="hr_holidays.model_hr_holidays"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                ]]>
+            </field>
+        </record>
+
+        <record id="validate_template" model="mail.template">
+            <field name="name">Plantilla para validar uso de ausencia</field>
+            <field name="email_from"></field>
+            <field name="subject"></field>
+            <field name="email_to"></field>
+            <field name="lang"></field>
+            <field name="model_id" ref="hr_holidays.model_hr_holidays"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                ]]>
+            </field>
+        </record>
+
+        <record id="refuse_template" model="mail.template">
+            <field name="name">Plantilla para rechazar solicitud de ausencia</field>
+            <field name="email_from"></field>
+            <field name="subject"></field>
+            <field name="email_to"></field>
+            <field name="lang"></field>
+            <field name="model_id" ref="hr_holidays.model_hr_holidays"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                ]]>
+            </field>
+        </record>
+
+        <record id="postponed_template" model="mail.template">
+            <field name="name">Plantilla para aplazar solicitud de ausencia</field>
+            <field name="email_from"></field>
+            <field name="subject"></field>
+            <field name="email_to"></field>
+            <field name="lang"></field>
+            <field name="model_id" ref="hr_holidays.model_hr_holidays"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                ]]>
+            </field>
+        </record>
+    </data>
+</odoo>
