@@ -31,6 +31,33 @@ class HolidaysUpdated(models.Model):
             raise UserError('La solicitud de ausencia debe estar en estado "pre aprobada" para poder aplazarla.')
         return self.write({'state': 'delay'})
 
+    @api.multi
+    def action_refuse(self):
+        if not self.env.user.has_group('hr_holidays.group_hr_holidays_user'):
+            raise UserError('Solamente  un jefe de departamento o superior puede rechazar la solicitud.')
+
+        manager = self.env['hr.employee'].search([('user_id', '=', self.env.uid)], limit=1)
+        for holiday in self:
+            if holiday.state not in ['confirm', 'validate', 'validate1', 'delay']:
+                raise UserError(
+                    'La solicitud de ausencia debe estar enviada ("Pendiente Aprobación" ), aplazada ("Aplazada") o aprobada ("Aprobada y Confirmada") para poder rechazarla.')
+
+            if holiday.state == 'validate1':
+                holiday.write({'state': 'refuse', 'manager_id': manager.id})
+            else:
+                holiday.write({'state': 'refuse', 'manager_id2': manager.id})
+            # Delete the meeting
+            if holiday.meeting_id:
+                holiday.meeting_id.unlink()
+            # If a category that created several holidays, cancel all related
+            holiday.linked_request_ids.action_refuse()
+            
+            template = self.env.ref('ciberc_holidays.reject_template')
+            self.env['mail.template'].browse(template.id).send_mail(self.id)
+
+        self._remove_resource_leave()
+        return True
+
 #clase creada por alltic que agrega fecha fin para reporte
 class ReportLeavesnewFieldbyDepartment(models.TransientModel):
     _inherit = 'hr.holidays.summary.dept'
