@@ -30,7 +30,17 @@ class HolidaysUpdated(models.Model):
     def action_postponed(self):
         if self.filtered(lambda holiday: holiday.state != 'validate1'):
             raise UserError('La solicitud de ausencia debe estar en estado "pre aprobada" para poder aplazarla.')
+        template = self.env.ref('ciberc_holidays.postponed_template')
+        self.env['mail.template'].browse(template.id).send_mail(self.id)
         return self.write({'state': 'delay'})
+
+    @api.multi
+    def action_confirm(self):
+        if self.filtered(lambda holiday: holiday.state != 'draft'):
+            raise UserError('La solicitud de ausencia debe estar en estado "Borrador" para enviarla.')
+        template = self.env.ref('ciberc_holidays.confirm_template')
+        self.env['mail.template'].browse(template.id).send_mail(self.id)
+        return self.write({'state': 'confirm'})
 
     @api.multi
     def action_approve(self):
