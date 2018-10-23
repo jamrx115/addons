@@ -29,7 +29,7 @@
         <record id="group_ciberc_knowledge_human_resources" model="res.groups">
             <field name="name">Talento Humano</field>
             <field name="category_id" ref="ciberc_knowledge.module_knowledge"/>
-            <field name="comment">Perfil de acceso con la posibilidad de gestionar costos, proveedores de la solicitud, etc.</field>
+            <field name="comment">Perfil de acceso con la posibilidad de gestionar costos, proveedores de la solicitud, etc. destinado para actores de alta gerencia</field>
         </record>
 
         <record id="group_ciberc_knowledge_management" model="res.groups">
