@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from datetime import timedelta
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError
 
@@ -30,6 +30,23 @@ class HolidaysUpdated(models.Model):
     #########################
     # para cálculo de días
     #########################
+    def get_special_days(self, date_from, date_to, employee):
+        country_emp_id = employee.company_id.country_id.id
+        special_days = 0
+        deduct_saturday = True
+        deduct_sunday = True
+
+        date = date_from
+        a_day = timedelta(days=1)
+        while date <= date_to:
+            if date.weekday() == 5 and deduct_saturday:
+                special_days += 1
+            elif date.weekday() == 6 and deduct_sunday:
+                special_days += 1
+            date += a_day
+
+        return special_days
+
     def _get_number_of_days(self, date_from, date_to, employee_id):
         """ Returns a float equals to the timedelta between two dates given as string."""
         from_dt = fields.Datetime.from_string(date_from)
@@ -41,15 +58,13 @@ class HolidaysUpdated(models.Model):
             if resource and resource.calendar_id:
                 hours = resource.calendar_id.get_working_hours(from_dt, to_dt, resource_id=resource.id, compute_leaves=True)
                 _logger.info('-----------------------------------------------------')
-                _logger.info('Selecciona según el horario del trabajador')
-                _logger.info('resource_calendar_attendance tiene: dayofweek, hour_from y hour_to')
-                _logger.info('cantidad horas = hours = %s', hours)
-                _logger.info('-----------------------------------------------------')
+                _logger.info('total hours = %s', hours)
                 uom_hour = resource.calendar_id.uom_id
-                _logger.info('uom_hour = %s', uom_hour)
                 uom_day = self.env.ref('product.product_uom_day')
-                _logger.info('uom_day = %s', uom_day)
+                days_to_rest = self.get_special_days(from_dt, to_dt, employee)
+                _logger.info('days for delete = %s', days_to_rest )
                 _logger.info('-----------------------------------------------------')
+                hours = hours - (days_to_rest*HOURS_PER_DAY)
                 if uom_hour and uom_day:
                     return uom_hour._compute_quantity(hours, uom_day)
 
