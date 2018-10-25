@@ -1,4 +1,3 @@
-
 <openerp>
     <data>
         <!-- ............................ CREACIÓN DE LAS VISTAS ..................................... -->
@@ -29,16 +28,21 @@
                             <group>
                                 <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True" readonly="1"/>
                             </group>
-
+                        </group>
+                        <group>
+                            <group>
+                                <field name="loaded" invisible="1"/>
+                                <button string="Cargar objetivos" name="get_goal" type="object" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin" attrs="{'invisible': [('loaded','=',True)]}"/>
+                            </group>
                         </group>
                         <notebook>
                             <page string="Objetivos de rendimiento">
-                                <field name="performance_goal_id" nolabel="1" mode="tree"  widget="one2many_list" options="{&quot;no_open&quot;: True}">
-                                    <tree string="objetivos de rendimiento" editable="bottom">
+                                <field name="performance_goal_id" nolabel="1">
+                                    <tree string="objetivos de rendimiento" editable="bottom" create="false">
                                         <field name="sequence" widget="handle"/>
                                         <!--<field name="goal" options="{&quot;no_open&quot;: True}" widget="many2many"/>-->
-                                        <field name="goal_id" options="{&quot;no_create&quot;: True}" readonly="1"/>
                                         <field name="main_goal_id" readonly="1" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                                        <field name="goal_id" options="{&quot;no_create&quot;: True}" readonly="1"/>
                                         <field name="first_semester" readonly="1"/>
                                         <field name="second_semester" readonly="1"/>
                                         <field name="score" readonly="1"/>
@@ -55,7 +59,7 @@
                                     <tree string="objetivos de desarrollo personal" editable="bottom">
                                         <field name="sequence" widget="handle"/>
                                         <field name="name"/>
-                                        <field name="main_personal_goal" options="{&quot;no_open&quot;: True}"/>
+                                        <field name="main_personal_goal_id" options="{&quot;no_open&quot;: True}"/>
                                         <field name="scope"/>
                                         <field name="date"/>
                                         <field name="comments"/>
@@ -190,7 +194,7 @@
                         <field name="date"/>
                         <field name="scope"/>
                         <field name="comments"/>
-                        <field name="main_personal_goal" options="{&quot;no_open&quot;: True}"/>
+                        <field name="main_personal_goal_id" options="{&quot;no_open&quot;: True}"/>
                     </group>
                 </form>
             </field>

@@ -47,7 +47,7 @@ class ciberc_knowledge (models.Model):
     pin = fields.Char(string="Test track pin")
     cost_centre_id = fields.Char(string="Centro de costo")
     #Campos para los otros actores del proceso
-    reason = fields.Selection([('mal','Mal formulado'),('duplicado','Duplicado'),('impertinente','No es pertinente')], string="Motivo de rechazo o de aplazamiento")
+    reason = fields.Many2one('ciberc.reasons', string="Motivo de rechazo o de aplazamiento")
     reason_detail = fields.Text(string="Detalles del motivo")
     supplier_id = fields.Many2one('res.partner', domain=[('supplier','=',True)],string="Proveedor")
     final_cost = fields.Integer(string="Costo final")
@@ -288,3 +288,8 @@ class ciberc_evaluation_knowledge (models.Model):
         elif self.question6 == False:
             raise exceptions.ValidationError("Debe ingresar una respuesta a la pregunta 6")
 
+class reasons (models.Model):
+    _name="ciberc.reasons"
+    _description= "Razones de rechazo"
+
+    name = fields.Char(string='Nombre')

@@ -125,7 +125,7 @@
 
         <record id="knowledge_email_template_rejected" model="mail.template">
           <field name="name">(Ciberc) - Plantilla para el rechazo</field>
-          <field name="email_from">yazmin.acuna@ciberc.com,sandra.valencia@ciberc.com</field>
+          <field name="email_from"></field>
           <field name="subject">Solicitud rechazada - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
           <field name="email_to">employee@ciberc.com,ast&amp;e@ciberc.com</field>
           <field name="email_cc">${object.approver_id.email},${object.email}</field>
@@ -508,7 +508,7 @@
 
         <record id="knowledge_email_template_rejected" model="mail.template">
           <field name="name">(Ciberc) - Plantilla para el rechazo</field>
-          <field name="email_from">yazmin.acuna@ciberc.com,sandra.valencia@ciberc.com</field>
+          <field name="email_from"></field>
           <field name="subject">Solicitud rechazada - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
           <field name="email_to">employee@ciberc.com,ast&amp;e@ciberc.com</field>
           <field name="email_cc">${object.approver_id.email},${object.email}</field>
