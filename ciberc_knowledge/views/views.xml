@@ -55,7 +55,7 @@
                                 <h2 style="color:#728FCC; font-weight:bold" >Gestión</h2><br/>
                                 <div attrs="{'invisible':[('state','=','validacion')]}">
                                     <label for="reason"/><br/>
-                                    <field name="reason"/><br/>
+                                    <field name="reason"  options="{&quot;no_open&quot;: True}"/><br/>
                                     <field name="reason_detail" attrs="{'invisible':[('reason','=',False)]}" placeholder="Especifique ..."/><br/><br/>
                                     <div attrs="{'invisible':['|',('state','=','jefe')]}">
 	                                    <label for="supplier_id" groups="ciberc_knowledge.group_ciberc_knowledge_services,ciberc_knowledge.group_ciberc_knowledge_human_resources,ciberc_knowledge.group_ciberc_knowledge_management,ciberc_knowledge.group_ciberc_knowledge_admin"/><br/>
