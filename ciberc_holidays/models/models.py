@@ -7,6 +7,7 @@ from odoo.exceptions import UserError
 
 import logging
 import time
+import math
 import re
 
 _logger = logging.getLogger(__name__)
@@ -26,6 +27,38 @@ class HolidaysUpdated(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, track_visibility='onchange', copy=False, default='draft')
 
+    #########################
+    # para cálculo de días
+    #########################
+    def _get_number_of_days(self, date_from, date_to, employee_id):
+        """ Returns a float equals to the timedelta between two dates given as string."""
+        from_dt = fields.Datetime.from_string(date_from)
+        to_dt = fields.Datetime.from_string(date_to)
+
+        if employee_id:
+            employee = self.env['hr.employee'].browse(employee_id)
+            resource = employee.resource_id.sudo()
+            if resource and resource.calendar_id:
+                hours = resource.calendar_id.get_working_hours(from_dt, to_dt, resource_id=resource.id, compute_leaves=True)
+                _logger.info('-----------------------------------------------------')
+                _logger.info('Selecciona según el horario del trabajador')
+                _logger.info('resource_calendar_attendance tiene: dayofweek, hour_from y hour_to')
+                _logger.info('cantidad horas = hours = %s', hours)
+                _logger.info('-----------------------------------------------------')
+                uom_hour = resource.calendar_id.uom_id
+                _logger.info('uom_hour = %s', uom_hour)
+                uom_day = self.env.ref('product.product_uom_day')
+                _logger.info('uom_day = %s', uom_day)
+                _logger.info('-----------------------------------------------------')
+                if uom_hour and uom_day:
+                    return uom_hour._compute_quantity(hours, uom_day)
+
+        time_delta = to_dt - from_dt
+        return math.ceil(time_delta.days + float(time_delta.seconds) / 86400)
+
+    #########################
+    # para botones
+    #########################
     @api.multi
     def action_postponed(self):
         is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
