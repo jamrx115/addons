@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<template>
+    
+    
+    <!-- extend FormView widget -->
+
+    <t t-extend="FormView.buttons">
+        <t t-jquery="div.o_form_buttons_view" t-operation="append">
+            <button type="button" id="create_pdf" class="btn btn-sm btn-success">
+                Print
+                <span class="fa fa-print"></span>
+            </button>
+        </t>
+    </t>
+
+    <!-- extend ListView widget -->
+
+    <t t-extend="ListView.buttons">
+        <t t-jquery="div.o_list_buttons" t-operation="append">
+            <button type="button" id="create_pdf" class="btn btn-sm btn-success">
+                Print
+                <span class="fa fa-print"></span>
+            </button>
+        </t>
+    </t>
+
+    <!-- extend KanbanView widget -->
+
+    <t t-extend="KanbanView.buttons">
+        <t t-jquery="div" t-operation="append">
+            <button type="button" id="create_pdf" class="btn btn-sm btn-success">
+                Print
+                <span class="fa fa-print"></span>
+            </button>
+        </t>
+    </t>
+
+    <!-- extend PivotView widget -->
+
+    <t t-extend="PivotView.buttons">
+        <t t-jquery="button[title='Download xls']" t-operation="after">
+            <button type="button" id="create_pdf" class="btn btn-sm btn-success">
+                Print
+                <span class="fa fa-print"></span>
+            </button>
+        </t>
+    </t>
+
+    <!-- extend GraphView widget -->
+
+    <t t-extend="GraphView.buttons">
+        <t t-jquery="button[data-mode='pie']" t-operation="after">
+            <button type="button"  id="create_pdf" class="btn btn-sm btn-success">
+                Print
+                <span class="fa fa-print"></span>
+            </button>
+        </t>
+    </t>
+
+    <!-- extend CalendarView widget -->
+
+     <t t-extend="CalendarView.buttons">
+        <t t-jquery="div.o_calendar_buttons" t-operation="append">
+            <button type="button" id="create_pdf" class="btn btn-sm btn-success">
+                Print
+                <span class="fa fa-print"></span>
+            </button>
+        </t>
+    </t>
+
+
+</template>
+

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Multi Payslip Confirmation Wizard -->
+    <record id="multi_payslip_view_wiz" model="ir.ui.view">
+        <field name="name">multi.payslip.wiz.form.view</field>
+        <field name="model">multi.payslip</field>
+        <field name="arch" type="xml">
+            <form string="Confirm">
+                <field name="employee_ids">
+                    <tree editable="bottom">
+                        <field name="employee_id"/>
+                        <field name="month_from"/>
+                        <field name="month_to"/>
+                    </tree>
+                </field>
+                
+                <h3>Click on Confirm for confirm Multi payslip.</h3>
+                <footer>
+                    <button name="multi_payslip" string="Confirm" type="object" class="oe_highlight" context="{'employee_ids':employee_ids}"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Assign Multiple payslip -->
+
+    <record id="hr_employee_action_multiple_payslip" model="ir.actions.act_window">
+        <field name="name">Create payslip</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">multi.payslip</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+    
+    <record id="hr_employee_action_multiple_payslip_create" model="ir.values">
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="name">Create Payslip</field>
+        <field name="key2">client_action_multi</field>
+        <field name="value" eval="'ir.actions.act_window,' + str(ref('hr_employee_action_multiple_payslip'))"/>
+        <field name="key">action</field>
+        <field name="model">hr.employee</field>
+    </record>
+
+</odoo>
