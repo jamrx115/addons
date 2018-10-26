@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Multi Payslip Wizard -->
+        <record id="multi_payslip_confirm_form_wizard" model="ir.ui.view">
+            <field name="name">multi.payslip.wizard.form.wizard</field>
+            <field name="model">multi.payslip.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <h3>Click on Confirm Button for confirm multiple Payslips.</h3>
+                    <footer>
+                        <button name="multi_payslip" string="Confirm" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_multi_payslip_confirm_wizard" model="ir.actions.act_window">
+            <field name="name">Multi Payslips Confirm</field>
+            <field name="res_model">multi.payslip.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        
+        <record id="action_multiple_payslip_hr_payslip" model="ir.values">
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="name">Multi Payslip Confirm</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_multi_payslip_confirm_wizard'))"/>
+            <field name="key">action</field>
+            <field name="model">hr.payslip</field>
+        </record>
+        
+    </data>
+</odoo>
