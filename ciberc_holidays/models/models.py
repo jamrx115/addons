@@ -3,7 +3,7 @@
 from odoo import models, fields, api, _
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, AccessError
 
 import logging
 import time
@@ -18,6 +18,7 @@ HOURS_PER_DAY = 8
 class HolidaysUpdated(models.Model):
     _inherit = 'hr.holidays'
 
+    # override fields
     state = fields.Selection([
         ('draft', 'To Submit'),
         ('confirm', 'To Approve'),
@@ -28,7 +29,9 @@ class HolidaysUpdated(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, track_visibility='onchange', copy=False, default='draft')
 
+    # new fields
     company_id = fields.Many2one('res.company', 'Compañía')
+    date_return = fields.Datetime('Fecha de regreso', readonly=True, index=True, copy=False)
 
     #########################
     # para cálculo de días
@@ -162,8 +165,18 @@ class HolidaysUpdated(models.Model):
             if holiday.state != 'confirm':
                 raise UserError('La solicitud de ausencia debe estar enviada ("Pendiente de aprobación") para aprobarla.')
 
+            # writing return_date
+            to_dt = fields.Datetime.from_string(self.date_to)
+            employee = self.employee_id
+            resource = employee.resource_id.sudo()
+            to_dt_zero_utc  = pytz.timezone(self.env.user.partner_id.tz).localize(datetime(to_dt.year, to_dt.month, to_dt.day, 0, 0, 0)).astimezone(pytz.utc)
+            to_dt_hours_t = resource.calendar_id.working_hours_on_day(to_dt)
+            to_dt_hours_w = resource.calendar_id.get_working_hours(datetime(to_dt_zero_utc.year, to_dt_zero_utc.month, to_dt_zero_utc.day, 0, 0, 0), to_dt, resource_id=resource.id, compute_leaves=True)
+            date_return = to_dt if to_dt_hours_w < to_dt_hours_t else self.write_return_day(to_dt, employee.company_id.country_id.id)
+            self.write({ 'date_return': date_return, })
+
             if holiday.double_validation:
-                template = self.env.ref('ciberc_holidays.aprove_template')
+                template = self.env.ref('ciberc_holidays.approve_template')
                 self.env['mail.template'].browse(template.id).send_mail(self.id)
                 return holiday.write({'state': 'validate1', 'manager_id': manager.id if manager else False})
             else:
@@ -249,6 +262,33 @@ class HolidaysUpdated(models.Model):
 
         self._remove_resource_leave()
         return True
+
+    #########################
+    # para día de retorno
+    #########################
+
+    # return True if date is holiday, saturday or sunday
+    def is_special_day(self, date, country_emp_id):
+        answer = False
+        date_str = str(date.date())
+        is_holiday = self.get_holidays_ids(date-timedelta(days=1), date, country_emp_id).filtered(lambda r: r.date == date_str)
+        if (len(is_holiday) == 1) or (date.weekday() == 5) or (date.weekday() == 6): answer = True
+        return answer
+
+    # return return_day
+    def write_return_day(self, to_dt, country_emp_id):
+        day = to_dt+timedelta(days=1)
+        control = self.is_special_day(day, country_emp_id)
+
+        while (control):
+            if day.weekday() == 5:
+                day = day+timedelta(days=2)
+            else:
+                day = day+timedelta(days=1)
+            control = self.is_special_day(day, country_emp_id)
+
+        answer = datetime(year=day.year, month=day.month, day=day.day)
+        return answer
 
 #clase creada por alltic que agrega fecha fin para reporte
 class ReportLeavesnewFieldbyDepartment(models.TransientModel):
