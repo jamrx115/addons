@@ -27,6 +27,7 @@
         'security/ir.model.access.csv',
         'views/views.xml',
         'data/knowledge_template.xml',
+        'data/reasons_data.xml',
         #'data/data.xml',
     ]
 }

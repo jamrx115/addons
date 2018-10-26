@@ -8,7 +8,7 @@ access_ciberc_knowledge_user6,ciberc.hr.job.user,hr.model_hr_job,group_ciberc_kn
 access_ciberc_knowledge_user7,ciberc.res.country.user,base.model_res_country,group_ciberc_knowledge_user,1,1,1,0
 access_ciberc_knowledge_user8,ciberc.res.currency.user,base.model_res_currency,group_ciberc_knowledge_user,1,1,1,0
 access_ciberc_knowledge_user10,ciberc.res.partner.user,base.model_res_partner,group_ciberc_knowledge_user,1,1,1,0
-
+access_ciberc_knowledge_user11,ciberc.reasons,model_ciberc_reasons,group_ciberc_knowledge_user,1,1,0,0
 
 access_ciberc_knowledge_boss1,ciberc.knowledge.boss,model_ciberc_knowledge,group_ciberc_knowledge_boss,1,1,1,0
 access_ciberc_knowledge_boss2,ciberc.approver_knowledge.boss,model_ciberc_approver_knowledge,group_ciberc_knowledge_boss,1,1,1,0
@@ -19,7 +19,7 @@ access_ciberc_knowledge_boss6,ciberc.hr.job.boss,hr.model_hr_job,group_ciberc_kn
 access_ciberc_knowledge_boss7,ciberc.res.country.boss,base.model_res_country,group_ciberc_knowledge_boss,1,1,1,0
 access_ciberc_knowledge_boss8,ciberc.res.currency.boss,base.model_res_currency,group_ciberc_knowledge_boss,1,1,1,0
 access_ciberc_knowledge_boss10,ciberc.res.partner.boss,base.model_res_partner,group_ciberc_knowledge_boss,1,1,1,0
-
+access_ciberc_knowledge_boss11,ciberc.reasons,model_ciberc_reasons,group_ciberc_knowledge_boss,1,1,0,0
 
 access_ciberc_knowledge_services,ciberc.knowledge.services,model_ciberc_knowledge,group_ciberc_knowledge_services,1,1,1,0
 access_ciberc_knowledge_services2,ciberc.approver_knowledge.services,model_ciberc_approver_knowledge,group_ciberc_knowledge_services,1,1,1,0
@@ -30,7 +30,7 @@ access_ciberc_knowledge_services6,ciberc.hr.job.services,hr.model_hr_job,group_c
 access_ciberc_knowledge_services7,ciberc.res.country.services,base.model_res_country,group_ciberc_knowledge_services,1,1,1,0
 access_ciberc_knowledge_services8,ciberc.res.currency.services,base.model_res_currency,group_ciberc_knowledge_services,1,1,1,0
 access_ciberc_knowledge_services10,ciberc.res.partner.services,base.model_res_partner,group_ciberc_knowledge_services,1,1,1,0
-
+access_ciberc_knowledge_services11,ciberc.reasons,model_ciberc_reasons,group_ciberc_knowledge_services,1,1,0,0
 
 access_ciberc_knowledge_human,ciberc.knowledge.human,model_ciberc_knowledge,group_ciberc_knowledge_human_resources,1,1,1,0
 access_ciberc_knowledge_human2,ciberc.approver_knowledge.human,model_ciberc_approver_knowledge,group_ciberc_knowledge_human_resources,1,1,1,0
@@ -41,7 +41,7 @@ access_ciberc_knowledge_human6,ciberc.hr.job.human,hr.model_hr_job,group_ciberc_
 access_ciberc_knowledge_human7,ciberc.res.country.human,base.model_res_country,group_ciberc_knowledge_human_resources,1,1,1,0
 access_ciberc_knowledge_human8,ciberc.res.currency.human,base.model_res_currency,group_ciberc_knowledge_human_resources,1,1,1,0
 access_ciberc_knowledge_human10,ciberc.res.partner.human,base.model_res_partner,group_ciberc_knowledge_human_resources,1,1,1,0
-
+access_ciberc_knowledge_human11,ciberc.reasons,model_ciberc_reasons,group_ciberc_knowledge_human_resources,1,1,0,0
 
 access_ciberc_knowledge_management,ciberc.knowledge.management,model_ciberc_knowledge,group_ciberc_knowledge_management,1,1,1,0
 access_ciberc_knowledge_management2,ciberc.approver_knowledge.management,model_ciberc_approver_knowledge,group_ciberc_knowledge_management,1,1,1,0
@@ -52,7 +52,7 @@ access_ciberc_knowledge_management6,ciberc.hr.job.management,hr.model_hr_job,gro
 access_ciberc_knowledge_management7,ciberc.res.country.management,base.model_res_country,group_ciberc_knowledge_management,1,1,1,0
 access_ciberc_knowledge_management8,ciberc.res.currency.management,base.model_res_currency,group_ciberc_knowledge_management,1,1,1,0
 access_ciberc_knowledge_management10,ciberc.res.partner.management,base.model_res_partner,group_ciberc_knowledge_management,1,1,1,0
-
+access_ciberc_knowledge_management11,ciberc.reasons,model_ciberc_reasons,group_ciberc_knowledge_management,1,1,0,0
 
 access_ciberc_knowledge_admin,ciberc.knowledge.admin,model_ciberc_knowledge,group_ciberc_knowledge_admin,1,1,1,1
 access_ciberc_knowledge_admin2,ciberc.approver_knowledge.admin,model_ciberc_approver_knowledge,group_ciberc_knowledge_admin,1,1,1,1
@@ -63,3 +63,4 @@ access_ciberc_knowledge_admin6,ciberc.hr.job.admin,hr.model_hr_job,group_ciberc_
 access_ciberc_knowledge_admin7,ciberc.res.country.admin,base.model_res_country,group_ciberc_knowledge_admin,1,1,1,1
 access_ciberc_knowledge_admin8,ciberc.res.currency.admin,base.model_res_currency,group_ciberc_knowledge_admin,1,1,1,1
 access_ciberc_knowledge_admin10,ciberc.res.partner.admin,base.model_res_partner,group_ciberc_knowledge_admin,1,1,1,1
+access_ciberc_knowledge_admin11,ciberc.reasons,model_ciberc_reasons,group_ciberc_knowledge_admin,1,1,1,1

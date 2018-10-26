@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    	<record id="dato1" model="ciberc.reasons">
+		    <field name="name">Duplicado</field>
+		</record>
+		<record id="dato2" model="ciberc.reasons">
+		    <field name="name">Fuera de tiempo</field>
+		</record>
+		<record id="dato3" model="ciberc.reasons">
+		    <field name="name">No disponible</field>
+		</record>
+    </data>
+</odoo>

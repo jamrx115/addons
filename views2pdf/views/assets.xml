@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- vim:fdn=3:
+-->
+<openerp>
+    <data>
+        <template id="assets_backend" name="popup_reminder assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+
+                <!-- css -->
+
+                <link rel="stylesheet" href="/views2pdf/static/src/css/views2pdf.css"/>
+
+                <!-- js -->
+
+                <script type="text/javascript" src="/views2pdf/static/src/js/jspdf.min.js"></script>
+                <script type="text/javascript" src="/views2pdf/static/src/js/saveSvgAsPng.js"></script>
+                <script type="text/javascript" src="/views2pdf/static/src/js/views2pdf.js"></script>
+            </xpath>
+        </template>
+    </data>
+</openerp>
