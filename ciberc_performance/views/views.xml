@@ -7,8 +7,8 @@
             <field name="arch" type="xml">
                 <form>
                     <header>
-                        <button string="Devolver" name="action_back_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea devolver la solicitud a 'primer semestre'?" attrs="{'invisible': [('state','!=','finalizada')]}" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin"/>
-                        <button string="Segundo semestre" name="action_segundo_semestre" type="object" class="oe_highlight" confirm="¿Seguro que desea colocar la evaluación de desempeño en segundo semestre?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','segundo')]}" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin"/>
+                        <button string="Devolver" name="action_back_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea devolver la solicitud a 'primera fase'?" attrs="{'invisible': [('state','!=','finalizada')]}" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin"/>
+                        <button string="Segunda fase" name="action_segundo_semestre" type="object" class="oe_highlight" confirm="¿Seguro que desea colocar la evaluación de desempeño en segunda fase?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','segundo')]}" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin"/>
                         <button string="Finalizar" name="action_end_performance" type="object" class="oe_highlight" confirm="¿Seguro que desea dar por finalizada la evaluacion de desempeño?" attrs="{'invisible': ['|','|',('state','=','borrador'),('state','=','finalizada'),('state','=','primer')]}" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin"/>
                         <field name="state" widget="statusbar" statusbar_visible="borrador,primer,segundo,finalizada"/>
                     </header>
@@ -32,7 +32,7 @@
                         <group>
                             <group>
                                 <field name="loaded" invisible="1"/>
-                                <button string="Cargar objetivos" name="get_goal" type="object" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin" attrs="{'invisible': [('loaded','=',True)]}"/>
+                                <button string="Cargar objetivos" name="get_goal" type="object" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin" attrs="{'invisible': ['|',('state','=','segundo'),('state','=','finalizada')]}" confirm="¿Seguro que desea cargar los objetivos del colaborador?"/>
                             </group>
                         </group>
                         <notebook>
@@ -85,7 +85,7 @@
         <record id="performance_tree" model="ir.ui.view">
             <field name="model">ciberc.performance</field>
             <field name="arch" type="xml">
-                <tree string="performance"  colors="green:state== 'finalizada'">
+                <tree string="performance"  colors="blue:state== 'finalizada'">
                     <field name="name"/>
                     <field name="department_id"/>
                     <field name="date"/>
