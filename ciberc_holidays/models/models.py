@@ -28,6 +28,8 @@ class HolidaysUpdated(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, track_visibility='onchange', copy=False, default='draft')
 
+    company_id = fields.Many2one('res.company', 'Compañía')
+
     #########################
     # para cálculo de días
     #########################
