@@ -7,6 +7,7 @@ from odoo.exceptions import UserError
 
 import logging
 import time
+import pytz
 import math
 import re
 
@@ -30,23 +31,53 @@ class HolidaysUpdated(models.Model):
     #########################
     # para cálculo de días
     #########################
-    def get_special_days(self, date_from, date_to, employee):
-        country_emp_id = employee.company_id.country_id.id
-        special_days = 0
-        deduct_saturday = True
-        deduct_sunday = True
 
-        date = date_from
-        a_day = timedelta(days=1)
-        while date <= date_to:
-            if date.weekday() == 5 and deduct_saturday:
-                special_days += 1
-            elif date.weekday() == 6 and deduct_sunday:
-                special_days += 1
-            date += a_day
+    # return holidays IN DICT
+    def get_holidays_ids(self, date_from, date_to, country_emp_id):
 
-        return special_days
+        if date_from.year == date_to.year:
+            holidays_ids = self.env['hr.holidays.public.line'].search(
+                ['&', '&', ('date', '>=', date_from), ('date', '<=', date_to),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                                                                         ('country_id', '=', country_emp_id)]).id)])
+        else:
+            holidays_ids1 = self.env['hr.holidays.public.line'].search(
+                ['&', '&', ('date', '>=', date_from),
+                 ('date', '<=', datetime.strptime(str(date_from.year) + '-12-31', '%Y-%m-%d')),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                                                                         ('country_id', '=', country_emp_id)]).id)])
+            holidays_ids = holidays_ids1 | self.env['hr.holidays.public.line'].search(
+                ['&', '&', ('date', '>=', datetime.strptime(str(date_to.year) + '-01-01', '%Y-%m-%d')),
+                 ('date', '<=', date_to),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                                                                         ('country_id', '=', country_emp_id)]).id)])
+        return holidays_ids
 
+    # return [a, b] with data for zero_hour and final_hour FOR A DAY
+    def get_hours(self, first_date, last_date, date):
+
+        utc_time_zone  = pytz.utc
+        user_time_zone = pytz.timezone(self.env.user.partner_id.tz)
+
+        hour_zero_for_user  = user_time_zone.localize(datetime(date.year, date.month, date.day, 0, 0, 0))
+        hour_final_for_user = user_time_zone.localize(datetime(date.year, date.month, date.day, 23, 59, 59))
+
+        hour_zero_utc  = hour_zero_for_user.astimezone(utc_time_zone)
+        hour_final_utc = hour_final_for_user.astimezone(utc_time_zone)
+
+        date = datetime(date.year, date.month, date.day, last_date.hour, last_date.minute, last_date.minute)
+
+        if date.day == first_date.day:
+            return [date,
+                    datetime(hour_final_utc.year, hour_final_utc.month, hour_final_utc.day, hour_final_utc.hour, hour_final_utc.minute, hour_final_utc.second)]
+        elif date.day == last_date.day:
+            return [datetime(hour_zero_utc.year, hour_zero_utc.month, hour_zero_utc.day, hour_zero_utc.hour, hour_zero_utc.minute, hour_zero_utc.second),
+                    date]
+        else:
+            return [datetime(hour_zero_utc.year, hour_zero_utc.month, hour_zero_utc.day, hour_zero_utc.hour, hour_zero_utc.minute, hour_zero_utc.second),
+                    datetime(hour_final_utc.year, hour_final_utc.month, hour_final_utc.day, hour_final_utc.hour, hour_final_utc.minute, hour_final_utc.second)]
+
+    # override
     def _get_number_of_days(self, date_from, date_to, employee_id):
         """ Returns a float equals to the timedelta between two dates given as string."""
         from_dt = fields.Datetime.from_string(date_from)
@@ -55,16 +86,39 @@ class HolidaysUpdated(models.Model):
         if employee_id:
             employee = self.env['hr.employee'].browse(employee_id)
             resource = employee.resource_id.sudo()
+
             if resource and resource.calendar_id:
+                country_emp_id = employee.company_id.country_id.id
+                deduct_saturday = True
+                deduct_sunday = True
+                holidays_ids = self.get_holidays_ids(from_dt, to_dt, country_emp_id)
+                subtrahend = 0.0
+
+                date = from_dt
+                delta = timedelta(days=1)
+                while date <= to_dt:
+                    date_str = str(date.date())
+                    holiday_obj = holidays_ids.filtered(lambda r: r.date == date_str)
+
+                    if holiday_obj:
+                        f = self.get_hours(from_dt, to_dt, date)
+                        h_f = resource.calendar_id.get_working_hours(f[0], f[1], resource_id=resource.id, compute_leaves=True)
+                        subtrahend += h_f
+                    elif date.weekday() == 5 and deduct_saturday:
+                        s = self.get_hours(from_dt, to_dt, date)
+                        h_s = resource.calendar_id.get_working_hours(s[0], s[1], resource_id=resource.id, compute_leaves=True)
+                        subtrahend += h_s
+                    elif date.weekday() == 6 and deduct_sunday:
+                        d = self.get_hours(from_dt, to_dt, date)
+                        h_d = resource.calendar_id.get_working_hours(d[0], d[1], resource_id=resource.id, compute_leaves=True)
+                        subtrahend += h_d
+
+                    date += delta
+
                 hours = resource.calendar_id.get_working_hours(from_dt, to_dt, resource_id=resource.id, compute_leaves=True)
-                _logger.info('-----------------------------------------------------')
-                _logger.info('total hours = %s', hours)
+                hours = hours - subtrahend
                 uom_hour = resource.calendar_id.uom_id
                 uom_day = self.env.ref('product.product_uom_day')
-                days_to_rest = self.get_special_days(from_dt, to_dt, employee)
-                _logger.info('days for delete = %s', days_to_rest )
-                _logger.info('-----------------------------------------------------')
-                hours = hours - (days_to_rest*HOURS_PER_DAY)
                 if uom_hour and uom_day:
                     return uom_hour._compute_quantity(hours, uom_day)
 
