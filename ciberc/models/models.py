@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, tools, _
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 import re
 import logging
 
@@ -160,3 +162,40 @@ class AccountAnalyticLine(models.Model):
         return self.env.context.get('user_id', self.env.user.id)
 
     user_id = fields.Many2one('res.users', string='User', default=_default_user, domain=lambda self: [('id', '=', self.env.uid)])
+
+# actualización de préstamos
+class HrLoanUpdated(models.Model):
+    _inherit = 'hr.loan'
+
+    def get_installment_day(self, date):
+        if date.day <= 15:
+            day = 15
+        else:
+            if date.month == 2:
+                day = 28
+            else:
+                day = 30
+        return day
+
+    # override
+    @api.multi
+    def compute_installment(self):
+        """This automatically create the installment the employee need to pay to
+        company based on payment start date and the no of installments.
+            """
+        for loan in self:
+            self.env['hr.loan.line'].search([('loan_id.id', '=', self.id)]).unlink() # new
+            date_base = datetime.strptime(loan.payment_date, '%Y-%m-%d')
+            date_start = datetime(year=date_base.year, month=date_base.month, day=self.get_installment_day(date_base))
+            amount = loan.loan_amount / loan.installment
+            limit = loan.installment + 1
+            for i in range(1, limit):
+                self.env['hr.loan.line'].create({
+                    'date': date_start,
+                    'amount': amount,
+                    'employee_id': loan.employee_id.id,
+                    'loan_id': loan.id})
+                date_base = date_start + relativedelta(days=13)
+                date_start = datetime(year=date_base.year, month=date_base.month,
+                                      day=self.get_installment_day(date_base))
+        return True

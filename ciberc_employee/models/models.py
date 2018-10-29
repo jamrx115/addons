@@ -14,8 +14,6 @@ class EmployeeCode(models.Model):
         ('employee_code_unique', 'UNIQUE(x_code)', 'El código ingresado ya fue asignado')
     ]
 
-    _logger.debug('------------------------------- Employee Code')
-
     #code = fields.Char(string='Código de Empleado', size=5, copy=True, readonly = True, store=True)
 
     @api.model
