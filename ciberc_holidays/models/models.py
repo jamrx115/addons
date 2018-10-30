@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, _
-from datetime import timedelta
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, AccessError
 
 import logging
 import time
+import pytz
 import math
 import re
 
@@ -17,6 +18,7 @@ HOURS_PER_DAY = 8
 class HolidaysUpdated(models.Model):
     _inherit = 'hr.holidays'
 
+    # override fields
     state = fields.Selection([
         ('draft', 'To Submit'),
         ('confirm', 'To Approve'),
@@ -27,9 +29,60 @@ class HolidaysUpdated(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', readonly=True, track_visibility='onchange', copy=False, default='draft')
 
+    # new fields
+    company_id = fields.Many2one('res.company', 'Compañía')
+    date_return = fields.Datetime('Fecha de regreso', readonly=True, index=True, copy=False)
+
     #########################
     # para cálculo de días
     #########################
+
+    # return holidays IN DICT
+    def get_holidays_ids(self, date_from, date_to, country_emp_id):
+
+        if date_from.year == date_to.year:
+            holidays_ids = self.env['hr.holidays.public.line'].search(
+                ['&', '&', ('date', '>=', date_from), ('date', '<=', date_to),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                                                                         ('country_id', '=', country_emp_id)]).id)])
+        else:
+            holidays_ids1 = self.env['hr.holidays.public.line'].search(
+                ['&', '&', ('date', '>=', date_from),
+                 ('date', '<=', datetime.strptime(str(date_from.year) + '-12-31', '%Y-%m-%d')),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                                                                         ('country_id', '=', country_emp_id)]).id)])
+            holidays_ids = holidays_ids1 | self.env['hr.holidays.public.line'].search(
+                ['&', '&', ('date', '>=', datetime.strptime(str(date_to.year) + '-01-01', '%Y-%m-%d')),
+                 ('date', '<=', date_to),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                                                                         ('country_id', '=', country_emp_id)]).id)])
+        return holidays_ids
+
+    # return [a, b] with data for zero_hour and final_hour FOR A DAY
+    def get_hours(self, first_date, last_date, date):
+
+        utc_time_zone  = pytz.utc
+        user_time_zone = pytz.timezone(self.env.user.partner_id.tz)
+
+        hour_zero_for_user  = user_time_zone.localize(datetime(date.year, date.month, date.day, 0, 0, 0))
+        hour_final_for_user = user_time_zone.localize(datetime(date.year, date.month, date.day, 23, 59, 59))
+
+        hour_zero_utc  = hour_zero_for_user.astimezone(utc_time_zone)
+        hour_final_utc = hour_final_for_user.astimezone(utc_time_zone)
+
+        date = datetime(date.year, date.month, date.day, last_date.hour, last_date.minute, last_date.minute)
+
+        if date.day == first_date.day:
+            return [date,
+                    datetime(hour_final_utc.year, hour_final_utc.month, hour_final_utc.day, hour_final_utc.hour, hour_final_utc.minute, hour_final_utc.second)]
+        elif date.day == last_date.day:
+            return [datetime(hour_zero_utc.year, hour_zero_utc.month, hour_zero_utc.day, hour_zero_utc.hour, hour_zero_utc.minute, hour_zero_utc.second),
+                    date]
+        else:
+            return [datetime(hour_zero_utc.year, hour_zero_utc.month, hour_zero_utc.day, hour_zero_utc.hour, hour_zero_utc.minute, hour_zero_utc.second),
+                    datetime(hour_final_utc.year, hour_final_utc.month, hour_final_utc.day, hour_final_utc.hour, hour_final_utc.minute, hour_final_utc.second)]
+
+    # override
     def _get_number_of_days(self, date_from, date_to, employee_id):
         """ Returns a float equals to the timedelta between two dates given as string."""
         from_dt = fields.Datetime.from_string(date_from)
@@ -38,18 +91,39 @@ class HolidaysUpdated(models.Model):
         if employee_id:
             employee = self.env['hr.employee'].browse(employee_id)
             resource = employee.resource_id.sudo()
+
             if resource and resource.calendar_id:
+                country_emp_id = employee.company_id.country_id.id
+                deduct_saturday = True
+                deduct_sunday = True
+                holidays_ids = self.get_holidays_ids(from_dt, to_dt, country_emp_id)
+                subtrahend = 0.0
+
+                date = from_dt
+                delta = timedelta(days=1)
+                while date <= to_dt:
+                    date_str = str(date.date())
+                    holiday_obj = holidays_ids.filtered(lambda r: r.date == date_str)
+
+                    if holiday_obj:
+                        f = self.get_hours(from_dt, to_dt, date)
+                        h_f = resource.calendar_id.get_working_hours(f[0], f[1], resource_id=resource.id, compute_leaves=True)
+                        subtrahend += h_f
+                    elif date.weekday() == 5 and deduct_saturday:
+                        s = self.get_hours(from_dt, to_dt, date)
+                        h_s = resource.calendar_id.get_working_hours(s[0], s[1], resource_id=resource.id, compute_leaves=True)
+                        subtrahend += h_s
+                    elif date.weekday() == 6 and deduct_sunday:
+                        d = self.get_hours(from_dt, to_dt, date)
+                        h_d = resource.calendar_id.get_working_hours(d[0], d[1], resource_id=resource.id, compute_leaves=True)
+                        subtrahend += h_d
+
+                    date += delta
+
                 hours = resource.calendar_id.get_working_hours(from_dt, to_dt, resource_id=resource.id, compute_leaves=True)
-                _logger.info('-----------------------------------------------------')
-                _logger.info('Selecciona según el horario del trabajador')
-                _logger.info('resource_calendar_attendance tiene: dayofweek, hour_from y hour_to')
-                _logger.info('cantidad horas = hours = %s', hours)
-                _logger.info('-----------------------------------------------------')
+                hours = hours - subtrahend
                 uom_hour = resource.calendar_id.uom_id
-                _logger.info('uom_hour = %s', uom_hour)
                 uom_day = self.env.ref('product.product_uom_day')
-                _logger.info('uom_day = %s', uom_day)
-                _logger.info('-----------------------------------------------------')
                 if uom_hour and uom_day:
                     return uom_hour._compute_quantity(hours, uom_day)
 
@@ -91,8 +165,18 @@ class HolidaysUpdated(models.Model):
             if holiday.state != 'confirm':
                 raise UserError('La solicitud de ausencia debe estar enviada ("Pendiente de aprobación") para aprobarla.')
 
+            # writing return_date
+            to_dt = fields.Datetime.from_string(self.date_to)
+            employee = self.employee_id
+            resource = employee.resource_id.sudo()
+            to_dt_zero_utc  = pytz.timezone(self.env.user.partner_id.tz).localize(datetime(to_dt.year, to_dt.month, to_dt.day, 0, 0, 0)).astimezone(pytz.utc)
+            to_dt_hours_t = resource.calendar_id.working_hours_on_day(to_dt)
+            to_dt_hours_w = resource.calendar_id.get_working_hours(datetime(to_dt_zero_utc.year, to_dt_zero_utc.month, to_dt_zero_utc.day, 0, 0, 0), to_dt, resource_id=resource.id, compute_leaves=True)
+            date_return = to_dt if to_dt_hours_w < to_dt_hours_t else self.write_return_day(to_dt, employee.company_id.country_id.id)
+            self.write({ 'date_return': date_return, })
+
             if holiday.double_validation:
-                template = self.env.ref('ciberc_holidays.aprove_template')
+                template = self.env.ref('ciberc_holidays.approve_template')
                 self.env['mail.template'].browse(template.id).send_mail(self.id)
                 return holiday.write({'state': 'validate1', 'manager_id': manager.id if manager else False})
             else:
@@ -178,6 +262,33 @@ class HolidaysUpdated(models.Model):
 
         self._remove_resource_leave()
         return True
+
+    #########################
+    # para día de retorno
+    #########################
+
+    # return True if date is holiday, saturday or sunday
+    def is_special_day(self, date, country_emp_id):
+        answer = False
+        date_str = str(date.date())
+        is_holiday = self.get_holidays_ids(date-timedelta(days=1), date, country_emp_id).filtered(lambda r: r.date == date_str)
+        if (len(is_holiday) == 1) or (date.weekday() == 5) or (date.weekday() == 6): answer = True
+        return answer
+
+    # return return_day
+    def write_return_day(self, to_dt, country_emp_id):
+        day = to_dt+timedelta(days=1)
+        control = self.is_special_day(day, country_emp_id)
+
+        while (control):
+            if day.weekday() == 5:
+                day = day+timedelta(days=2)
+            else:
+                day = day+timedelta(days=1)
+            control = self.is_special_day(day, country_emp_id)
+
+        answer = datetime(year=day.year, month=day.month, day=day.day)
+        return answer
 
 #clase creada por alltic que agrega fecha fin para reporte
 class ReportLeavesnewFieldbyDepartment(models.TransientModel):

@@ -36,6 +36,10 @@
         <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
         <field name="arch" type="xml">
             <data>
+                <!-- nuevo campo código -->
+                <xpath expr="//field[@name='department_id']" position="after">
+                    <field name="date_return" attrs="{'invisible':['|',('state','=','draft'),('state','=','confirm')]}"/>
+                </xpath>
                 <!-- holiday_type invisible -->
                 <xpath expr="//field[@name='holiday_type']" position="replace">
                     <field name="holiday_type" string="Mode" invisible="1" context="{'employee_id':employee_id}"/>
