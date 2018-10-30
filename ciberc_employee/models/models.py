@@ -30,7 +30,7 @@ class ciberc_cities(models.Model):
     code = fields.Char(string='Código',)
     state_id = fields.Many2one("res.country.state", string='Estado/Departamento', ondelete='restrict',required=True)
 
-#clase creada por alltic que modifica empleado base
+# clase creada por alltic que modifica empleado base
 class ciberc_employee(models.Model):
     _inherit = 'hr.employee'
 
@@ -194,3 +194,22 @@ class ciberc_employee(models.Model):
         #self.work_phone = self.address_id.phone
         #self.mobile_phone = self.address_id.mobile
         pass
+
+# clase creada por alltic que vuelve solo lectura el campo horario en empleado
+class ciberc_resource(models.Model):
+    _inherit = 'resource.resource'
+
+    calendar_id = fields.Many2one("resource.calendar", string='Working Time', readonly=True, help="Define the schedule of resource")
+
+# clase creada por alltic que une los campos horario desde contrato
+class ciberc_contract(models.Model):
+
+    _inherit = 'hr.contract'
+
+    # override
+    @api.multi
+    def write(self, vals):
+        res = super(ciberc_contract, self).write(vals)
+        if self.working_hours:
+            self.employee_id.resource_id.write({'calendar_id': self.working_hours.id})
+        return res
