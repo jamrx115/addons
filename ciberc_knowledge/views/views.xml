@@ -387,7 +387,7 @@
             </record>
 
             <!--herencia para el grupo servicios avanzados -->
-            <record id="ciberc_knowledge_read_only_services" model="ir.ui.view">
+            <record id="ciberc_knowledge_read_only_boss" model="ir.ui.view">
                 <field name="name">herencia read only solicitud de capacitacion servicios avanzados</field>
                 <field name="model">ciberc.knowledge</field>
                 <field name="inherit_id" ref="ciberc_knowledge.knowledge_request_form" />
