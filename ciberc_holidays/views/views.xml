@@ -47,6 +47,22 @@
                 <xpath expr="//button[@name='action_validate']" position="attributes">
                     <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
                 </xpath>
+                <!-- modificación comentarios -->
+                <field name="notes" position="replace"/>
+                <xpath expr="//field[@name='report_note']" position="replace">
+                    <notebook colspan="4">
+                        <page name='notes' string="Notas">
+                            <div name="note1">
+                                <separator string="Comentarios del empleado" />
+                                <field name="notes" nolabel="1" colspan="4" placeholder="Agregar un motivo..."/>
+                            </div>
+                            <div name="note2" groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user" attrs="{'invisible':[('state','=','draft')]}">
+                                <separator string="Comentarios del aprobador"/>
+                                <field name="report_note" placeholder="e.j. Reportar al mes siguiente..."/>
+                            </div>
+                        </page>
+                    </notebook>
+                </xpath>
             </data>
         </field>
     </record>
