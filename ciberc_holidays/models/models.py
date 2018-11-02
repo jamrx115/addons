@@ -156,6 +156,14 @@ class HolidaysUpdated(models.Model):
     #########################
     # para botones
     #########################
+    def _check_state_access_right(self, vals):
+        is_approver = self.env['res.users'].has_group('hr_holidays.group_hr_holidays_user') or\
+                      self.env['res.users'].has_group(
+            'hr_holidays.group_hr_holidays_manager')
+        if vals.get('state') and vals['state'] not in ['draft', 'confirm', 'cancel'] and not is_approver:
+            return False
+        return True
+
     @api.multi
     def action_postponed(self):
         is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
