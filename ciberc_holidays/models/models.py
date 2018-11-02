@@ -14,7 +14,6 @@ import re
 _logger = logging.getLogger(__name__)
 HOURS_PER_DAY = 8
 utc_time_zone = pytz.utc
-today = datetime.now()
 
 #clase creada por alltic que modifica las ausencias
 class HolidaysUpdated(models.Model):
@@ -32,12 +31,14 @@ class HolidaysUpdated(models.Model):
     ], string='Status', readonly=True, track_visibility='onchange', copy=False, default='draft')
 
     def _default_zero(self):
+        today = datetime.now()
         user_time_zone = pytz.timezone(self.env.user.partner_id.tz)
         hour_zero_for_user = user_time_zone.localize(datetime(today.year, today.month, today.day, 0, 0, 0))
         hour_zero_utc = hour_zero_for_user.astimezone(utc_time_zone)
         return datetime(year=hour_zero_utc.year, month=hour_zero_utc.month, day=hour_zero_utc.day, hour=hour_zero_utc.hour, minute=hour_zero_utc.minute, second=hour_zero_utc.second)
 
     def _default_final(self):
+        today = datetime.now()
         user_time_zone = pytz.timezone(self.env.user.partner_id.tz)
         hour_final_for_user = user_time_zone.localize(datetime(today.year, today.month, today.day, 23, 59, 59))
         hour_final_utc = hour_final_for_user.astimezone(utc_time_zone)
