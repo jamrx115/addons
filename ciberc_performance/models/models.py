@@ -16,7 +16,7 @@ class ciberc_performance (models.Model):
 
     name = fields.Many2one('res.users', string='Nombre del empleado', track_visibility="onchange")
     evaluator_id = fields.Many2one('res.users', string="Evaluador", track_visibility="onchange")
-    date = fields.Date(string = "Fecha",default=datetime.today(), help="Ingrese la fecha de creación de la evaluación")
+    date = fields.Date(string = "Fecha",default=datetime.now(), help="Ingrese la fecha de creación de la evaluación")
     performance_goal_id = fields.One2many('ciberc.performance.line','ciberc_performance_id',string="Objetivos de rendimiento")
     evolution_personal_goal_id = fields.One2many('ciberc.personal.goals','ciberc_performance_id', string="Objetivos de desarrollo personal")
     general_rating = fields.Selection([('excepcional', 'Excepcional'),('sobresaliente', 'Sobresaliente'),('bueno', 'Bueno'),('mejor', 'Necesita mejorar'),],string="Calificación general", track_visibility="onchange")
