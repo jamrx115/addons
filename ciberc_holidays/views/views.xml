@@ -2,34 +2,6 @@
 
     <!-- ********************* hr.holidays ******************** -->
 
-    <!-- Vista tree Ausencias- varias actualizaciones -->
-    <record id="view_holiday_allocation_tree_updated" model="ir.ui.view">
-        <field name="model">hr.holidays</field>
-        <field name="inherit_id" ref="hr_holidays.view_holiday_allocation_tree"/>
-        <field name="arch" type="xml">
-            <data>
-                <field name="holiday_type" position="replace"/>
-                <field name="category_id" position="replace"/>
-
-                <xpath expr="//field[@name='number_of_days']" position="replace">
-                    <field name="number_of_days" sum="Remaining Days"/>
-                </xpath>
-            </data>
-        </field>
-    </record>
-
-    <!-- Vista tree Detalles de ausencia - ocultando campos -->
-    <record id="view_holiday_employee_updated" model="ir.ui.view">
-        <field name="model">hr.holidays</field>
-        <field name="inherit_id" ref="hr_holidays.view_holiday_employee"/>
-        <field name="arch" type="xml">
-            <data>
-                <button name="toggle_payslip_status" position="replace"/>
-                <field name="report_note" position="replace"/>
-            </data>
-        </field>
-    </record>
-
     <!-- Vista form Ausencia nueva -->
     <record id="edit_holiday_new_updated" model="ir.ui.view">
         <field name="model">hr.holidays</field>
@@ -42,7 +14,7 @@
                 </xpath>
                 <!-- holiday_type invisible -->
                 <xpath expr="//field[@name='holiday_type']" position="replace">
-                    <field name="holiday_type" string="Mode" invisible="1" context="{'employee_id':employee_id}"/>
+                    <field name="holiday_type" attrs="{'invisible':[('type', '=', 'remove')], 'readonly':[('state','!=','draft')]}" string="Mode" context="{'employee_id':employee_id}" />
                 </xpath>
                 <!-- payslip_status oculto -->
                 <xpath expr="//field[@name='payslip_status']" position="replace">
@@ -74,6 +46,22 @@
                 </xpath>
                 <xpath expr="//button[@name='action_validate']" position="attributes">
                     <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
+                </xpath>
+                <!-- modificación comentarios -->
+                <field name="notes" position="replace"/>
+                <xpath expr="//field[@name='report_note']" position="replace">
+                    <notebook colspan="4">
+                        <page name='notes' string="Notas">
+                            <div name="note1">
+                                <separator string="Comentarios del empleado" />
+                                <field name="notes" nolabel="1" colspan="4" placeholder="Agregar un motivo..."/>
+                            </div>
+                            <div name="note2" groups="hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user" attrs="{'invisible':[('state','=','draft')]}">
+                                <separator string="Comentarios del aprobador"/>
+                                <field name="report_note" placeholder="e.j. Reportar al mes siguiente..."/>
+                            </div>
+                        </page>
+                    </notebook>
                 </xpath>
             </data>
         </field>
@@ -117,6 +105,34 @@
                 <xpath expr="//field[@name='holiday_type']" position="attributes">
                     <attribute name="invisible" eval="0"/>
                 </xpath>
+            </data>
+        </field>
+    </record>
+
+    <!-- Vista tree Ausencias- varias actualizaciones -->
+    <record id="view_holiday_allocation_tree_updated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday_allocation_tree"/>
+        <field name="arch" type="xml">
+            <data>
+                <field name="holiday_type" position="replace"/>
+                <field name="category_id" position="replace"/>
+
+                <xpath expr="//field[@name='number_of_days']" position="replace">
+                    <field name="number_of_days" sum="Remaining Days"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <!-- Vista tree Detalles de ausencia - ocultando campos -->
+    <record id="view_holiday_employee_updated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday_employee"/>
+        <field name="arch" type="xml">
+            <data>
+                <button name="toggle_payslip_status" position="replace"/>
+                <field name="report_note" position="replace"/>
             </data>
         </field>
     </record>
