@@ -20,6 +20,11 @@
                         </group>
                         <group>
                             <group>
+                                <field name="type_evaluation" required="True"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group>
                                 <field name="name" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="True" readonly="1"/>
                             </group>
                             <group>
@@ -31,7 +36,6 @@
                         </group>
                         <group>
                             <group>
-                                <field name="loaded" invisible="1"/>
                                 <button string="Cargar objetivos" name="get_goal" type="object" groups="ciberc_performance.group_ciberc_perfomance_manager,ciberc_performance.group_ciberc_perfomance_admin" attrs="{'invisible': ['|',('state','=','segundo'),('state','=','finalizada')]}" confirm="¿Seguro que desea cargar los objetivos del colaborador?"/>
                             </group>
                         </group>
@@ -89,6 +93,7 @@
                     <field name="name"/>
                     <field name="department_id"/>
                     <field name="date"/>
+                    <field name="type_evaluation"/>
                     <field name="state"/>
                 </tree>
             </field>
@@ -114,7 +119,7 @@
                         <field name="departments_ids" widget="many2many_tags" required="True"/><br/>
                         <label for="goal"/><br/>
                         <field name="goal"/><br/>
-                        <group string="Parametros de control">
+                        <group string="Parámetros de control">
                             <field name="goal_min"/>
                             <field name="goal_max"/>
                         </group>

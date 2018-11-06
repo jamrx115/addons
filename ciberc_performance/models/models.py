@@ -16,22 +16,18 @@ class ciberc_performance (models.Model):
 
     name = fields.Many2one('res.users', string='Nombre del empleado', track_visibility="onchange")
     evaluator_id = fields.Many2one('res.users', string="Evaluador", track_visibility="onchange")
-    date = fields.Date(string = "Fecha",default=datetime.now(), help="Ingrese la fecha de creación de la evaluación")
+    date = fields.Date(string = "Fecha", help="Ingrese la fecha de creación de la evaluación")
     performance_goal_id = fields.One2many('ciberc.performance.line','ciberc_performance_id',string="Objetivos de rendimiento")
     evolution_personal_goal_id = fields.One2many('ciberc.personal.goals','ciberc_performance_id', string="Objetivos de desarrollo personal")
     general_rating = fields.Selection([('excepcional', 'Excepcional'),('sobresaliente', 'Sobresaliente'),('bueno', 'Bueno'),('mejor', 'Necesita mejorar'),],string="Calificación general", track_visibility="onchange")
     comments_extra = fields.Text(string="Comentarios adicionales")
-    department_id = fields.Many2one('hr.department', related="name.employee_ids.department_id", string="Departamento")
+    department_id = fields.Many2one('hr.department', string="Departamento")
+    type_evaluation = fields.Selection([('evaluacion', 'Evaluación de desempeño'),('prueba', 'Periodo de prueba')],string="Tipo")
     state = fields.Selection([('borrador','Borrador'),('primer','Primera fase'),('segundo','Segunda fase'),('finalizada','Finalizada')], string="Estado", track_visibility="onchange",default="borrador")
-    loaded = fields.Boolean(string="Cargado?", default=False)
 
-    @api.onchange('name')
-    def _onchange_employee_department(self):
-        self.department_id = self.name.employee_ids.department_id
 
     @api.one
     def action_segundo_semestre(self):
-        _logger.debug('.... Ingresó al metodo')
         self.write({
             'state': 'segundo',
         })
@@ -100,32 +96,6 @@ class ciberc_performance (models.Model):
         return goal_list
     
 
-
-    """    
-    @api.onchange('performance_goal_id')
-    def check_goals(self):
-        goals_set = self.env['ciberc.performance.line']
-    """
-
-
-    """
-    if self.loaded == False:
-        self.write({'loaded':True})
-        goal_list = []
-        goals_of_this_employee = self.env['ciberc.goals'].search([('departments_ids', '=', self.department_id.id)])
-        for goal in goals_of_this_employee:
-            goal_created  = self.env['ciberc.performance.line'].create({
-                            'goal_id': goal.id})
-            goal_list.append(goal_created.id)
-        self.performance_goal_id = goal_list
-        return goal_list
-    """
-       
-
-
-
-
-
 class ciberc_performance_line (models.Model):
     _name="ciberc.performance.line"
     _description = "Objetivos de rendimiento"
@@ -137,7 +107,6 @@ class ciberc_performance_line (models.Model):
     #goal_id = fields.Many2one('ciberc.goals',string="Nombre", domain="[('departments_ids.member_ids.user_id', '=', 'ciberc_performance.name')]")        
     #goal_id = fields.Many2one('ciberc.goals',string="Nombre", domain="[('departments_ids.member_ids.user_id', '=', 'name_employee.name')]")        
     main_goal_id = fields.Many2one('ciberc.main.goals',related="goal_id.main_goal_related_id", string="objetivo general")
-    #main_goal_id = fields.Many2one('ciberc.main.goals', string="objetivo general")
     personal_goal = fields.Char(string="Meta personal")
     first_semester = fields.Char(string="Primera fase")
     second_semester = fields.Char(string="Segunda fase")
@@ -145,7 +114,6 @@ class ciberc_performance_line (models.Model):
     comments_employee = fields.Text(string="Comentarios empleado")
     comments_evaluator = fields.Text(string="Comentarios evaluador")
     sequence = fields.Integer(string="secuencia")
-    #pruebas
     ciberc_performance_id = fields.Many2one('ciberc.performance',string="conexión")
 
        
