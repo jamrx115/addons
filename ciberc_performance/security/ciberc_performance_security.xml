@@ -38,10 +38,21 @@
             <field name="domain_force">[('name', '=', user.id)]</field>
         </record>
         
+        <record id="record_rule_some_performance" model="ir.rule">
+            <field name="name">Mostrar las evaluaciones de desempeño propias y las de las personas de sus departamentos a cargo</field>
+            <field name="model_id" ref="ciberc_performance.model_ciberc_performance"/>
+            <field name="groups" eval="[(4, ref('ciberc_performance.group_ciberc_perfomance_manager'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">['|','|',('name', '=', user.id),('department_id.manager_id.user_id','=', user.id),('create_uid', '=', user.id)]</field>
+        </record>
+
         <record id="record_rule_all_performance" model="ir.rule">
             <field name="name">Mostrar todas las evaluaciones de desempeño</field>
             <field name="model_id" ref="ciberc_performance.model_ciberc_performance"/>
-            <field name="groups" eval="[(4, ref('ciberc_performance.group_ciberc_perfomance_manager'))]"/>
+            <field name="groups" eval="[(4, ref('ciberc_performance.group_ciberc_perfomance_admin'))]"/>
             <field name="perm_read" eval="1"/>
             <field name="perm_write" eval="1"/>
             <field name="perm_create" eval="1"/>
