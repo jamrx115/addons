@@ -249,8 +249,8 @@ class HolidaysUpdated(models.Model):
                     'privacy': 'confidential'
                 }
                 #Add the partner_id (if exist) as an attendee
-                if holiday.user_id and holiday.user_id.partner_id:
-                    meeting_values['partner_ids'] = [(4, holiday.user_id.partner_id.id)]
+                #if holiday.user_id and holiday.user_id.partner_id:
+                    #meeting_values['partner_ids'] = [(4, holiday.user_id.partner_id.id)]
 
                 meeting = self.env['calendar.event'].with_context(no_mail_to_attendees=True).create(meeting_values)
                 holiday._create_resource_leave()
