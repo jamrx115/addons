@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Custom report.-->
+<odoo>
+<template id="report_knowledge_evaluation">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="report.external_layout">
+                <div class="page">
+                    <br/>
+                    <br/>
+                    <br/>
+                    <h1 style="color:#728FCC; font-weight:bold; text-align:center;">Evaluación del impacto de la capacitación</h1><br/>
+                    <div style="display:inline-block">
+                        <p><b>Fecha:  </b><span t-field="o.date"/></p>
+                        <p><b>Capacitación/entrenamiento: </b><span t-field="o.knowledge_topic_evaluation"/></p>
+                    </div>
+                    <div style="display:inline-block; margin-left:170px">
+                        <p><b>Nombre: </b><span t-field="o.name"/></p>
+                        <p><b>Puesto: </b><span t-field="o.job_id"/></p>
+                        <p><b>Departamento: </b><span t-field="o.department_id"/></p>
+                    </div>
+                    <br/>
+                    <div style="background-color:#eeeeee;padding: 20pt">
+                        <p> Las preguntas adjuntas le permiten expresar su opinión con relación a la aplicación de los conocimientos adquiridos en esta capitación.<br/><br/>
+                        Lea cada punto cuidadosamente y responda con toda sinceridad ya que esto permite obtener la información adecuada para mejorar futuras capacitaciones o cursos de formación.<br/><br/>
+                        Marque la opción que crea conveniente<br/>
+                        </p>
+                    </div><br/>
+                    <h1 style="color:#728FCC; font-weight:bold; text-align:center;">CUESTIONARIO</h1><br/>
+                    <p><b>Pregunta 1: </b><span t-field="o.question1"/></p>
+                    <span t-field="o.question1_details"/>
+                    <p><b>Pregunta 2: </b><span t-field="o.question2"/></p>
+                    <span t-field="o.question1_details"/>
+                    <p><b>Pregunta 3: </b><span t-field="o.question3"/></p>
+                    <span t-field="o.question1_details"/>
+                    <p><b>Pregunta 4: </b><span t-field="o.question4"/></p>
+                    <span t-field="o.question1_details"/>
+                    <p><b>Pregunta 5: </b><span t-field="o.question5"/></p>
+                    <span t-field="o.question1_details"/>
+                    <p><b>Pregunta 6: </b><span t-field="o.question6"/></p>
+                    <span t-field="o.question1_details"/>
+                    <p><b>Aplicación: </b><span t-field="o.applied"/></p>
+                    <p><b>Observaciones: </b><span t-field="o.observations"/></p>
+                </div>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>

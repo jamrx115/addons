@@ -23,9 +23,12 @@
 
     # always loaded
     'data': [
+        'data/report_paperformat_knowledge.xml',
         'security/ciberc_knowledge_security.xml',
         'security/ir.model.access.csv',
         'views/views.xml',
+        'views/report_knowledge_templates.xml',
+        'views/ciberc_knowledge_report.xml',
         'data/knowledge_template.xml',
         'data/reasons_data.xml',
         #'data/data.xml',

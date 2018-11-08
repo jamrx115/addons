@@ -79,19 +79,19 @@
             <field name="perm_write" eval="1"/>
             <field name="perm_create" eval="1"/>
             <field name="perm_unlink" eval="1"/>
-            <field name="domain_force">['|','|',('create_uid','=', user.id),('name','=',user.id),('approver_id','=',user.id)]</field>
+            <field name="domain_force">['|','|',('create_uid','=', user.id),('name','=',user.id),('approver_id.name','=',user.id)]</field>
         </record>
 
         <!-- Regla de registro para el grupo jefe -->
         <record id="record_rule_own_evaluation_boss" model="ir.rule">
-            <field name="name">Solo mostrar sus evaluaciones</field>
+            <field name="name">Solo mostrar sus evaluaciones y las de los colaboradores de departamentos a cargo</field>
             <field name="model_id" ref="ciberc_knowledge.model_ciberc_evaluation_knowledge"/>
             <field name="groups" eval="[(4, ref('ciberc_knowledge.group_ciberc_knowledge_boss'))]"/>
             <field name="perm_read" eval="1"/>
             <field name="perm_write" eval="1"/>
             <field name="perm_create" eval="1"/>
             <field name="perm_unlink" eval="1"/>
-            <field name="domain_force">[('create_uid','=', user.id)]</field>
+            <field name="domain_force">['|',('create_uid','=', user.id),('department_id.manager_id.user_id','=', user.id)]</field>
         </record>
     </data>
 </odoo>
