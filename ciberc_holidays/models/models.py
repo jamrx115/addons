@@ -482,62 +482,60 @@ class CodeLeaveTypePayroll(models.Model):
             ], limit=1)
 
         res = []
-        # fill only if the contract as a working schedule linked
         uom_day = self.env.ref('product.product_uom_day', raise_if_not_found=False)
         for contract in self.env['hr.contract'].browse(contract_ids).filtered(lambda contract: contract.working_hours):
-            uom_hour = contract.employee_id.resource_id.calendar_id.uom_id or self.env.ref('product.product_uom_hour',
-                                                                                           raise_if_not_found=False)
+            uom_hour = contract.employee_id.resource_id.calendar_id.uom_id or self.env.ref('product.product_uom_hour', raise_if_not_found=False)
             interval_data = []
             holidays = self.env['hr.holidays']
             attendances = {
-                'name': _("Normal Working Days paid at 100%"),
-                'sequence': 1,
-                'code': 'WORK100',
-                'number_of_days': 0.0,
-                'number_of_hours': 0.0,
-                'contract_id': contract.id,
+                 'name': _("Normal Working Days paid at 100%"),
+                 'sequence': 1,
+                 'code': 'WORK100',
+                 'number_of_days': 0.0,
+                 'number_of_hours': 0.0,
+                 'contract_id': contract.id,
             }
             leaves = {}
             day_from = fields.Datetime.from_string(date_from)
             day_to = fields.Datetime.from_string(date_to)
             nb_of_days = (day_to - day_from).days + 1
+            country_emp_id = contract.employee_id.company_id.country_id.id
+            holidays_ids = holidays.get_holidays_ids(day_from, day_to, country_emp_id)
 
-            # Gather all intervals and holidays
             for day in range(0, nb_of_days):
-                working_intervals_on_day = contract.working_hours.get_working_intervals_of_day(
-                    start_dt=day_from + timedelta(days=day))
+                working_intervals_on_day = contract.working_hours.get_working_intervals_of_day(start_dt=day_from + timedelta(days=day))
                 for interval in working_intervals_on_day:
-                    interval_data.append(
-                        (interval, was_on_leave_interval(contract.employee_id.id, interval[0], interval[1])))
+                    interval_data.append((interval, was_on_leave_interval(contract.employee_id.id, interval[0], interval[1])))
 
-            # Extract information from previous data. A working interval is considered:
-            # - as a leave if a hr.holiday completely covers the period
-            # - as a working period instead
-            for interval, holiday in interval_data:
-                holidays |= holiday
+            for interval, ausencia in interval_data:
+                holidays |= ausencia
                 hours = (interval[1] - interval[0]).total_seconds() / 3600.0
-                if holiday:
-                    # if he was on leave, fill the leaves dict
-                    if holiday.holiday_status_id.name in leaves:
-                        leaves[holiday.holiday_status_id.name]['number_of_hours'] += hours
+                date_str = str(interval[0].date())
+                holiday_obj = holidays_ids.filtered(lambda r: r.date == date_str)
+                if ausencia: # hay ausencia -> conteo ausencia
+                    if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
+                        # fin de semana o festivo
+                        attendances['number_of_hours'] += hours
                     else:
-                        leaves[holiday.holiday_status_id.name] = {
-                            'name': holiday.holiday_status_id.name,
-                            'sequence': 5,
-                            'code': holiday.holiday_status_id.code,
-                            'number_of_days': 0.0,
-                            'number_of_hours': hours,
-                            'contract_id': contract.id,
-                        }
+                        # entre semana no festivo
+                        if ausencia.holiday_status_id.name in leaves:
+                            leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
+                        else:
+                            leaves[ausencia.holiday_status_id.name] = {
+                                'name': ausencia.holiday_status_id.name,
+                                'sequence': 5,
+                                'code': ausencia.holiday_status_id.code,
+                                'number_of_days': 0.0,
+                                'number_of_hours': hours,
+                                'contract_id': contract.id,
+                            }
                 else:
-                    # add the input vals to tmp (increment if existing)
+                    # no hay ausencia -> conteo WORK100
                     attendances['number_of_hours'] += hours
-
-            # Clean-up the results
             leaves = [value for key, value in leaves.items()]
             for data in [attendances] + leaves:
-                data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day) \
-                    if uom_day and uom_hour \
+                data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day)\
+                    if uom_day and uom_hour\
                     else data['number_of_hours'] / 8.0
                 res.append(data)
         return res
@@ -546,4 +544,8 @@ class CodeLeaveTypePayroll(models.Model):
 class CodeHoliday(models.Model):
     _inherit = 'hr.contract'
 
+    # campo personalizado para vacaciones o días libres
     annual_holiday = fields.Integer('Días libres anuales', help='Vacaciones para contrato laboral y días libres para prestación de servicios')
+    # campo personalizado para cuenta bancaria
+    bank_account_contract_id = fields.Many2one('res.partner.bank', string='Cuenta bancaria',
+                                      help='Cuenta bancaria para pagos nómina', groups='hr.group_hr_user,base.group_user')
