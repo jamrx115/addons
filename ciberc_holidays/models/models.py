@@ -544,4 +544,8 @@ class CodeLeaveTypePayroll(models.Model):
 class CodeHoliday(models.Model):
     _inherit = 'hr.contract'
 
+    # campo personalizado para vacaciones o días libres
     annual_holiday = fields.Integer('Días libres anuales', help='Vacaciones para contrato laboral y días libres para prestación de servicios')
+    # campo personalizado para cuenta bancaria
+    bank_account_contract_id = fields.Many2one('res.partner.bank', string='Cuenta bancaria',
+                                      help='Cuenta bancaria para pagos nómina', groups='hr.group_hr_user,base.group_user')

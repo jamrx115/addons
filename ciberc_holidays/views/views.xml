@@ -208,6 +208,7 @@
         <field name="inherit_id" ref="hr_payroll.hr_contract_form_inherit"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='struct_id']" position="after">
+                <field name="bank_account_contract_id" />
                 <field name="annual_holiday" />
             </xpath>
         </field>
