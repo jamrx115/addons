@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_holiday">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-if="o.state=='validate'">
+                <t t-call="report.external_layout">
+                    <div class="page">
+                        <h2>Comprobante ausencia <span t-field="o.employee_id"/></h2>
+
+                        <table class="table table-condensed table-bordered">
+                            <tr>
+                                <td><strong>Descripción</strong></td>
+                                <td><span t-field="o.name"/></td>
+                                <td><strong>Motivo</strong></td>
+                                <td><span t-field="o.holiday_status_id"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Empleado</strong></td>
+                                <td><span t-field="o.employee_id"/></td>
+                                <td><strong>Departamento</strong></td>
+                                <td><span t-field="o.employee_id.department_id"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email</strong></td>
+                                <td><span t-field="o.employee_id.work_email"/></td>
+                                <td><strong>Identificación</strong></td>
+                                <td><span t-field="o.employee_id.identification_id"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inicio ausencia</strong></td>
+                                <td><span t-field="o.date_from"/></td>
+                                <td><strong>Fin ausencia</strong></td>
+                                <td><span t-field="o.date_to"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Regreso</strong></td>
+                                <td><span t-field="o.date_return"/></td>
+                                <td><strong>Duración (días)</strong></td>
+                                <td><span t-field="o.number_of_days_temp"/></td>
+                            </tr>
+                        </table>
+
+                        <table class="table table-condensed table-bordered">
+                            <tr>
+                                <td><strong>Aprobado por</strong></td>
+                                <td><span t-field="o.manager_id"/></td>
+                                <td><strong>Confirmado por</strong></td>
+                                <td><span t-field="o.manager_id2"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>
