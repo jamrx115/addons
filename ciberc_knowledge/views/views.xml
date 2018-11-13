@@ -14,6 +14,7 @@
                         <field name="knowledge"/>
                         <field name="knowledge_application"/>
                         <field name="knowledge_topic"/>
+                        <field name="exam_name_id"/>
                         <field name="state"/>
                     </tree>
                 </field>

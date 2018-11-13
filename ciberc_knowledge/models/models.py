@@ -15,7 +15,7 @@ class ciberc_knowledge (models.Model):
     _inherit = ['mail.thread', 'ir.needaction_mixin']
 
     name = fields.Many2one('res.users', string='Nombre completo',track_visibility="onchange")
-    date = fields.Date(string="Fecha de solicitud",default=datetime.today(), track_visibility="onchange")
+    date = fields.Date(string="Fecha de solicitud", track_visibility="onchange")
     approver_id = fields.Many2one('ciberc.approver.knowledge',string="Aprobador", track_visibility="onchange")
     department_id = fields.Many2one('hr.department', string="Departamento", track_visibility="onchange")
     country_id = fields.Many2one('res.country',string="País ubicación de trabajo")
@@ -28,7 +28,7 @@ class ciberc_knowledge (models.Model):
     knowledge_start = fields.Date(string="Fecha inicio")
     knowledge_end = fields.Date(string="Fecha fin")
     knowledge_time = fields.Integer(string="Duración de capacitacion/entrenamiento (hrs)")
-    knowledge_cost = fields.Char(string="Costo de capacitacion/entrenamiento")
+    knowledge_cost = fields.Float(string="Costo de capacitacion/entrenamiento", digits=(15,4))
     currency_id = fields.Many2one('res.currency',string="Moneda")
     excuse = fields.Selection([('asociado','Asociado al proyecto'),('cumplimiento','Cumplimiento del rol'),('seguimiento','Seguimiento evaluación de desempeño'),('otro','Otro')],string="Justificación de capacitación/entrenamiento")
     excuse_details = fields.Text(string="Especificación de la justificación")
@@ -36,7 +36,7 @@ class ciberc_knowledge (models.Model):
     exam_name_id = fields.Many2one('x_certificacion.conocimientos', string="Nombre del examen")
     partner = fields.Char(string="Tecnologia/partner")
     code_exam = fields.Char(string="Código del examen", size=10)
-    cost_exam = fields.Char(string="Costo del examen")
+    cost_exam = fields.Float(string="Costo del examen",digits=(15,4))
     currency_two_id = fields.Many2one('res.currency',string="Moneda")
     date_exam = fields.Date(string="Fecha a presentar el examen")
     schedule_start = fields.Float(string="Hora de inicio")
@@ -50,7 +50,7 @@ class ciberc_knowledge (models.Model):
     reason = fields.Many2one('ciberc.reasons', string="Motivo de rechazo o de aplazamiento")
     reason_detail = fields.Text(string="Detalles del motivo")
     supplier_id = fields.Many2one('res.partner', domain=[('supplier','=',True)],string="Proveedor")
-    final_cost = fields.Integer(string="Costo final")
+    final_cost = fields.Float(string="Costo final", digits=(15,4))
     currency_three_id = fields.Many2one('res.currency',string="Moneda")
     deferment = fields.Boolean(string="¿Desea configurar fecha de aplazamiento?")
     deferment_date = fields.Date(string="Fecha de aplazamiento")
@@ -138,12 +138,15 @@ class ciberc_knowledge (models.Model):
                 'state': 'jefe',
             })
 
-
     @api.one
     def action_no_valid_exam(self):
         if self.tecnical_details == False:
             raise UserError('Primero debe ingresar las observaciones técnicas')
         else:
+            # Find the e-mail template
+            template = self.env.ref('ciberc_knowledge.knowledge_email_template_rejected')
+            # Send out the e-mail template to the user
+            self.env['mail.template'].browse(template.id).send_mail(self.id)
             self.write({
                 'state': 'rechazada',
             })
@@ -193,7 +196,7 @@ class ciberc_knowledge (models.Model):
     @api.one
     def action_devolver(self):
         self.write({
-            'state': 'solicitud',
+            'state': 'jefe',
         })
 
     @api.one
@@ -244,7 +247,7 @@ class ciberc_evaluation_knowledge (models.Model):
     _description= "Evaluacion de la capacitacion"
     _inherit = ['mail.thread', 'ir.needaction_mixin']
 
-    date = fields.Date(string='Fecha',default=datetime.today(), track_visibility="onchange")
+    date = fields.Date(string='Fecha', track_visibility="onchange")
     knowledge_topic_evaluation = fields.Char(string="Capacitación/entrenamiento", track_visibility="onchange")
     name = fields.Many2one('res.users', string='Nombre', track_visibility="onchange")
     job_id = fields.Many2one('hr.job',string="Puesto", track_visibility="onchange")

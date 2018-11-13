@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <report 
+        id="custom_report_knowledge_evaluation"
+        model="ciberc.evaluation.knowledge"
+        string="Evaluación del impacto de la capacitación"
+        report_type="qweb-pdf"
+        name="ciberc_knowledge.report_knowledge_evaluation"
+        attachment_use="False"
+        file="ciberc_knowledge.report_knowledge_evaluation"
+        paperformat="ciberc_knowledge.paperformat_knowledge"   
+
+    />
+</odoo>

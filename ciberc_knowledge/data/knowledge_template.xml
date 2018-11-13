@@ -46,7 +46,7 @@
               <![CDATA[
 
               <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-              ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} solicita capacitación/Examen en: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link:<br/><br/>
+              ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} solicita capacitación/Examen en: ${object.knowledge_topic or '-'} ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link:<br/><br/>
               </font></p>
 
 
@@ -67,7 +67,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-            Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'}, por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
+            Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
             </font></p>         
             ]]>
           </field>
@@ -85,7 +85,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-            De manera atenta se requiere su aprobación en la solicitud de ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} para realizar Capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link: <br/><br/>
+            De manera atenta se requiere su aprobación en la solicitud de ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} para realizar Capacitación/Examen: ${object.knowledge_topic or '-'} ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link: <br/><br/>
             </font></p>
 
             <a style="border-radius: 3px; color: #F7FBFD; padding: 5px 10px; margin-left: 85px; background-color: #875A7B; text-align: center" href="https://hcm.ciberc.com/web/login">Ingresar a Odoo</a><br/><br/><br/><br/>
@@ -106,7 +106,7 @@
 
         <record id="knowledge_email_template_approved" model="mail.template">
           <field name="name">(Ciberc) - Plantilla para la aprobación</field>
-          <field name="email_from">yazmin.acuna@ciberc.com,sandra.valencia@ciberc.com</field>
+          <field name="email_from"></field>
           <field name="subject">Solicitud aprobada - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
           <field name="email_to">employee@ciberc.com,ast&amp;e@ciberc.com</field>
           <field name="email_cc">${object.approver_id.email},${object.email}</field>
@@ -116,7 +116,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-            Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'}, por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
+            Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
             </font></p>
                      
             ]]>
@@ -191,6 +191,22 @@
         </record>
         -->
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         <!--
       <record id="knowledge_email_template_tecnical" model="mail.template">
         <field name="name">(Ciberc) - Plantilla validación técnica</field>
@@ -238,7 +254,7 @@
               <![CDATA[
 
               <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-              ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} solicita capacitación/Examen en: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link:<br/><br/>
+              ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} solicita capacitación/Examen en: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link:<br/><br/>
               </font></p>
 
 
@@ -259,7 +275,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-            Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'}, por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
+            Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
             </font></p>         
             ]]>
           </field>
@@ -277,7 +293,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-            De manera atenta se requiere su aprobación en la solicitud de ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} para realizar Capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link: <br/><br/>
+            De manera atenta se requiere su aprobación en la solicitud de ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} para realizar Capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link: <br/><br/>
             </font></p>
 
             <a style="border-radius: 3px; color: #F7FBFD; padding: 5px 10px; margin-left: 85px; background-color: #875A7B; text-align: center" href="https://hcm.ciberc.com/web/login
@@ -309,7 +325,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-            Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'}, por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
+            Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
             </font></p>
                      
             ]]>
@@ -429,7 +445,7 @@
               <![CDATA[
 
               <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-              (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} solicita capacitación/Examen en: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link:<br/><br/>
+              (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} solicita capacitación/Examen en: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link:<br/><br/>
               </font></p>
 
 
@@ -450,7 +466,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-            (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'}, por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
+            (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
             </font></p>         
             ]]>
           </field>
@@ -468,7 +484,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
-            (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) De manera atenta se requiere su aprobación en la solicitud de ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} para realizar Capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link: <br/><br/>
+            (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) De manera atenta se requiere su aprobación en la solicitud de ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} para realizar Capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link: <br/><br/>
             </font></p>
 
             <a style="border-radius: 3px; color: #F7FBFD; padding: 5px 10px; margin-left: 85px; background-color: #875A7B; text-align: center" href="https://hcm.ciberc.com/web/login">Ingresar a Odoo</a><br/><br/><br/><br/>
@@ -489,7 +505,7 @@
 
         <record id="knowledge_email_template_approved" model="mail.template">
           <field name="name">(Ciberc) - Plantilla para la aprobación</field>
-          <field name="email_from">yazmin.acuna@ciberc.com,sandra.valencia@ciberc.com</field>
+          <field name="email_from"></field>
           <field name="subject">Solicitud aprobada - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
           <field name="email_to">employee@ciberc.com,ast&amp;e@ciberc.com</field>
           <field name="email_cc">${object.approver_id.email},${object.email}</field>
@@ -499,7 +515,7 @@
           <field name="body_html">
             <![CDATA[
             <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font  style="font-size: 14px;">
-            (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'} / ${object.exam_name_id.x_name or '-'}, por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
+            (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
             </font></p>
                      
             ]]>

@@ -41,6 +41,9 @@
                 <xpath expr="//button[@name='action_refuse']" position="attributes">
                     <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
                 </xpath>
+                <xpath expr="//button[@name='action_refuse']" position="attributes">
+                    <attribute name="states">confirm,validate1</attribute>
+                </xpath>
                 <xpath expr="//button[@name='action_approve']" position="attributes">
                     <attribute name="groups">hr_holidays.group_hr_holidays_manager,hr_holidays.group_hr_holidays_user</attribute>
                 </xpath>
