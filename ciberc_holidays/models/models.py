@@ -187,6 +187,7 @@ class HolidaysUpdated(models.Model):
         # if double_validation: this method is the first approval approval
         # if not double_validation: this method calls action_validate() below
         is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
 
         if not is_approver:
             raise UserError('Solamente un jefe de departamento o superior  puede aprobar la solicitud.')
@@ -198,11 +199,19 @@ class HolidaysUpdated(models.Model):
 
             # writing return_date
             to_dt = fields.Datetime.from_string(self.date_to)
+
+            to_dt_tz_user = user_tz.fromutc(to_dt) # tz user
+            to_dt_user    = datetime.combine(to_dt_tz_user.date(), to_dt_tz_user.time())
+            to_dt_user_ztz = user_tz.localize(datetime(to_dt_user.year, to_dt_user.month, to_dt_user.day, 0, 0, 0)) # tz user
+            to_dt_utcz_ztz = to_dt_user_ztz.astimezone(pytz.utc) # tz utczero
+            to_dt_utcz_z = datetime.combine(to_dt_utcz_ztz.date(), to_dt_utcz_ztz.time())
+
             employee = self.employee_id
             resource = employee.resource_id.sudo()
-            to_dt_zero_utc  = pytz.timezone(self.env.user.partner_id.tz).localize(datetime(to_dt.year, to_dt.month, to_dt.day, 0, 0, 0)).astimezone(pytz.utc)
+
             to_dt_hours_t = resource.calendar_id.working_hours_on_day(to_dt)
-            to_dt_hours_w = resource.calendar_id.get_working_hours(datetime(to_dt_zero_utc.year, to_dt_zero_utc.month, to_dt_zero_utc.day, 0, 0, 0), to_dt, resource_id=resource.id, compute_leaves=True)
+            to_dt_hours_w = resource.calendar_id.get_working_hours(to_dt_utcz_z, to_dt, resource_id=resource.id, compute_leaves=True)
+
             date_return = to_dt if to_dt_hours_w < to_dt_hours_t else self.write_return_day(to_dt, employee.company_id.country_id.id)
             self.write({ 'date_return': date_return, })
 
@@ -308,7 +317,11 @@ class HolidaysUpdated(models.Model):
 
     # return return_day
     def write_return_day(self, to_dt, country_emp_id):
-        day = to_dt+timedelta(days=1)
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        date_tz_user = user_tz.fromutc(to_dt)  # tz user
+        date_user = datetime.combine(date_tz_user.date(), date_tz_user.time())
+
+        day = date_user+timedelta(days=1)
         control = self.is_special_day(day, country_emp_id)
 
         while (control):
@@ -318,7 +331,9 @@ class HolidaysUpdated(models.Model):
                 day = day+timedelta(days=1)
             control = self.is_special_day(day, country_emp_id)
 
-        answer = datetime(year=day.year, month=day.month, day=day.day)
+        answer_tz_user = user_tz.localize(datetime(day.year, day.month, day.day, 0, 0, 0))  # tz user
+        answer_tz_zero = answer_tz_user.astimezone(pytz.utc)  # tz zero
+        answer = datetime.combine(answer_tz_zero.date(), answer_tz_zero.time())
         return answer
 
 #clase creada por alltic que agrega fecha fin para reporte
