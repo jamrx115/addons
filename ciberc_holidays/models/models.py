@@ -62,23 +62,28 @@ class HolidaysUpdated(models.Model):
 
     # return holidays IN DICT
     def get_holidays_ids(self, date_from, date_to, country_emp_id):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
 
-        if date_from.year == date_to.year:
+        date_from_tz_user = user_tz.fromutc(date_from)  # tz user
+        date_to_tz_user = user_tz.fromutc(date_to)  # tz user
+
+        if date_from_tz_user.year == date_to_tz_user.year:
             holidays_ids = self.env['hr.holidays.public.line'].search(
-                ['&', '&', ('date', '>=', date_from), ('date', '<=', date_to),
-                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                ['&', '&', ('date', '>=', date_from_tz_user), ('date', '<=', date_to_tz_user),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from_tz_user.year),
                                                                          ('country_id', '=', country_emp_id)]).id)])
         else:
             holidays_ids1 = self.env['hr.holidays.public.line'].search(
-                ['&', '&', ('date', '>=', date_from),
-                 ('date', '<=', datetime.strptime(str(date_from.year) + '-12-31', '%Y-%m-%d')),
-                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                ['&', '&', ('date', '>=', date_from_tz_user),
+                 ('date', '<=', datetime.strptime(str(date_from_tz_user.year) + '-12-31', '%Y-%m-%d')),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from_tz_user.year),
                                                                          ('country_id', '=', country_emp_id)]).id)])
-            holidays_ids = holidays_ids1 | self.env['hr.holidays.public.line'].search(
-                ['&', '&', ('date', '>=', datetime.strptime(str(date_to.year) + '-01-01', '%Y-%m-%d')),
-                 ('date', '<=', date_to),
-                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+            holidays_ids2 = self.env['hr.holidays.public.line'].search(
+                ['&', '&', ('date', '>=', datetime.strptime(str(date_to_tz_user.year) + '-01-01', '%Y-%m-%d')),
+                 ('date', '<=', date_to_tz_user),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_to_tz_user.year),
                                                                          ('country_id', '=', country_emp_id)]).id)])
+            holidays_ids = holidays_ids1 | holidays_ids2
         return holidays_ids
 
     # return [a, b] with data for zero_hour and final_hour FOR A DAY
