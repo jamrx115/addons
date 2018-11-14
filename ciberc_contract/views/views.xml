@@ -17,6 +17,13 @@
                     <field name="x_tipo_novedad_contrato_id"/>
                     <field name="x_tipo_novedad_cierre_contrato_id"/>
                 </group>
+                <group name="datos_bancarios" string="Datos bancarios">
+                    <field name="x_cuenta_bancaria"/>
+                    <field name="x_tipo_cuenta"/>
+                    <field name="x_bank_id"/>
+                    <field name="x_cod_swift"/>
+                    <field name="x_currency_id"/>
+                </group>
             </xpath>
         </field>
     </record>

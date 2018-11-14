@@ -24,6 +24,8 @@ class ciberc_contract(models.Model):
     x_bank_id = fields.Many2one('res.bank', string='Banco')
     x_cuenta_bancaria = fields.Char(string='Número cuenta bancaria')
     x_tipo_cuenta = fields.Char(string='Tipo cuenta')
+    x_cod_swift = fields.Char(string='Código Swift')
+    x_currency_id = fields.Many2one('res.currency', string='Moneda')
     # -otros campos personalizados
     x_bonificacion = fields.Float(string='Bonificación')
     x_comision = fields.Float(string='Comisión')
@@ -52,14 +54,15 @@ class ciberc_contract(models.Model):
     # -override
     @api.multi
     def write(self, vals):
-        res = super(ciberc_contract, self).write(vals)
-        # escribir el horario en datos de empleado
-        if self.working_hours:
-            self.employee_id.resource_id.write({'calendar_id': self.working_hours.id})
-        # escribir la fecha de inicio de labores en datos de empleado
-        if self.date_start:
-            self.employee_id.write({'joining_date': self.date_start})
-        return res
+        for contract_obj in self:
+            res = super(ciberc_contract, contract_obj).write(vals)
+            # escribir el horario en datos de empleado
+            if contract_obj.working_hours:
+                contract_obj.employee_id.resource_id.write({'calendar_id': contract_obj.working_hours.id})
+            # escribir la fecha de inicio de labores en datos de empleado
+            if contract_obj.date_start:
+                contract_obj.employee_id.write({'joining_date': contract_obj.date_start})
+            return res
 
 # clase creada por alltic que vuelve solo lectura el campo horario en empleado
 class ciberc_resource(models.Model):
