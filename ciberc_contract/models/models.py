@@ -42,12 +42,12 @@ class ciberc_contract(models.Model):
     @api.model
     def create(self, vals):
         res = super(ciberc_contract, self).create(vals)
-
+        employee_obj = self.env['hr.employee'].search([('id', '=', vals['employee_id'])], limit=1)
         if vals['working_hours']:
             self.employee_id.resource_id.write({'calendar_id': self.working_hours.id})
 
         if vals['date_start']:
-            self.employee_id.write({'joining_date': self.date_start})
+            employee_obj.write({'joining_date': vals['date_start']})
 
         return res
 
@@ -56,12 +56,13 @@ class ciberc_contract(models.Model):
     def write(self, vals):
         for contract_obj in self:
             res = super(ciberc_contract, contract_obj).write(vals)
+            employee_obj = self.env['hr.employee'].search([('id', '=', contract_obj.employee_id.id)], limit=1)
             # escribir el horario en datos de empleado
             if contract_obj.working_hours:
                 contract_obj.employee_id.resource_id.write({'calendar_id': contract_obj.working_hours.id})
             # escribir la fecha de inicio de labores en datos de empleado
             if contract_obj.date_start:
-                contract_obj.employee_id.write({'joining_date': contract_obj.date_start})
+                employee_obj.write({'joining_date': contract_obj.date_start})
             return res
 
 # clase creada por alltic que vuelve solo lectura el campo horario en empleado
