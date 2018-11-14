@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "CIBERC - Employee custom module",
+    'name': "CIBERC - Contract custom module",
 
     'summary': """
-        Campos adicionales al modelo de empleados""",
+        Campos adicionales al modelo de contrato""",
 
     'description': """
-        Campos adicionales al modelo de empleados
+        Campos adicionales al modelo de contrato
     """,
 
     'author': "Alltic SAS",
@@ -19,12 +19,10 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','hr_employee_updation'],
+    'depends': ['base','hr','hr_contract', 'resource'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
         'views/views.xml',
-        'data/data.xml',
     ]
 }

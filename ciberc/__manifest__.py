@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','bi_view_editor', 'mail', 'hr', 'hr_contract', 'project','hr_timesheet', 'analytic', 'ohrms_loan'],
+    'depends': ['base','bi_view_editor', 'mail', 'hr', 'project','hr_timesheet', 'analytic', 'ohrms_loan'],
 
     # always loaded
     'data': [

@@ -1,0 +1,57 @@
+<openerp>
+
+    <!-- Form contrato -->
+    <record id="hr_contract_view_form_updated" model="ir.ui.view">
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='wage']" position="after">
+                <field name="x_bonificacion" />
+                <field name="x_isr" invisible="1"/>
+                <field name="x_renta_ex_patrono" />
+            </xpath>
+            <xpath expr="//group[@name='salary_and_advantages']" position="before">
+                <group name="novedades_contrato" string="Novedades del contrato">
+                    <field name="x_numero_contrato"/>
+                    <field name="annual_holiday" />
+                    <field name="x_tipo_novedad_contrato_id"/>
+                    <field name="x_tipo_novedad_cierre_contrato_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Form employee : ir a hr_employee_updation.hr_employee_inherit_form_view -->
+    <!-- hacer readonly a field[@name='joining_date'] -->
+
+    <!-- Nuevo modelo Tipos de novedades contrato -->
+
+    <record id="tiponovedad_view_tree" model="ir.ui.view">
+        <field name="model">ciberc.tipo.novedad.contrato</field>
+        <field name="arch" type="xml">
+            <tree default_order='name'>
+                <field name="name"></field>
+            </tree>
+        </field>
+    </record>
+
+    <record id="tiponovedad_view_form" model="ir.ui.view">
+        <field name="model">ciberc.tipo.novedad.contrato</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"></field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_list_tiponovedad">
+            <field name="name">Tipo novedad contrato</field>
+            <field name="res_model">ciberc.tipo.novedad.contrato</field>
+            <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_tiponovedad" name="Tipo novedad contrato" parent="hr.menu_human_resources_configuration" sequence="3" action="action_list_tiponovedad"/>
+
+</openerp>
