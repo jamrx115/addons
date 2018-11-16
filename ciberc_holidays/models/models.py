@@ -56,6 +56,16 @@ class HolidaysUpdated(models.Model):
     company_id = fields.Many2one('res.company', 'Compañía')
     date_return = fields.Datetime('Fecha de regreso', readonly=True, index=True, copy=False)
 
+    # -override
+    @api.model
+    def create(self, vals):
+
+        if vals['type'] == 'add':
+            vals['date_from'] = None
+            vals['date_to'] = None
+
+        return super(HolidaysUpdated, self).create(vals)
+
     #########################
     # para cálculo de días
     #########################
@@ -202,23 +212,24 @@ class HolidaysUpdated(models.Model):
             if holiday.state != 'confirm':
                 raise UserError('La solicitud de ausencia debe estar enviada ("Pendiente de aprobación") para aprobarla.')
 
-            # writing return_date
-            to_dt = fields.Datetime.from_string(self.date_to)
+            if holiday.type == 'remove':
+                # writing return_date
+                to_dt = fields.Datetime.from_string(self.date_to)
 
-            to_dt_tz_user = user_tz.fromutc(to_dt) # tz user
-            to_dt_user    = datetime.combine(to_dt_tz_user.date(), to_dt_tz_user.time())
-            to_dt_user_ztz = user_tz.localize(datetime(to_dt_user.year, to_dt_user.month, to_dt_user.day, 0, 0, 0)) # tz user
-            to_dt_utcz_ztz = to_dt_user_ztz.astimezone(pytz.utc) # tz utczero
-            to_dt_utcz_z = datetime.combine(to_dt_utcz_ztz.date(), to_dt_utcz_ztz.time())
+                to_dt_tz_user = user_tz.fromutc(to_dt) # tz user
+                to_dt_user    = datetime.combine(to_dt_tz_user.date(), to_dt_tz_user.time())
+                to_dt_user_ztz = user_tz.localize(datetime(to_dt_user.year, to_dt_user.month, to_dt_user.day, 0, 0, 0)) # tz user
+                to_dt_utcz_ztz = to_dt_user_ztz.astimezone(pytz.utc) # tz utczero
+                to_dt_utcz_z = datetime.combine(to_dt_utcz_ztz.date(), to_dt_utcz_ztz.time())
 
-            employee = self.employee_id
-            resource = employee.resource_id.sudo()
+                employee = self.employee_id
+                resource = employee.resource_id.sudo()
 
-            to_dt_hours_t = resource.calendar_id.working_hours_on_day(to_dt)
-            to_dt_hours_w = resource.calendar_id.get_working_hours(to_dt_utcz_z, to_dt, resource_id=resource.id, compute_leaves=True)
+                to_dt_hours_t = resource.calendar_id.working_hours_on_day(to_dt)
+                to_dt_hours_w = resource.calendar_id.get_working_hours(to_dt_utcz_z, to_dt, resource_id=resource.id, compute_leaves=True)
 
-            date_return = to_dt if to_dt_hours_w < to_dt_hours_t else self.write_return_day(to_dt, employee.company_id.country_id.id)
-            self.write({ 'date_return': date_return, })
+                date_return = to_dt if to_dt_hours_w < to_dt_hours_t else self.write_return_day(to_dt, employee.company_id.country_id.id)
+                self.write({ 'date_return': date_return, })
 
             if holiday.double_validation:
                 template = self.env.ref('ciberc_holidays.approve_template')
