@@ -9,6 +9,5 @@
         attachment_use="False"
         file="ciberc_knowledge.report_knowledge_evaluation"
         paperformat="ciberc_knowledge.paperformat_knowledge"   
-
     />
 </odoo>
