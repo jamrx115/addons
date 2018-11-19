@@ -55,6 +55,17 @@ class HolidaysUpdated(models.Model):
     # new fields
     company_id = fields.Many2one('res.company', 'Compañía')
     date_return = fields.Datetime('Fecha de regreso', readonly=True, index=True, copy=False)
+    number_of_days_calendar = fields.Float('Días Calendario')
+
+    # -override
+    @api.model
+    def create(self, vals):
+
+        if vals['type'] == 'add':
+            vals['date_from'] = None
+            vals['date_to'] = None
+
+        return super(HolidaysUpdated, self).create(vals)
 
     #########################
     # para cálculo de días
@@ -62,23 +73,28 @@ class HolidaysUpdated(models.Model):
 
     # return holidays IN DICT
     def get_holidays_ids(self, date_from, date_to, country_emp_id):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
 
-        if date_from.year == date_to.year:
+        date_from_tz_user = user_tz.fromutc(date_from)  # tz user
+        date_to_tz_user = user_tz.fromutc(date_to)  # tz user
+
+        if date_from_tz_user.year == date_to_tz_user.year:
             holidays_ids = self.env['hr.holidays.public.line'].search(
-                ['&', '&', ('date', '>=', date_from), ('date', '<=', date_to),
-                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                ['&', '&', ('date', '>=', date_from_tz_user), ('date', '<=', date_to_tz_user),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from_tz_user.year),
                                                                          ('country_id', '=', country_emp_id)]).id)])
         else:
             holidays_ids1 = self.env['hr.holidays.public.line'].search(
-                ['&', '&', ('date', '>=', date_from),
-                 ('date', '<=', datetime.strptime(str(date_from.year) + '-12-31', '%Y-%m-%d')),
-                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+                ['&', '&', ('date', '>=', date_from_tz_user),
+                 ('date', '<=', datetime.strptime(str(date_from_tz_user.year) + '-12-31', '%Y-%m-%d')),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from_tz_user.year),
                                                                          ('country_id', '=', country_emp_id)]).id)])
-            holidays_ids = holidays_ids1 | self.env['hr.holidays.public.line'].search(
-                ['&', '&', ('date', '>=', datetime.strptime(str(date_to.year) + '-01-01', '%Y-%m-%d')),
-                 ('date', '<=', date_to),
-                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_from.year),
+            holidays_ids2 = self.env['hr.holidays.public.line'].search(
+                ['&', '&', ('date', '>=', datetime.strptime(str(date_to_tz_user.year) + '-01-01', '%Y-%m-%d')),
+                 ('date', '<=', date_to_tz_user),
+                 ('year_id', '=', self.env['hr.holidays.public'].search(['&', ('year', '=', date_to_tz_user.year),
                                                                          ('country_id', '=', country_emp_id)]).id)])
+            holidays_ids = holidays_ids1 | holidays_ids2
         return holidays_ids
 
     # return [a, b] with data for zero_hour and final_hour FOR A DAY
@@ -180,6 +196,15 @@ class HolidaysUpdated(models.Model):
             raise UserError('La solicitud de ausencia debe estar en estado "Borrador" para enviarla.')
         template = self.env.ref('ciberc_holidays.confirm_template')
         self.env['mail.template'].browse(template.id).send_mail(self.id)
+
+        # opción 2 - fechas calendario
+        from_dt = fields.Datetime.from_string(self.date_from)
+        to_dt = fields.Datetime.from_string(self.date_to)
+
+        calendar_delta = to_dt - from_dt
+        calendar_days = (calendar_delta.days + float(calendar_delta.seconds) ) / 86400
+        self.write({'number_of_days_calendar': calendar_days})
+
         return self.write({'state': 'confirm'})
 
     @api.multi
@@ -187,6 +212,7 @@ class HolidaysUpdated(models.Model):
         # if double_validation: this method is the first approval approval
         # if not double_validation: this method calls action_validate() below
         is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
 
         if not is_approver:
             raise UserError('Solamente un jefe de departamento o superior  puede aprobar la solicitud.')
@@ -196,15 +222,24 @@ class HolidaysUpdated(models.Model):
             if holiday.state != 'confirm':
                 raise UserError('La solicitud de ausencia debe estar enviada ("Pendiente de aprobación") para aprobarla.')
 
-            # writing return_date
-            to_dt = fields.Datetime.from_string(self.date_to)
-            employee = self.employee_id
-            resource = employee.resource_id.sudo()
-            to_dt_zero_utc  = pytz.timezone(self.env.user.partner_id.tz).localize(datetime(to_dt.year, to_dt.month, to_dt.day, 0, 0, 0)).astimezone(pytz.utc)
-            to_dt_hours_t = resource.calendar_id.working_hours_on_day(to_dt)
-            to_dt_hours_w = resource.calendar_id.get_working_hours(datetime(to_dt_zero_utc.year, to_dt_zero_utc.month, to_dt_zero_utc.day, 0, 0, 0), to_dt, resource_id=resource.id, compute_leaves=True)
-            date_return = to_dt if to_dt_hours_w < to_dt_hours_t else self.write_return_day(to_dt, employee.company_id.country_id.id)
-            self.write({ 'date_return': date_return, })
+            if holiday.type == 'remove':
+                # writing return_date
+                to_dt = fields.Datetime.from_string(self.date_to)
+
+                to_dt_tz_user = user_tz.fromutc(to_dt) # tz user
+                to_dt_user    = datetime.combine(to_dt_tz_user.date(), to_dt_tz_user.time())
+                to_dt_user_ztz = user_tz.localize(datetime(to_dt_user.year, to_dt_user.month, to_dt_user.day, 0, 0, 0)) # tz user
+                to_dt_utcz_ztz = to_dt_user_ztz.astimezone(pytz.utc) # tz utczero
+                to_dt_utcz_z = datetime.combine(to_dt_utcz_ztz.date(), to_dt_utcz_ztz.time())
+
+                employee = self.employee_id
+                resource = employee.resource_id.sudo()
+
+                to_dt_hours_t = resource.calendar_id.working_hours_on_day(to_dt)
+                to_dt_hours_w = resource.calendar_id.get_working_hours(to_dt_utcz_z, to_dt, resource_id=resource.id, compute_leaves=True)
+
+                date_return = to_dt if to_dt_hours_w < to_dt_hours_t else self.write_return_day(to_dt, employee.company_id.country_id.id)
+                self.write({ 'date_return': date_return, })
 
             if holiday.double_validation:
                 template = self.env.ref('ciberc_holidays.approve_template')
@@ -308,7 +343,11 @@ class HolidaysUpdated(models.Model):
 
     # return return_day
     def write_return_day(self, to_dt, country_emp_id):
-        day = to_dt+timedelta(days=1)
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        date_tz_user = user_tz.fromutc(to_dt)  # tz user
+        date_user = datetime.combine(date_tz_user.date(), date_tz_user.time())
+
+        day = date_user+timedelta(days=1)
         control = self.is_special_day(day, country_emp_id)
 
         while (control):
@@ -318,7 +357,9 @@ class HolidaysUpdated(models.Model):
                 day = day+timedelta(days=1)
             control = self.is_special_day(day, country_emp_id)
 
-        answer = datetime(year=day.year, month=day.month, day=day.day)
+        answer_tz_user = user_tz.localize(datetime(day.year, day.month, day.day, 0, 0, 0))  # tz user
+        answer_tz_zero = answer_tz_user.astimezone(pytz.utc)  # tz zero
+        answer = datetime.combine(answer_tz_zero.date(), answer_tz_zero.time())
         return answer
 
 #clase creada por alltic que agrega fecha fin para reporte
@@ -539,13 +580,3 @@ class CodeLeaveTypePayroll(models.Model):
                     else data['number_of_hours'] / 8.0
                 res.append(data)
         return res
-
-#clase creada por alltic que crea valor anual para job
-class CodeHoliday(models.Model):
-    _inherit = 'hr.contract'
-
-    # campo personalizado para vacaciones o días libres
-    annual_holiday = fields.Integer('Días libres anuales', help='Vacaciones para contrato laboral y días libres para prestación de servicios')
-    # campo personalizado para cuenta bancaria
-    bank_account_contract_id = fields.Many2one('res.partner.bank', string='Cuenta bancaria',
-                                      help='Cuenta bancaria para pagos nómina', groups='hr.group_hr_user,base.group_user')
