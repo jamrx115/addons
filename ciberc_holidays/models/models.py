@@ -55,6 +55,7 @@ class HolidaysUpdated(models.Model):
     # new fields
     company_id = fields.Many2one('res.company', 'Compañía')
     date_return = fields.Datetime('Fecha de regreso', readonly=True, index=True, copy=False)
+    number_of_days_calendar = fields.Float('Días Calendario')
 
     # -override
     @api.model
@@ -195,6 +196,15 @@ class HolidaysUpdated(models.Model):
             raise UserError('La solicitud de ausencia debe estar en estado "Borrador" para enviarla.')
         template = self.env.ref('ciberc_holidays.confirm_template')
         self.env['mail.template'].browse(template.id).send_mail(self.id)
+
+        # opción 2 - fechas calendario
+        from_dt = fields.Datetime.from_string(self.date_from)
+        to_dt = fields.Datetime.from_string(self.date_to)
+
+        calendar_delta = to_dt - from_dt
+        calendar_days = (calendar_delta.days + float(calendar_delta.seconds) ) / 86400
+        self.write({'number_of_days_calendar': calendar_days})
+
         return self.write({'state': 'confirm'})
 
     @api.multi
