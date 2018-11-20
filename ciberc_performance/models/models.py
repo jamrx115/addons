@@ -152,6 +152,8 @@ class ciberc_main_goals (models.Model):
     description = fields.Text(string='Descripción')
     goal = fields.Char(string='Meta')
     comments = fields.Text(string='Comentarios')
+    active = fields.Boolean(string="Activo", default="True")
+
     
     @api.model
     def create(self, values):
