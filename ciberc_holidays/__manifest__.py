@@ -28,5 +28,6 @@
         'views/mail_templates.xml',
         'views/report_holiday_template.xml',
         'views/report_menu.xml',
+        'views/hr_payroll_views.xml',
     ]
 }

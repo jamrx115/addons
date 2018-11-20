@@ -580,3 +580,9 @@ class CodeLeaveTypePayroll(models.Model):
                     else data['number_of_hours'] / 8.0
                 res.append(data)
         return res
+
+# clase creada por alltic que modifica el atributo groups del campo payslip_count
+class HrEmployeePayslip(models.Model):
+    _inherit = 'hr.employee'
+
+    payslip_count = fields.Integer(compute='_compute_payslip_count', string='Payslips')

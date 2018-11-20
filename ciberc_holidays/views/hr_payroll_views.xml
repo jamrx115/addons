@@ -1,0 +1,11 @@
+<openerp>
+
+    <!-- override by groups-->
+    <menuitem id="hr_payroll.menu_hr_payroll_configuration" name="Configuración"
+              parent="hr_payroll.menu_hr_payroll_root" sequence="100"
+              groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
+    <menuitem id="hr_payroll.menu_department_tree" action="hr_payroll.action_view_hr_payslip_form"
+              parent="hr_payroll.menu_hr_payroll_root"
+              groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
+
+</openerp>
