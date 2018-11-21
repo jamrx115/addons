@@ -202,7 +202,7 @@ class HolidaysUpdated(models.Model):
         to_dt = fields.Datetime.from_string(self.date_to)
 
         calendar_delta = to_dt - from_dt
-        calendar_days = (calendar_delta.days + float(calendar_delta.seconds) ) / 86400
+        calendar_days = round(calendar_delta.total_seconds() / 86400 , 2)
         self.write({'number_of_days_calendar': calendar_days})
 
         return self.write({'state': 'confirm'})
@@ -500,6 +500,12 @@ class CodeLeaveType(models.Model):
                                 'message': 'Formato de código no valido, debe incluir términos alfanúmeros y guion (si aplica), longitud 3 a 6 caracteres', }
                 }
 
+#
+class PayslipWorkedDaysUpdated(models.Model):
+    _inherit = 'hr.payslip.worked_days'
+
+    number_of_days_calendar = fields.Float(string='Días Calendario')
+
 #clase creada por alltic que trabaja con el codigo para regla salarial
 class CodeLeaveTypePayroll(models.Model):
     _inherit = 'hr.payslip'
@@ -535,6 +541,9 @@ class CodeLeaveTypePayroll(models.Model):
                  'number_of_days': 0.0,
                  'number_of_hours': 0.0,
                  'contract_id': contract.id,
+                 'number_of_days_calendar': 0.0, # empty
+                 'date_from': None, # empty
+                 'date_to': None, # empty
             }
             leaves = {}
             day_from = fields.Datetime.from_string(date_from)
@@ -548,19 +557,25 @@ class CodeLeaveTypePayroll(models.Model):
                 for interval in working_intervals_on_day:
                     interval_data.append((interval, was_on_leave_interval(contract.employee_id.id, interval[0], interval[1])))
 
+            # Note: Here, the dates are in UTC-0
             for interval, ausencia in interval_data:
                 holidays |= ausencia
                 hours = (interval[1] - interval[0]).total_seconds() / 3600.0
                 date_str = str(interval[0].date())
                 holiday_obj = holidays_ids.filtered(lambda r: r.date == date_str)
+
                 if ausencia: # hay ausencia -> conteo ausencia
                     if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
                         # fin de semana o festivo
                         attendances['number_of_hours'] += hours
+                        # copy condition
+                        if ausencia.holiday_status_id.name in leaves:
+                            leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
                     else:
                         # entre semana no festivo
                         if ausencia.holiday_status_id.name in leaves:
                             leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
+                            leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
                         else:
                             leaves[ausencia.holiday_status_id.name] = {
                                 'name': ausencia.holiday_status_id.name,
@@ -569,14 +584,34 @@ class CodeLeaveTypePayroll(models.Model):
                                 'number_of_days': 0.0,
                                 'number_of_hours': hours,
                                 'contract_id': contract.id,
+
+                                'number_of_days_calendar': 0.0,
+                                'date_from': interval[0].date(),
+                                'date_to': interval[1].date(),
                             }
                 else:
                     # no hay ausencia -> conteo WORK100
                     attendances['number_of_hours'] += hours
+
             leaves = [value for key, value in leaves.items()]
+
+            auxiliar_for_WORK100 = 0.00
             for data in [attendances] + leaves:
                 data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day)\
                     if uom_day and uom_hour\
                     else data['number_of_hours'] / 8.0
+                if data['code'] != 'WORK100':
+                    calendar_delta = data['date_to'] - data['date_from']
+                    number_of_days_calendar = round(calendar_delta.days + float(calendar_delta.seconds) / 86400 , 2) + 1.00
+                    auxiliar_for_WORK100 += number_of_days_calendar
+                    data['number_of_days_calendar'] = number_of_days_calendar
                 res.append(data)
+                res[0]['number_of_days_calendar'] = nb_of_days - auxiliar_for_WORK100
+
         return res
+
+# clase creada por alltic que modifica el atributo groups del campo payslip_count
+class HrEmployeePayslip(models.Model):
+    _inherit = 'hr.employee'
+
+    payslip_count = fields.Integer(compute='_compute_payslip_count', string='Payslips')
