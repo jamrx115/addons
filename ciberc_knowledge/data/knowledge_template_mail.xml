@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+      <record id="knowledge_email_template_tecnical" model="mail.template">
+        <field name="name">(Ciberc) - Plantilla validación técnica</field>
+        <field name="email_from">ht@ciberc.com</field>
+        <field name="subject">Validación técnica previo Examen CCIE - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} </field>
+        <field name="email_to">ast&amp;e@ciberc.com</field>
+        <field name="email_cc">employee@ciberc.com</field>
+        <field name="model_id" ref="ciberc_knowledge.model_ciberc_knowledge"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="user_signature" eval="False"/>
+        <field name="body_html">
+          <![CDATA[
+          <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
+
+
+          (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Se recibió solicitud de ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} para presentar examen de ${object.exam_name_id.x_name}, por lo que se solicita apoyo en coordinar entrevista para validación técnica y tener la confirmación de su preparación, previo a realizar el examen.<br/><br/><br/><br/>
+          </font></p>
+
+
+          <b><span lang="ES-GT" style="color: rgb(95, 95, 95); font-size: 17px; font-family: TeXGyreAdventor;">Departamento de Talento Humano</span></b><br><br>
+
+          <a style="font-family:verdana; font-size: 8.5px" href="http://www.ciberc.com/">www.ciberc.com</a><br><br>
+
+          <img title="" class="pull-left" style="style=width:6.5in;height:1.2916in" src="https://hcm.ciberc.com/web/image/3545" data-original-title=""><br><br>
+
+
+          <font style="font-size: 8.5px;"><span lang="EN-US" style="line-height: 14.95px;color: rgb(95, 95, 95);font-family: verdana;">This email may contain confidential and privileged material for the sole use of the intended recipient. Any review, use, distribution or disclosure by others is strictly prohibited. If you are not the intended recipient (or authorized to receive for the recipient), please contact the sender by reply email and delete all copies of this message.</span></font></p>
+                   
+          ]]>
+        </field>
+      </record>
+      
+      
+
+      <record id="knowledge_email_template_boss" model="mail.template">
+        <field name="name">(Ciberc) - Plantilla visto bueno jefe</field>
+        <field name="email_from">${object.email}</field>
+        <field name="subject">Solicitud de capacitación - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} </field>
+        <field name="email_to">${object.approver_id.email}</field>
+        <field name="email_cc">employee@ciberc.com,ast&amp;e@ciberc.com</field>
+        <field name="model_id" ref="ciberc_knowledge.model_ciberc_knowledge"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="user_signature" eval="True"/>
+        <field name="body_html">
+            <![CDATA[
+
+            <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
+            (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} solicita capacitación/Examen en: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link:<br/><br/>
+            </font></p>
+
+
+            <a style="border-radius: 3px; color: #F7FBFD; padding: 5px 10px; margin-left: 85px; background-color: #875A7B; text-align: center" href="https://hcm.ciberc.com/web/login">Ingresar a HCM</a><br/><br/><br/><br/>         
+          ]]>
+        </field>
+      </record>
+      
+      <record id="knowledge_email_template_human_services" model="mail.template">
+        <field name="name">(Ciberc) - Plantilla para talento humano - servicios avanzados</field>
+        <field name="email_from">${object.approver_id.email}</field>
+        <field name="subject">Solicitud Aprobada Capacitación/ Examen -  ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
+        <field name="email_to">employee@ciberc.com,ast&amp;e@ciberc.com</field>
+        <field name="email_cc"></field>
+        <field name="model_id" ref="ciberc_knowledge.model_ciberc_knowledge"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="user_signature" eval="True"/>
+        <field name="body_html">
+          <![CDATA[
+          <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
+          (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
+          </font></p>         
+          ]]>
+        </field>
+      </record>
+
+      <record id="knowledge_email_template_management" model="mail.template">
+        <field name="name">(Ciberc) - Plantilla para alta gerencia</field>
+        <field name="email_from">ht@ciberc.com</field>
+        <field name="subject">Solicitud de aprobación - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
+        <field name="email_to">yazmin.acuna@ciberc.com,sandra.valencia@ciberc.com</field>
+        <field name="email_cc">${object.approver_id.email}</field>
+        <field name="model_id" ref="ciberc_knowledge.model_ciberc_knowledge"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="user_signature" eval="False"/>
+        <field name="body_html">
+          <![CDATA[
+          <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
+          (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) De manera atenta se requiere su aprobación en la solicitud de ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} para realizar Capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} para continuar con el proceso agradecemos su validación, ingresando al siguiente link: <br/><br/>
+          </font></p>
+
+          <a style="border-radius: 3px; color: #F7FBFD; padding: 5px 10px; margin-left: 85px; background-color: #875A7B; text-align: center" href="https://hcm.ciberc.com/web/login">Ingresar a HCM</a><br/><br/><br/><br/>
+
+          <b><span lang="ES-GT" style="color: rgb(95, 95, 95); font-size: 17px; font-family: TeXGyreAdventor;">Departamento de Talento Humano</span></b><br><br>
+
+          <a style="font-family:verdana; font-size: 8.5px" href="http://www.ciberc.com/">www.ciberc.com</a><br><br>
+
+          <img title="" class="pull-left" style="style=width:6.5in;height:1.2916in" src="https://hcm.ciberc.com/web/image/3545" data-original-title=""><br><br>
+
+
+          <font style="font-size: 8.5px;"><span lang="EN-US" style="line-height: 14.95px;color: rgb(95, 95, 95);font-family: verdana;">This email may contain confidential and privileged material for the sole use of the intended recipient. Any review, use, distribution or disclosure by others is strictly prohibited. If you are not the intended recipient (or authorized to receive for the recipient), please contact the sender by reply email and delete all copies of this message.</span></font></p>
+
+                   
+          ]]>
+        </field>
+      </record>
+
+      <record id="knowledge_email_template_approved" model="mail.template">
+        <field name="name">(Ciberc) - Plantilla para la aprobación</field>
+        <field name="email_from"></field>
+        <field name="subject">Solicitud aprobada - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
+        <field name="email_to">employee@ciberc.com,ast&amp;e@ciberc.com</field>
+        <field name="email_cc">${object.approver_id.email},${object.email}</field>
+        <field name="model_id" ref="ciberc_knowledge.model_ciberc_knowledge"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="user_signature" eval="True"/>
+        <field name="body_html">
+          <![CDATA[
+          <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font  style="font-size: 14px;">
+          (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Por este medio confirmo aprobación para que ${object.name.partner_id.firstname} ${object.name.partner_id.lastname} participe en capacitación/Examen: ${object.knowledge_topic or '-'}  ${object.exam_name_id.x_name or '-'} por lo que agradeceré continuar con el proceso correspondiente.<br/><br/><br/><br/>
+          </font></p>
+                   
+          ]]>
+        </field>
+      </record>
+
+      <record id="knowledge_email_template_rejected" model="mail.template">
+        <field name="name">(Ciberc) - Plantilla para el rechazo</field>
+        <field name="email_from"></field>
+        <field name="subject">Solicitud rechazada - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
+        <field name="email_to">employee@ciberc.com,ast&amp;e@ciberc.com</field>
+        <field name="email_cc">${object.approver_id.email},${object.email}</field>
+        <field name="model_id" ref="ciberc_knowledge.model_ciberc_knowledge"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="user_signature" eval="True"/>
+        <field name="body_html">
+          <![CDATA[
+          <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
+          (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Por este medio agradecemos su iniciativa en continuar su desarrollo profesional, pero en esta oportunidad no será posible aprobar su solicitud. Sin embargo, desde ya estamos considerando su requerimiento para incluirlo en un plan futuro de desarrollo.<br/><br/><br/><br/>
+          </font></p>
+                   
+          ]]>
+        </field>
+      </record>
+
+      <record id="knowledge_email_template_deferment" model="mail.template">
+        <field name="name">(Ciberc) - Plantilla para aplazar</field>
+        <field name="email_from">yazmin.acuna@ciberc.com,sandra.valencia@ciberc.com</field>
+        <field name="subject">Solicitud aplazada - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
+        <field name="email_to">employee@ciberc.com,ast&amp;e@ciberc.com</field>
+        <field name="email_cc">${object.approver_id.email},${object.email}</field>
+        <field name="model_id" ref="ciberc_knowledge.model_ciberc_knowledge"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="user_signature" eval="True"/>
+        <field name="body_html">
+          <![CDATA[
+          <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
+          (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Por este medio agradecemos su iniciativa en continuar su desarrollo profesional, pero en esta oportunidad no será posible aprobar su solicitud.<br/>
+          La misma estará siendo planificada para una próxima fecha (${object.deferment_date or 'aún por definir'}), la cual le estaremos informando.
+          <br/><br/><br/><br/>
+          </font></p>     
+          ]]>
+        </field>
+      </record>
+
+      <record id="knowledge_email_template_documents" model="mail.template">
+        <field name="name">(Ciberc) - Plantilla para solicitar documentos de capacitaciones</field>
+        <field name="email_from">ht@ciberc.com</field>
+        <field name="subject">Actualización de información académica/cursos en HCM - ${object.name.partner_id.firstname} ${object.name.partner_id.lastname}</field>
+        <field name="email_to">${object.email}</field>
+        <field name="email_cc">employee@ciberc.com</field>
+        <field name="model_id" ref="ciberc_knowledge.model_ciberc_knowledge"/>
+        <field name="auto_delete" eval="True"/>
+        <field name="user_signature" eval="False"/>
+        <field name="body_html">
+          <![CDATA[
+          <p style="font-family:&quot;Lucida Grande&quot;,Helvetica,Verdana,Arial,sans-serif;text-align:justify"><font style="font-size: 14px;">
+          (ESTE MENSAJE ES UNA PRUEBA POR FAVOR HAGA CASO OMISO) Luego de haber concluido satisfactoriamente su proceso de capacitación/ entrenamiento/examen de: ${object.knowledge_topic or '-'} ${object.exam_name_id.x_name or '-'}, solicitamos su apoyo en actualizar sus datos en el sistema HCM y enviar por correo electrónico su certificación, diploma o constancias de soporte a: employee@ciberc.com.<br/><br/>
+          Se solicita que pueda completar su Evaluación de impacto de capacitación.
+          <br/><br/>
+          </font></p>
+
+          <a style="border-radius: 3px; color: #F7FBFD; padding: 5px 10px; margin-left: 85px; background-color: #875A7B; text-align: center" href="https://hcm.ciberc.com">Ingresar a HCM</a><br/><br/><br/><br/>
+
+          <b><span lang="ES-GT" style="color: rgb(95, 95, 95); font-size: 17px; font-family: TeXGyreAdventor;">Departamento de Talento Humano</span></b><br><br>
+
+          <a style="font-family:verdana; font-size: 8.5px" href="http://www.ciberc.com/">www.ciberc.com</a><br><br>
+
+          <img title="" class="pull-left" style="style=width:6.5in;height:1.2916in" src="https://hcm.ciberc.com/web/image/3545" data-original-title=""><br><br>
+
+
+          <font style="font-size: 8.5px;"><span lang="EN-US" style="line-height: 14.95px;color: rgb(95, 95, 95);font-family: verdana;">This email may contain confidential and privileged material for the sole use of the intended recipient. Any review, use, distribution or disclosure by others is strictly prohibited. If you are not the intended recipient (or authorized to receive for the recipient), please contact the sender by reply email and delete all copies of this message.</span></font></p>     
+          ]]>
+        </field>
+      </record>
+    </data>
+</odoo>
