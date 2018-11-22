@@ -194,16 +194,17 @@ class HolidaysUpdated(models.Model):
         is_approver = self.env.user.has_group('hr_holidays.group_hr_holidays_user') or self.env.user.has_group('hr_holidays.group_hr_holidays_manager')
         if self.filtered(lambda holiday: holiday.state != 'draft'):
             raise UserError('La solicitud de ausencia debe estar en estado "Borrador" para enviarla.')
+
+        if self.type == 'remove':
+            from_dt = fields.Datetime.from_string(self.date_from)
+            to_dt = fields.Datetime.from_string(self.date_to)
+
+            calendar_delta = to_dt - from_dt
+            calendar_days = round(calendar_delta.total_seconds() / 86400 , 2)
+            self.write({'number_of_days_calendar': calendar_days})
+
         template = self.env.ref('ciberc_holidays.confirm_template')
         self.env['mail.template'].browse(template.id).send_mail(self.id)
-
-        # opción 2 - fechas calendario
-        from_dt = fields.Datetime.from_string(self.date_from)
-        to_dt = fields.Datetime.from_string(self.date_to)
-
-        calendar_delta = to_dt - from_dt
-        calendar_days = round(calendar_delta.total_seconds() / 86400 , 2)
-        self.write({'number_of_days_calendar': calendar_days})
 
         return self.write({'state': 'confirm'})
 
