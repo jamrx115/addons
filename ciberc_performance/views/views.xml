@@ -62,12 +62,11 @@
                                 <field name="evolution_personal_goal_id" nolabel="1" mode="tree"  widget="one2many_list">
                                     <tree string="objetivos de desarrollo personal" editable="bottom">
                                         <field name="sequence" widget="handle"/>
-                                        <field name="name"/>
-                                        <field name="main_personal_goal_id" options="{&quot;no_open&quot;: True}"/>
+                                        <field name="name" required="1"/>
+                                        <field name="main_personal_goal_id" required="1"/>
                                         <field name="scope"/>
                                         <field name="date"/>
                                         <field name="comments"/>
-
                                     </tree>
                                 </field>
                             </page>
@@ -99,12 +98,18 @@
             </field>
         </record>
 
+
          <!-- Creación de la vista  form objetivos -->
         <record id="performance_goals_form" model="ir.ui.view">
             <field name="model">ciberc.goals</field>
             <field name="arch" type="xml">
                 <form>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                                <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                            </button>
+                        </div><br/><br/>
                         <group>
                             <group>
                                 <field name="name" required="True"/>
@@ -143,6 +148,8 @@
             </field>
         </record>
 
+
+
          <!-- Creación de la vista  form objetivos principales-->
         <record id="performance_main_goals_form" model="ir.ui.view">
             <field name="model">ciberc.main.goals</field>
@@ -153,7 +160,7 @@
                             <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
                                 <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
                             </button>
-                        </div>
+                        </div><br/><br/>
                         <label for="name"/><br/>
                         <field name="name" required="True"/><br/><br/>
                         <label for="description"/><br/>
@@ -204,7 +211,7 @@
                         <field name="date"/>
                         <field name="scope"/>
                         <field name="comments"/>
-                        <field name="main_personal_goal_id" options="{&quot;no_open&quot;: True}"/>
+                        <field name="main_personal_goal_id"/>
                     </group>
                 </form>
             </field>
@@ -254,7 +261,6 @@
                 </field>
             </field>
         </record>
-
 
         <!-- ............................ CREACIÓN DE LAS ACCIONES ..................................... -->
        
@@ -331,6 +337,32 @@
             <field name="view_id" ref="performance_main_goals_form"/>
             <field name="act_window_id" ref="action__main_goals"/>
         </record>
+
+        <!-- ............................ CREACIÓN DE LAS SEARCH VIEWS..................................... -->
+        <record id="performance_main_goals_search" model="ir.ui.view">
+            <field name="name">Objetivos estrategia general search</field>
+            <field name="model">ciberc.main.goals</field>
+            <field name="arch" type="xml">
+                <search string="Search main objective">
+                    <filter string="Archivado" name="inactive" domain="[('active','=',False)]"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="performance_goals_search" model="ir.ui.view">
+            <field name="name">Objetivos especificos search</field>
+            <field name="model">ciberc.goals</field>
+            <field name="arch" type="xml">
+                <search string="Search main objective">
+                    <filter string="Archivado" name="inactive" domain="[('active','=',False)]"/>
+                </search>
+            </field>
+        </record>
+
+
+
+
+
 
         <!-- ............................ CREACIÓN DE LOS MENÚS ..................................... -->
         

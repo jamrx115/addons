@@ -3,6 +3,7 @@
 from odoo import models, fields, api, _
 from datetime import datetime
 from odoo.exceptions import UserError
+from openerp.exceptions import except_orm, Warning, RedirectWarning
 
 import re
 import logging
@@ -51,38 +52,8 @@ class ciberc_performance (models.Model):
         values['state'] = 'primer'
         res = super(ciberc_performance,self.with_context(mail_create_nosubscribe=True)).create(values)
         return res
-    
-    @api.multi
-    def get_goal(self):
-        """
-        goal_list = []
-        goal_exist_list = []
-        goal_set_list = []
-        self.env['ciberc.performance.line'].search([('ciberc_performance_id.id', '=', self.id)]).unlink()
-        #goals_of_this_employee = self.env['ciberc.goals'].search([('departments_ids', '=', self.department_id.id),('id', 'not in', self.performance_goal_id.goal_id.id)])
-        goals_of_this_employee = self.env['ciberc.goals'].search([('departments_ids', '=', self.department_id.id)])
-        goals_set_in_this_employee = self.env['ciberc.performance.line']
-
-        for goal_exist in goals_of_this_employee:
-            goal_exist_list.append(goal_exist.id)
-
-        for goal_set in goals_set_in_this_employee:
-            goal_set_list.append(goal_set.goal_id.id)
-
-        for goal in goal_exist_list:
-            if not self.performance_goal_id:
-                for goal2 in self.performance_goal_id.ids:
-                    if goal != goal2:
-                        goal_created  = self.env['ciberc.performance.line'].create({'goal_id': goal})
-                        goal_list.append(goal_created.id)
-            else:
-                goal_created  = self.env['ciberc.performance.line'].create({'goal_id': goal})
-                goal_list.append(goal_created.id)
-        self.performance_goal_id = goal_list
-    """
-
-    
-    #FUNCIONA BIEN PERO QUIERO AGREGARLE UN IF PARA QUE NO CARGUE VARIAS VECES LOS MISMOS
+     
+    #Carga los objetivos del área del colaborador y cuando se vuelve a llamar formatea y vuelve a iniciar.
     @api.multi
     def get_goal(self):
         goal_list = []
@@ -135,12 +106,23 @@ class ciberc_goals (models.Model):
     goal = fields.Char(string='Meta')
     goal_min = fields.Char(string='Mínimo')
     goal_max = fields.Char(string='Máximo')
+    active = fields.Boolean(string="Activo", default="True")
+
 
     @api.model
     def create(self, values):
         res=super(ciberc_goals,self.with_context(mail_create_nosubscribe=True)).create(values)
         return res
-    
+
+
+    @api.multi
+    def unlink(self):
+        range_obj = self.env['ciberc.performance.line']
+        rule_ranges = range_obj.search([('goal_id', 'in', self.ids)])
+        if rule_ranges:
+            raise Warning(_("¡Está tratando de eliminar un objetivo especifico que aun está siendo usado!"))
+        return super(ciberc_goals, self).unlink()
+
 
 class ciberc_main_goals (models.Model):
     _name="ciberc.main.goals"
@@ -159,7 +141,16 @@ class ciberc_main_goals (models.Model):
     def create(self, values):
         res = super(ciberc_main_goals,self.with_context(mail_create_nosubscribe=True)).create(values)
         return res
-   
+
+    @api.multi
+    def unlink(self):
+        range_obj = self.env['ciberc.goals']
+        rule_ranges = range_obj.search([('main_goal_related_id', 'in', self.ids)])
+        if rule_ranges:
+            raise Warning(_("¡Está tratando de eliminar un objetivo de estrategia general que aun está siendo usado!"))
+        return super(ciberc_main_goals, self).unlink()
+
+
 
 class ciberc_personal_goals (models.Model):
     _name="ciberc.personal.goals"
@@ -180,3 +171,11 @@ class ciberc_personal_main_goals (models.Model):
     _description = "Objetivo personal general"
 
     name = fields.Char(string='Nombre')
+
+    @api.multi
+    def unlink(self):
+        range_obj = self.env['ciberc.personal.goals']
+        rule_ranges = range_obj.search([('main_personal_goal_id', 'in', self.ids)])
+        if len(rule_ranges) > 1:
+            raise Warning(_("¡Está tratando de eliminar un objetivo personal general que aun está siendo usado!"))
+        return super(ciberc_personal_main_goals, self).unlink()
