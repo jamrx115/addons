@@ -267,6 +267,7 @@
                     </form>
                 </field>
             </record>
+
             <!-- ........................................................................................................................... CREACIÓN DE LAS HERENCIAS READONLY ............................................................................................................................................................................................ -->
         
             <!--herencia para el grupo usuario -->
@@ -934,6 +935,17 @@
                 </field>
             </record>
 
+            <!--herencia para el grupo admin -->
+            <record id="ciberc_knowledge_read_only_admin" model="ir.ui.view">
+                <field name="name">herencia read only solicitud de capacitacion admin</field>
+                <field name="model">ciberc.knowledge</field>
+                <field name="inherit_id" ref="ciberc_knowledge.knowledge_request_form" />
+                <field name="groups_id" eval="[(6, 0, [ref('ciberc_knowledge.group_ciberc_knowledge_admin') ])]" />           <field name="arch" type="xml">
+                    <field name="reason" position="attributes">
+                       <attribute name="options">{&quot;no_open&quot;: False}</attribute>
+                    </field>                                   
+                </field>
+            </record>
 
             <!-- ............................ CREACIÓN DE LAS ACCIONES ..................................... -->
 
