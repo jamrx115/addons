@@ -1,0 +1,15 @@
+[1mdiff --git a/ciberc_contract/models/models.py b/ciberc_contract/models/models.py[m
+[1mindex b616040..f73aed4 100644[m
+[1m--- a/ciberc_contract/models/models.py[m
+[1m+++ b/ciberc_contract/models/models.py[m
+[36m@@ -54,8 +54,9 @@[m [mclass ciberc_contract(models.Model):[m
+     # -override[m
+     @api.multi[m
+     def write(self, vals):[m
+[32m+[m[32m        res = super(ciberc_contract, self).write(vals)[m
+[32m+[m
+         for contract_obj in self:[m
+[31m-            res = super(ciberc_contract, contract_obj).write(vals)[m
+             employee_obj = self.env['hr.employee'].search([('id', '=', contract_obj.employee_id.id)], limit=1)[m
+             # escribir el horario en datos de empleado[m
+             if contract_obj.working_hours:[m
