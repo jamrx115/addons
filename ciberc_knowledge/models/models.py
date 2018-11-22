@@ -19,7 +19,7 @@ class ciberc_knowledge (models.Model):
     approver_id = fields.Many2one('ciberc.approver.knowledge',string="Aprobador", track_visibility="onchange")
     department_id = fields.Many2one('hr.department', string="Departamento", track_visibility="onchange")
     country_id = fields.Many2one('res.country',string="País ubicación de trabajo")
-    email = fields.Char(string="Correo electrónico interno")
+    email = fields.Char(string="Correo electrónico interno",related="name.employee_ids.work_email",store=True, copy=True)
     knowledge = fields.Selection([('interno','Interno'),('externo','Externo')], string="Modalidad de capacitación/entrenamiento", track_visibility="onchange")
     kind_knowledge = fields.Selection([('habilidadestecnicas','Habilidades técnicas o actualización de conocimientos'),('habilidadesgerenciales','Habilidades gerenciales'),('nuevosmetodos','Nuevos metodos y procedimientos'),('habilidadesdeventas','Habilidades de ventas y/o servicio al cliente'),('otros','Otros')], string="Tipos de capacitaciones/entrenamientos")
     knowledge_application = fields.Selection([('diplomado','Diplomado'),('curso','Curso'),('seminario','Seminario'),('taller','Taller'),('examen','Examen'),('otro','Otro')], string="Solicitud de capacitación/entrenamiento", track_visibility="onchange")
@@ -28,7 +28,7 @@ class ciberc_knowledge (models.Model):
     knowledge_start = fields.Date(string="Fecha inicio")
     knowledge_end = fields.Date(string="Fecha fin")
     knowledge_time = fields.Integer(string="Duración de capacitacion/entrenamiento (hrs)")
-    knowledge_cost = fields.Float(string="Costo de capacitacion/entrenamiento", digits=(15,4))
+    knowledge_cost = fields.Float(string="Costo de capacitacion/entrenamiento", digits=(15,2))
     currency_id = fields.Many2one('res.currency',string="Moneda")
     excuse = fields.Selection([('asociado','Asociado al proyecto'),('cumplimiento','Cumplimiento del rol'),('seguimiento','Seguimiento evaluación de desempeño'),('otro','Otro')],string="Justificación de capacitación/entrenamiento")
     excuse_details = fields.Text(string="Especificación de la justificación")
@@ -36,7 +36,7 @@ class ciberc_knowledge (models.Model):
     exam_name_id = fields.Many2one('x_certificacion.conocimientos', string="Nombre del examen")
     partner = fields.Char(string="Tecnologia/partner")
     code_exam = fields.Char(string="Código del examen", size=10)
-    cost_exam = fields.Float(string="Costo del examen",digits=(15,4))
+    cost_exam = fields.Float(string="Costo del examen",digits=(15,2))
     currency_two_id = fields.Many2one('res.currency',string="Moneda")
     date_exam = fields.Date(string="Fecha a presentar el examen")
     schedule_start = fields.Float(string="Hora de inicio")
@@ -232,6 +232,9 @@ class ciberc_knowledge (models.Model):
         # Send out the e-mail template to the user
         self.env['mail.template'].browse(template.id).send_mail(self.id)
 
+    @api.onchange('name')
+    def _onchange_employee_work_email(self):
+        self.email = self.name.employee_ids.work_email
         
 
 class ciberc_approver_knowledge (models.Model):

@@ -29,7 +29,7 @@
         'views/views.xml',
         'views/report_knowledge_templates.xml',
         'views/ciberc_knowledge_report.xml',
-        'data/knowledge_template.xml',
+        'data/knowledge_template_mail.xml',
         'data/reasons_data.xml',
         #'data/data.xml',
     ]

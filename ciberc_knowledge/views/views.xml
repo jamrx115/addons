@@ -92,7 +92,7 @@
                             <label for="country_id"/><br/>
                             <field name="country_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" required="1"/><br/><br/>
                             <label for="email"/><br/>
-                            <field name="email" required="1"/><br/><br/>
+                            <field name="email" readonly="1"/><br/><br/>
                             <label for="knowledge"/><br/>
                             <field name="knowledge" required="1"/><br/><br/>
                             <label for="kind_knowledge"/><br/>
