@@ -242,11 +242,13 @@ class HolidaysUpdated(models.Model):
                 date_return = to_dt if to_dt_hours_w < to_dt_hours_t else self.write_return_day(to_dt, employee.company_id.country_id.id)
                 self.write({ 'date_return': date_return, })
 
-            if holiday.double_validation:
-                template = self.env.ref('ciberc_holidays.approve_template')
-                self.env['mail.template'].browse(template.id).send_mail(self.id)
-                return holiday.write({'state': 'validate1', 'manager_id': manager.id if manager else False})
-            else:
+                if holiday.double_validation:
+                    template = self.env.ref('ciberc_holidays.approve_template')
+                    self.env['mail.template'].browse(template.id).send_mail(self.id)
+                    return holiday.write({'state': 'validate1', 'manager_id': manager.id if manager else False})
+                else:
+                    holiday.action_validate()
+            else: # holiday.type == 'add'
                 holiday.action_validate()
 
     @api.multi
