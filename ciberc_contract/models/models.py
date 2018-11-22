@@ -54,8 +54,9 @@ class ciberc_contract(models.Model):
     # -override
     @api.multi
     def write(self, vals):
+        res = super(ciberc_contract, self).write(vals)
+
         for contract_obj in self:
-            res = super(ciberc_contract, contract_obj).write(vals)
             employee_obj = self.env['hr.employee'].search([('id', '=', contract_obj.employee_id.id)], limit=1)
             # escribir el horario en datos de empleado
             if contract_obj.working_hours:
