@@ -513,6 +513,7 @@ class PayslipWorkedDaysUpdated(models.Model):
     _inherit = 'hr.payslip.worked_days'
 
     number_of_days_calendar = fields.Float(string='Días Calendario')
+    distance_from_holiday = fields.Integer(string='Distancia al inicio de la ausencia')
 
 #clase creada por alltic que trabaja con el codigo para regla salarial
 class CodeLeaveTypePayroll(models.Model):
@@ -552,6 +553,7 @@ class CodeLeaveTypePayroll(models.Model):
                  'number_of_days_calendar': 0.0, # empty
                  'date_from': None, # empty
                  'date_to': None, # empty
+                 'distance_from_holiday': 0, # empty
             }
             leaves = {}
             day_from = fields.Datetime.from_string(date_from)
@@ -572,31 +574,32 @@ class CodeLeaveTypePayroll(models.Model):
                 date_str = str(interval[0].date())
                 holiday_obj = holidays_ids.filtered(lambda r: r.date == date_str)
 
-                if ausencia: # hay ausencia -> conteo ausencia
-                    if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
-                        # fin de semana o festivo
-                        attendances['number_of_hours'] += hours
-                        # copy condition
-                        if ausencia.holiday_status_id.name in leaves:
-                            leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
-                    else:
-                        # entre semana no festivo
-                        if ausencia.holiday_status_id.name in leaves:
-                            leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
-                            leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
+                if ausencia:  # hay ausencia -> conteo ausencia
+                    if ausencia.holiday_status_id.name in leaves:
+                        leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
+                        if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
+                            attendances['number_of_hours'] += hours
                         else:
-                            leaves[ausencia.holiday_status_id.name] = {
-                                'name': ausencia.holiday_status_id.name,
-                                'sequence': 5,
-                                'code': ausencia.holiday_status_id.code,
-                                'number_of_days': 0.0,
-                                'number_of_hours': hours,
-                                'contract_id': contract.id,
+                            leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
+                    else:
+                        ausencia_date_from = fields.Datetime.from_string(ausencia.date_from)
+                        leaves[ausencia.holiday_status_id.name] = {
+                            'name': ausencia.holiday_status_id.name,
+                            'sequence': 5,
+                            'code': ausencia.holiday_status_id.code,
+                            'number_of_days': 0.0,
+                            'number_of_hours': 0.0,
+                            'contract_id': contract.id,
 
-                                'number_of_days_calendar': 0.0,
-                                'date_from': interval[0].date(),
-                                'date_to': interval[1].date(),
-                            }
+                            'number_of_days_calendar': 0.0,
+                            'date_from': interval[0].date(),
+                            'date_to': interval[1].date(),
+                            'distance_from_holiday': (ausencia_date_from - day_from).days,
+                        }
+                        if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
+                            attendances['number_of_hours'] += hours
+                        else:
+                            leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
                 else:
                     # no hay ausencia -> conteo WORK100
                     attendances['number_of_hours'] += hours
@@ -608,13 +611,19 @@ class CodeLeaveTypePayroll(models.Model):
                 data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day)\
                     if uom_day and uom_hour\
                     else data['number_of_hours'] / 8.0
+
                 if data['code'] != 'WORK100':
                     calendar_delta = data['date_to'] - data['date_from']
                     number_of_days_calendar = round(calendar_delta.days + float(calendar_delta.seconds) / 86400 , 2) + 1.00
                     auxiliar_for_WORK100 += number_of_days_calendar
                     data['number_of_days_calendar'] = number_of_days_calendar
+
                 res.append(data)
-                res[0]['number_of_days_calendar'] = nb_of_days - auxiliar_for_WORK100
+
+            res[0]['number_of_days_calendar'] = nb_of_days - auxiliar_for_WORK100
+            if day_to.day == 31:
+                res[0]['number_of_days'] = res[0]['number_of_days'] - 1
+                res[0]['number_of_days_calendar'] = res[0]['number_of_days_calendar'] - 1
 
         return res
 
