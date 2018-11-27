@@ -627,9 +627,10 @@ class CodeLeaveTypePayroll(models.Model):
                 res.append(data)
 
             res[0]['number_of_days_calendar'] = nb_of_days - auxiliar_for_WORK100
-            if day_to.day == 31:
-                res[0]['number_of_days'] = res[0]['number_of_days'] - 1
-                res[0]['number_of_days_calendar'] = res[0]['number_of_days_calendar'] - 1
+            # Se traslada solución a regla salarial
+            # if day_to.day == 31:
+            #     res[0]['number_of_days'] = res[0]['number_of_days'] - 1
+            #     res[0]['number_of_days_calendar'] = res[0]['number_of_days_calendar'] - 1
 
         return res
 
