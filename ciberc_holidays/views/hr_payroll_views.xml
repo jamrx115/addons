@@ -51,7 +51,7 @@
                         <td><span t-field="o.employee_id.job_id"/></td>
                         <td><strong>Sueldo ordinario</strong></td>
                         <td><span t-esc="o.contract_id.wage"
-                                  t-esc-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                                  t-esc-options='{"widget": "monetary", "display_currency": o.contract_id.x_currency_id}'/></td>
                     </tr>
                     <tr>
                         <td><strong>Departamento</strong></td>
