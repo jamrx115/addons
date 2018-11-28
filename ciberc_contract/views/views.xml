@@ -28,6 +28,18 @@
         </field>
     </record>
 
+    <!-- Tree contrato -->
+    <record id="hr_contract_view_tree_updated" model="ir.ui.view">
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_end']" position="after">
+                <field name="wage" />
+                <field name="state" />
+            </xpath>
+        </field>
+    </record>
+
     <!-- Form employee : ir a hr_employee_updation.hr_employee_inherit_form_view -->
     <!-- hacer readonly a field[@name='joining_date'] -->
 
