@@ -75,9 +75,8 @@
                         <tr t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
                             <td><span t-field="line.code"/></td>
                             <td><span t-field="line.name"/></td>
-                            <td><span t-field="line.amount"/></td>
-                            <td><span t-field="line.total"/></td>
-
+                            <td><span t-esc="'%.2f'% line.amount"/></td>
+                            <td><span t-esc="'%.2f'% line.total"/></td>
                         </tr>
                     </tbody>
                 </table>
@@ -129,6 +128,34 @@
                             <field name="contract_id"/>
                             <field name="sequence"/>
                             <field name="distance_from_holiday"/>
+                        </group>
+                    </form>
+                </field>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']" position="replace">
+                <field name="line_ids" colspan="4" nolabel="1">
+                    <tree string="Salary Structure" editable="bottom" decoration-info="total == 0">
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="category_id"/>
+                        <field name="sequence" invisible="1"/>
+                        <field name="quantity" digits="(10, 0)"/>
+                        <field name="rate" digits="(10, 2)"/>
+                        <field name="salary_rule_id"/>
+                        <field name="amount" digits="(10, 2)"/>
+                        <field name="total" digits="(10, 2)"/>
+                    </tree>
+                    <form string="Payslip Line">
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="category_id"/>
+                            <field name="sequence"/>
+                            <field name="quantity" digits="(10, 0)"/>
+                            <field name="rate" digits="(10, 2)"/>
+                            <field name="amount" digits="(10, 2)"/>
+                            <field name="total" digits="(10, 2)"/>
+                            <field name="salary_rule_id"/>
                         </group>
                     </form>
                 </field>
