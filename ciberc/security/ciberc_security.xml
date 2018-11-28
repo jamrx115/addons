@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+    	<record id="group_hr_admin" model="res.groups">
+            <field name="name">Oficial administrador</field>
+            <field name="category_id" ref="base.module_category_human_resources"/>
+            <field name="comment">Este grupo de acceso es el superior en el cual las personas contenidas pueden ver, editar, borrar y agregar información a todos los empleados</field>
+        </record>
+    </data>
+</odoo>

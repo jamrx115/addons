@@ -50,7 +50,7 @@ class ciberc_knowledge (models.Model):
     reason = fields.Many2one('ciberc.reasons', string="Motivo de rechazo o de aplazamiento")
     reason_detail = fields.Text(string="Detalles del motivo")
     supplier_id = fields.Many2one('res.partner', domain=[('supplier','=',True)],string="Proveedor")
-    final_cost = fields.Float(string="Costo final", digits=(15,4))
+    final_cost = fields.Float(string="Costo final", digits=(15,2))
     currency_three_id = fields.Many2one('res.currency',string="Moneda")
     deferment = fields.Boolean(string="¿Desea configurar fecha de aplazamiento?")
     deferment_date = fields.Date(string="Fecha de aplazamiento")

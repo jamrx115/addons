@@ -24,5 +24,6 @@
     # always loaded
     'data': [
         'views/views.xml',
+        'security/ciberc_security.xml',
     ]
 }
