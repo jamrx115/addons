@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, tools, _
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, AccessError
 
 import logging
+import babel
 import time
 import pytz
 import math
@@ -265,43 +266,48 @@ class HolidaysUpdated(models.Model):
                 raise UserError('Solamente un jefe de departamento puede aplicar la segunda aprobación en solicitudes de ausencia.')
 
             holiday.write({'state': 'validate'})
-            if holiday.double_validation:
-                holiday.write({'manager_id2': manager.id})
-                template = self.env.ref('ciberc_holidays.validate_template')
-                self.env['mail.template'].browse(template.id).send_mail(self.id)
-            else:
-                holiday.write({'manager_id': manager.id})
-                template = self.env.ref('ciberc_holidays.validate_template')
-                self.env['mail.template'].browse(template.id).send_mail(self.id)
-            if holiday.holiday_type == 'employee' and holiday.type == 'remove':
-                meeting_values = {
-                    'name': holiday.display_name,
-                    'categ_ids': [(6, 0, [holiday.holiday_status_id.categ_id.id])] if holiday.holiday_status_id.categ_id else [],
-                    'duration': holiday.number_of_days_temp * HOURS_PER_DAY,
-                    'description': holiday.notes,
-                    'user_id': holiday.user_id.id,
-                    'start': holiday.date_from,
-                    'stop': holiday.date_to,
-                    'allday': False,
-                    'state': 'open',            # to block that meeting date in the calendar
-                    'privacy': 'confidential'
-                }
-                #Add the partner_id (if exist) as an attendee
-                #if holiday.user_id and holiday.user_id.partner_id:
-                    #meeting_values['partner_ids'] = [(4, holiday.user_id.partner_id.id)]
 
-                meeting = self.env['calendar.event'].with_context(no_mail_to_attendees=True).create(meeting_values)
-                holiday._create_resource_leave()
-                holiday.write({'meeting_id': meeting.id})
-            elif holiday.holiday_type == 'category':
-                leaves = self.env['hr.holidays']
-                for employee in holiday.category_id.employee_ids:
-                    values = holiday._prepare_create_by_category(employee)
-                    leaves += self.with_context(mail_notify_force_send=False).create(values)
-                # TODO is it necessary to interleave the calls?
-                leaves.action_approve()
-                if leaves and leaves[0].double_validation:
-                    leaves.action_validate()
+            if holiday.type == 'remove':
+                if holiday.double_validation:
+                    holiday.write({'manager_id2': manager.id})
+                    template = self.env.ref('ciberc_holidays.validate_template')
+                    self.env['mail.template'].browse(template.id).send_mail(self.id)
+                else:
+                    holiday.write({'manager_id': manager.id})
+                    template = self.env.ref('ciberc_holidays.validate_template')
+                    self.env['mail.template'].browse(template.id).send_mail(self.id)
+                if holiday.holiday_type == 'employee' and holiday.type == 'remove':
+                    meeting_values = {
+                        'name': holiday.display_name,
+                        'categ_ids': [(6, 0, [holiday.holiday_status_id.categ_id.id])] if holiday.holiday_status_id.categ_id else [],
+                        'duration': holiday.number_of_days_temp * HOURS_PER_DAY,
+                        'description': holiday.notes,
+                        'user_id': holiday.user_id.id,
+                        'start': holiday.date_from,
+                        'stop': holiday.date_to,
+                        'allday': False,
+                        'state': 'open',            # to block that meeting date in the calendar
+                        'privacy': 'confidential'
+                    }
+                    #Add the partner_id (if exist) as an attendee
+                    #if holiday.user_id and holiday.user_id.partner_id:
+                        #meeting_values['partner_ids'] = [(4, holiday.user_id.partner_id.id)]
+
+                    meeting = self.env['calendar.event'].with_context(no_mail_to_attendees=True).create(meeting_values)
+                    holiday._create_resource_leave()
+                    holiday.write({'meeting_id': meeting.id})
+                elif holiday.holiday_type == 'category':
+                    leaves = self.env['hr.holidays']
+                    for employee in holiday.category_id.employee_ids:
+                        values = holiday._prepare_create_by_category(employee)
+                        leaves += self.with_context(mail_notify_force_send=False).create(values)
+                    # TODO is it necessary to interleave the calls?
+                    leaves.action_approve()
+                    if leaves and leaves[0].double_validation:
+                        leaves.action_validate()
+            else: # holiday.type == 'add'
+                template = self.env.ref('ciberc_holidays.validate_template')
+                self.env['mail.template'].browse(template.id).send_mail(self.id)
         return True
 
     @api.multi
@@ -508,6 +514,7 @@ class PayslipWorkedDaysUpdated(models.Model):
     _inherit = 'hr.payslip.worked_days'
 
     number_of_days_calendar = fields.Float(string='Días Calendario')
+    distance_from_holiday = fields.Integer(string='Distancia al inicio de la ausencia')
 
 #clase creada por alltic que trabaja con el codigo para regla salarial
 class CodeLeaveTypePayroll(models.Model):
@@ -547,9 +554,15 @@ class CodeLeaveTypePayroll(models.Model):
                  'number_of_days_calendar': 0.0, # empty
                  'date_from': None, # empty
                  'date_to': None, # empty
+                 'distance_from_holiday': 0, # empty
             }
             leaves = {}
-            day_from = fields.Datetime.from_string(date_from)
+            day_from_contract = fields.Datetime.from_string(contract.date_start)
+            day_from_payslip = fields.Datetime.from_string(date_from)
+            if day_from_contract > day_from_payslip:
+                day_from = day_from_contract
+            else:
+                day_from = day_from_payslip
             day_to = fields.Datetime.from_string(date_to)
             nb_of_days = (day_to - day_from).days + 1
             country_emp_id = contract.employee_id.company_id.country_id.id
@@ -567,31 +580,32 @@ class CodeLeaveTypePayroll(models.Model):
                 date_str = str(interval[0].date())
                 holiday_obj = holidays_ids.filtered(lambda r: r.date == date_str)
 
-                if ausencia: # hay ausencia -> conteo ausencia
-                    if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
-                        # fin de semana o festivo
-                        attendances['number_of_hours'] += hours
-                        # copy condition
-                        if ausencia.holiday_status_id.name in leaves:
-                            leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
-                    else:
-                        # entre semana no festivo
-                        if ausencia.holiday_status_id.name in leaves:
-                            leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
-                            leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
+                if ausencia:  # hay ausencia -> conteo ausencia
+                    if ausencia.holiday_status_id.name in leaves:
+                        leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
+                        if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
+                            attendances['number_of_hours'] += hours
                         else:
-                            leaves[ausencia.holiday_status_id.name] = {
-                                'name': ausencia.holiday_status_id.name,
-                                'sequence': 5,
-                                'code': ausencia.holiday_status_id.code,
-                                'number_of_days': 0.0,
-                                'number_of_hours': hours,
-                                'contract_id': contract.id,
+                            leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
+                    else:
+                        ausencia_date_from = fields.Datetime.from_string(ausencia.date_from)
+                        leaves[ausencia.holiday_status_id.name] = {
+                            'name': ausencia.holiday_status_id.name,
+                            'sequence': 5,
+                            'code': ausencia.holiday_status_id.code,
+                            'number_of_days': 0.0,
+                            'number_of_hours': 0.0,
+                            'contract_id': contract.id,
 
-                                'number_of_days_calendar': 0.0,
-                                'date_from': interval[0].date(),
-                                'date_to': interval[1].date(),
-                            }
+                            'number_of_days_calendar': 0.0,
+                            'date_from': interval[0].date(),
+                            'date_to': interval[1].date(),
+                            'distance_from_holiday': (ausencia_date_from - day_from).days,
+                        }
+                        if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
+                            attendances['number_of_hours'] += hours
+                        else:
+                            leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
                 else:
                     # no hay ausencia -> conteo WORK100
                     attendances['number_of_hours'] += hours
@@ -603,15 +617,66 @@ class CodeLeaveTypePayroll(models.Model):
                 data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day)\
                     if uom_day and uom_hour\
                     else data['number_of_hours'] / 8.0
+
                 if data['code'] != 'WORK100':
                     calendar_delta = data['date_to'] - data['date_from']
                     number_of_days_calendar = round(calendar_delta.days + float(calendar_delta.seconds) / 86400 , 2) + 1.00
                     auxiliar_for_WORK100 += number_of_days_calendar
                     data['number_of_days_calendar'] = number_of_days_calendar
+
                 res.append(data)
-                res[0]['number_of_days_calendar'] = nb_of_days - auxiliar_for_WORK100
+
+            res[0]['number_of_days_calendar'] = nb_of_days - auxiliar_for_WORK100
+            # Se traslada solución a regla salarial
+            # if day_to.day == 31:
+            #     res[0]['number_of_days'] = res[0]['number_of_days'] - 1
+            #     res[0]['number_of_days_calendar'] = res[0]['number_of_days_calendar'] - 1
 
         return res
+
+    @api.onchange('employee_id', 'date_from', 'date_to', 'contract_id')
+    def onchange_employee(self):
+
+        if (not self.employee_id) or (not self.date_from) or (not self.date_to):
+            return
+
+        employee = self.employee_id
+        date_from = self.date_from
+        date_to = self.date_to
+
+        ttyme = datetime.fromtimestamp(time.mktime(time.strptime(date_from, "%Y-%m-%d")))
+        locale = self.env.context.get('lang') or 'en_US'
+        self.name = _('Salary Slip of %s for %s') % (
+        employee.name, tools.ustr(babel.dates.format_date(date=ttyme, format='MMMM-y', locale=locale)))
+        self.company_id = employee.company_id
+
+        if not self.env.context.get('contract') or not self.contract_id:
+            contract_ids = self.get_contract(employee, date_from, date_to)
+            if not contract_ids:
+                return
+            if not self.contract_id:
+                self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
+
+        # filter only for current contract
+        contract_ids = [self.contract_id.id]
+
+        if not self.contract_id.struct_id:
+            return
+        self.struct_id = self.contract_id.struct_id
+
+        # computation of the salary input
+        worked_days_line_ids = self.get_worked_day_lines(contract_ids, date_from, date_to)
+        worked_days_lines = self.worked_days_line_ids.browse([])
+        for r in worked_days_line_ids:
+            worked_days_lines += worked_days_lines.new(r)
+        self.worked_days_line_ids = worked_days_lines
+
+        input_line_ids = self.get_inputs(contract_ids, date_from, date_to)
+        input_lines = self.input_line_ids.browse([])
+        for r in input_line_ids:
+            input_lines += input_lines.new(r)
+        self.input_line_ids = input_lines
+        return
 
 # clase creada por alltic que modifica el atributo groups del campo payslip_count
 class HrEmployeePayslip(models.Model):

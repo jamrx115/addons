@@ -51,7 +51,7 @@
                         <td><span t-field="o.employee_id.job_id"/></td>
                         <td><strong>Sueldo ordinario</strong></td>
                         <td><span t-esc="o.contract_id.wage"
-                                  t-esc-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'/></td>
+                                  t-esc-options='{"widget": "monetary", "display_currency": o.contract_id.x_currency_id}'/></td>
                     </tr>
                     <tr>
                         <td><strong>Departamento</strong></td>
@@ -75,9 +75,8 @@
                         <tr t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
                             <td><span t-field="line.code"/></td>
                             <td><span t-field="line.name"/></td>
-                            <td><span t-field="line.amount"/></td>
-                            <td><span t-field="line.total"/></td>
-
+                            <td><span t-esc="'%.2f'% line.amount"/></td>
+                            <td><span t-esc="'%.2f'% line.total"/></td>
                         </tr>
                     </tbody>
                 </table>
@@ -102,7 +101,7 @@
     </template>
 
     <!-- ******************* updating views ******************-->
-    <!-- Widget reporte departamentos - nuevo campo -->
+    <!-- payslip - distance_from_holiday -->
     <record id="view_hr_payslip_form_updated" model="ir.ui.view">
         <field name="model">hr.payslip</field>
         <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
@@ -117,19 +116,72 @@
                         <field name="number_of_days_calendar"/>
                         <field name="contract_id"/>
                         <field name="sequence" invisible="True"/>
+                        <field name="distance_from_holiday" invisible="True"/>
                     </tree>
                     <form string="Worked Day">
                         <group col="4">
                             <field name="name"/>
                             <field name="code"/>
-                            <field name="sequence"/>
                             <field name="number_of_days"/>
                             <field name="number_of_hours"/>
                             <field name="number_of_days_calendar"/>
                             <field name="contract_id"/>
+                            <field name="sequence"/>
+                            <field name="distance_from_holiday"/>
                         </group>
                     </form>
                 </field>
+            </xpath>
+            <xpath expr="//field[@name='line_ids']" position="replace">
+                <field name="line_ids" colspan="4" nolabel="1">
+                    <tree string="Salary Structure" editable="bottom" decoration-info="total == 0">
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="category_id"/>
+                        <field name="sequence" invisible="1"/>
+                        <field name="quantity" digits="(10, 0)"/>
+                        <field name="rate" digits="(10, 2)"/>
+                        <field name="salary_rule_id"/>
+                        <field name="amount" digits="(10, 2)"/>
+                        <field name="total" digits="(10, 2)"/>
+                    </tree>
+                    <form string="Payslip Line">
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="category_id"/>
+                            <field name="sequence"/>
+                            <field name="quantity" digits="(10, 0)"/>
+                            <field name="rate" digits="(10, 2)"/>
+                            <field name="amount" digits="(10, 2)"/>
+                            <field name="total" digits="(10, 2)"/>
+                            <field name="salary_rule_id"/>
+                        </group>
+                    </form>
+                </field>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- salary rule - sequence visible -->
+    <record id="hr_salary_rule_list_updated" model="ir.ui.view">
+        <field name="model">hr.salary.rule</field>
+        <field name="inherit_id" ref="hr_payroll.hr_salary_rule_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sequence']" position="attributes">
+                <attribute name="invisible" eval="0"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- procesamientos de nómina - fechas creación y actualización visibles -->
+    <record id="hr_payslip_run_tree_updated" model="ir.ui.view">
+        <field name="model">hr.payslip.run</field>
+        <field name="inherit_id" ref="hr_payroll.hr_payslip_run_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="before">
+                <field name="create_date"/>
+                <field name="write_date"/>
             </xpath>
         </field>
     </record>
