@@ -161,6 +161,7 @@ class HolidaysUpdated(models.Model):
                     date += delta
 
                 hours = resource.calendar_id.get_working_hours(from_dt, to_dt, resource_id=resource.id, compute_leaves=True)
+                hours = round(hours, 6)
                 hours = hours - subtrahend
                 uom_hour = resource.calendar_id.uom_id
                 uom_day = self.env.ref('product.product_uom_day')
@@ -653,6 +654,9 @@ class CodeLeaveTypePayroll(models.Model):
         if not self.env.context.get('contract') or not self.contract_id:
             contract_ids = self.get_contract(employee, date_from, date_to)
             if not contract_ids:
+                self.contract_id = None
+                self.worked_days_line_ids = None
+                self.input_line_ids = None
                 return
             if not self.contract_id:
                 self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
