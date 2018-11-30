@@ -161,6 +161,7 @@ class HolidaysUpdated(models.Model):
                     date += delta
 
                 hours = resource.calendar_id.get_working_hours(from_dt, to_dt, resource_id=resource.id, compute_leaves=True)
+                hours = round(hours, 6)
                 hours = hours - subtrahend
                 uom_hour = resource.calendar_id.uom_id
                 uom_day = self.env.ref('product.product_uom_day')
