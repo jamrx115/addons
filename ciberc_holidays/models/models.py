@@ -653,6 +653,9 @@ class CodeLeaveTypePayroll(models.Model):
         if not self.env.context.get('contract') or not self.contract_id:
             contract_ids = self.get_contract(employee, date_from, date_to)
             if not contract_ids:
+                self.contract_id = None
+                self.worked_days_line_ids = None
+                self.input_line_ids = None
                 return
             if not self.contract_id:
                 self.contract_id = self.env['hr.contract'].browse(contract_ids[0])
