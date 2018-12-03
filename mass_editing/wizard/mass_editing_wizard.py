@@ -47,9 +47,9 @@ class MassEditingWizard(models.TransientModel):
                     all_fields["selection__" + field.name] = {
                         'type': 'selection',
                         'string': field_info[field.name]['string'],
-                        'selection': [('set', 'Set'),
-                                      ('remove_m2m', 'Remove'),
-                                      ('add', 'Add')]
+                        'selection': [('set', 'Establecer'),
+                                      ('remove_m2m', 'Remover'),
+                                      ('add', 'Agregar')]
                     }
                     xml_group = etree.SubElement(xml_group, 'group', {
                         'colspan': '6',
@@ -75,7 +75,7 @@ class MassEditingWizard(models.TransientModel):
                     all_fields["selection__" + field.name] = {
                         'type': 'selection',
                         'string': field_info[field.name]['string'],
-                        'selection': [('set', 'Set'), ('remove', 'Remove')],
+                        'selection': [('set', 'Establecer'), ('remove', 'Remover')],
                     }
                     all_fields[field.name] = {
                         'type': field.ttype,
@@ -97,7 +97,7 @@ class MassEditingWizard(models.TransientModel):
                     all_fields["selection__" + field.name] = {
                         'type': 'selection',
                         'string': field_info[field.name]['string'],
-                        'selection': [('set', 'Set'), ('remove', 'Remove')],
+                        'selection': [('set', 'Establecer'), ('remove', 'Remover')],
                     }
                     all_fields[field.name] = {
                         'type': field.ttype,
@@ -119,7 +119,7 @@ class MassEditingWizard(models.TransientModel):
                     all_fields["selection__" + field.name] = {
                         'type': 'selection',
                         'string': field_info[field.name]['string'],
-                        'selection': [('set', 'Set'), ('remove', 'Remove')],
+                        'selection': [('set', 'Establecer'), ('remove', 'Remover')],
                     }
                     all_fields[field.name] = {
                         'type': field.ttype,
@@ -141,7 +141,7 @@ class MassEditingWizard(models.TransientModel):
                     all_fields["selection__" + field.name] = {
                         'type': 'selection',
                         'string': field_info[field.name]['string'],
-                        'selection': [('set', 'Set'), ('remove', 'Remove')]
+                        'selection': [('set', 'Establecer'), ('remove', 'Remover')]
                     }
                     etree.SubElement(xml_group, 'field', {
                         'name': "selection__" + field.name,
@@ -167,7 +167,7 @@ class MassEditingWizard(models.TransientModel):
                     all_fields["selection__" + field.name] = {
                         'type': 'selection',
                         'string': field_info[field.name]['string'],
-                        'selection': [('set', 'Set'), ('remove', 'Remove')]
+                        'selection': [('set', 'Establecer'), ('remove', 'Remover')]
                     }
                     if field.ttype == 'text':
                         xml_group = etree.SubElement(xml_group, 'group', {
@@ -194,7 +194,7 @@ class MassEditingWizard(models.TransientModel):
                         all_fields["selection__" + field.name] = {
                             'type': 'selection',
                             'string': field_info[field.name]['string'],
-                            'selection': [('set', 'Set'), ('remove', 'Remove')]
+                            'selection': [('set', 'Establecer'), ('remove', 'Remover')]
                         }
                         etree.SubElement(xml_group, 'field', {
                             'name': "selection__" + field.name,
@@ -217,13 +217,13 @@ class MassEditingWizard(models.TransientModel):
             })
             xml_group3 = etree.SubElement(xml_form, 'footer', {})
             etree.SubElement(xml_group3, 'button', {
-                'string': 'Apply',
+                'string': 'Aplicar',
                 'class': 'btn-primary',
                 'type': 'object',
                 'name': 'action_apply',
             })
             etree.SubElement(xml_group3, 'button', {
-                'string': 'Close',
+                'string': 'Cerrar',
                 'class': 'btn-default',
                 'special': 'cancel',
             })
