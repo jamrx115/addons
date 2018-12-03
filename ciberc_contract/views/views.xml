@@ -33,8 +33,20 @@
         <field name="model">hr.contract</field>
         <field name="inherit_id" ref="hr_contract.hr_contract_view_tree"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='date_end']" position="after">
+            <xpath expr="//field[@name='date_start']" position="replace"/>
+            <xpath expr="//field[@name='date_end']" position="replace"/>
+
+            <xpath expr="//field[@name='employee_id']" position="after">
+                <field name="date_start" />
+                <field name="x_tipo_novedad_contrato_id" />
+                <field name="date_end" />
+                <field name="x_tipo_novedad_cierre_contrato_id" />
+            </xpath>
+            <xpath expr="//field[@name='x_tipo_novedad_cierre_contrato_id']" position="after">
                 <field name="wage" />
+                <field name="x_currency_id" />
+            </xpath>
+            <xpath expr="//field[@name='job_id']" position="after">
                 <field name="state" />
             </xpath>
         </field>
