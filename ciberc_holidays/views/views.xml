@@ -70,7 +70,7 @@
         </field>
     </record>
 
-    <!-- Vista form Ausencia nueva - Restricción campo empleados por grupo(s) -->
+    <!-- Vista form Ausencia nueva - Restricción campo empleados para grupo Vacaciones/Responsable (Ausencias/Responsable) -->
     <record id="edit_holiday_new_domaingroup" model="ir.ui.view">
         <field name="model">hr.holidays</field>
         <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
@@ -78,21 +78,7 @@
         <field name="arch" type="xml">
             <data>
                 <xpath expr="//field[@name='employee_id']" position="attributes">
-                    <attribute name="domain">[('department_id.member_ids.user_id', '=', uid)]</attribute>
-                </xpath>
-            </data>
-        </field>
-    </record>
-
-    <!-- Vista form Ausencia nueva - Restricción campo empleados eliminada para usuario administrador -->
-    <record id="edit_holiday_new_domaingroupadmin" model="ir.ui.view">
-        <field name="model">hr.holidays</field>
-        <field name="inherit_id" ref="hr_holidays.edit_holiday_new"/>
-        <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]" />
-        <field name="arch" type="xml">
-            <data>
-                <xpath expr="//field[@name='employee_id']" position="attributes">
-                    <attribute name="domain">[]</attribute>
+                    <attribute name="domain">['|',('parent_id.user_id', '=', uid), ('user_id', '=', uid)]</attribute>
                 </xpath>
             </data>
         </field>
