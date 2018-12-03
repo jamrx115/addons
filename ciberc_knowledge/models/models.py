@@ -3,6 +3,7 @@
 from odoo import models, fields, api, exceptions, _
 from datetime import datetime
 from odoo.exceptions import UserError
+from openerp.exceptions import except_orm, Warning, RedirectWarning
 
 import re
 import logging
@@ -299,3 +300,11 @@ class reasons (models.Model):
     _description= "Razones de rechazo"
 
     name = fields.Char(string='Nombre')
+
+    @api.multi
+    def unlink(self):
+        range_obj = self.env['ciberc.knowledge']
+        rule_ranges = range_obj.search([('reason', 'in', self.ids)])
+        if len(rule_ranges) > 1:
+            raise Warning(_("¡Está tratando de eliminar un motivo de rechazo que aun está siendo usado!"))
+        return super(reasons, self).unlink()
