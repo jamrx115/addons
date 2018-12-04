@@ -16,6 +16,8 @@ class ciberc_tipo_novedad_contrato (models.Model):
 class ciberc_contract(models.Model):
     _inherit = 'hr.contract'
 
+    # actualizacion campo
+    working_hours = fields.Many2one('resource.calendar', string='Working Schedule', required=True)
     # -campo personalizado para vacaciones o días libres
     annual_holiday = fields.Integer('Días libres anuales',
                                     help='Vacaciones para contrato laboral y días libres para prestación de servicios')
