@@ -37,7 +37,7 @@ class ciberc_contract(models.Model):
     x_meses_isr = fields.Float(string='Meses ISR')
     x_numero_contrato = fields.Char(string='Identificador Contrato Físico')
     x_renta_ex_patrono = fields.Float(string='Renta Ex-Patrono')
-    x_tipo_novedad_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad creacion del contrato')
+    x_tipo_novedad_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad creacion del contrato', required=True)
     x_tipo_novedad_cierre_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad cierre del contrato')
 
     # -override
