@@ -566,8 +566,11 @@ class CodeLeaveTypePayroll(models.Model):
                 day_from = day_from_contract
             else:
                 day_from = day_from_payslip
-            if day_to_contract < day_to_payslip:
-                day_to = day_to_contract
+            if day_to_contract:
+                if day_to_contract < day_to_payslip:
+                    day_to = day_to_contract
+                else:
+                    day_to = day_to_payslip
             else:
                 day_to = day_to_payslip
             nb_of_days = (day_to - day_from).days + 1
