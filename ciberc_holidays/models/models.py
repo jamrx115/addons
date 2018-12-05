@@ -690,6 +690,59 @@ class CodeLeaveTypePayroll(models.Model):
         self.input_line_ids = input_lines
         return
 
+    # obtener sumatoria comisiones para bono 14
+    @api.multi
+    def sum_commission_for_bono14(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
+        # date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
+        date_to_payslip = fields.Datetime.from_string(date_to_payslip) # tipo datetime
+        date_from_bono = datetime(year=(date_to_payslip.year)-1, month=7, day=1) # tipo datetime
+        date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30) # tipo datetime
+        result = 0.00
+
+        employee = self.env['hr.employee'].browse(employee_p) # tipo hr_employee
+        contract = contract_p # tipo hr_contract (obj)
+        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono) # tipo [int]
+        payslip_ids = self.env['hr.payslip'].search([('contract_id', '=', contract.id)], limit=0) # recordset vacío para concatenar
+
+        for contract_id in contract_ids:
+            payslip_aux = self.env['hr.payslip'].search(['&', ('contract_id', '=', contract_id), ('date_from', '=', date_from_bono), ('date_to', '=', date_to_bono)])
+            payslip_ids = payslip_ids + payslip_aux
+
+        for payslip in payslip_ids:
+            for input in payslip.input_line_ids:
+                if input.code == 'COM':
+                    result += input.amount
+
+        return result
+
+    # obtener sumatoria comisiones para aguinaldo
+    @api.multi
+    def sum_commission_for_aguinaldo(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
+        # date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
+        date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
+        date_from_bono = datetime(year=(date_to_payslip.year) - 1, month=12, day=1)  # tipo datetime
+        date_to_bono = datetime(year=date_to_payslip.year, month=11, day=30)  # tipo datetime
+        result = 0.00
+
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+        contract = contract_p  # tipo hr_contract (obj)
+        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
+        payslip_ids = self.env['hr.payslip'].search([('contract_id', '=', contract.id)],
+                                                    limit=0)  # recordset vacío para concatenar
+
+        for contract_id in contract_ids:
+            payslip_aux = self.env['hr.payslip'].search(
+                ['&', ('contract_id', '=', contract_id), ('date_from', '=', date_from_bono),
+                 ('date_to', '=', date_to_bono)])
+            payslip_ids = payslip_ids + payslip_aux
+
+        for payslip in payslip_ids:
+            for input in payslip.input_line_ids:
+                if input.code == 'COM':
+                    result += input.amount
+
+        return result
+
 # clase creada por alltic que modifica el atributo groups del campo payslip_count
 class HrEmployeePayslip(models.Model):
     _inherit = 'hr.employee'
