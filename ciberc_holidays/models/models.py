@@ -560,11 +560,16 @@ class CodeLeaveTypePayroll(models.Model):
             leaves = {}
             day_from_contract = fields.Datetime.from_string(contract.date_start)
             day_from_payslip = fields.Datetime.from_string(date_from)
+            day_to_contract = fields.Datetime.from_string(contract.date_end)
+            day_to_payslip = fields.Datetime.from_string(date_to)
             if day_from_contract > day_from_payslip:
                 day_from = day_from_contract
             else:
                 day_from = day_from_payslip
-            day_to = fields.Datetime.from_string(date_to)
+            if day_to_contract < day_to_payslip:
+                day_to = day_to_contract
+            else:
+                day_to = day_to_payslip
             nb_of_days = (day_to - day_from).days + 1
             country_emp_id = contract.employee_id.company_id.country_id.id
             holidays_ids = holidays.get_holidays_ids(day_from, day_to, country_emp_id)
