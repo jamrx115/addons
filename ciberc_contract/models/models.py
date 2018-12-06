@@ -69,68 +69,6 @@ class ciberc_contract(models.Model):
                 employee_obj.write({'joining_date': contract_obj.date_start})
             return res
 
-    # para la tarea programada
-    def llenar_bolsas(self):
-        today = datetime.now().date()
-        year_str = str(today.year)[2:]  # [2:] = 18 y [1:] = 018
-        _logger.debug('------------------------------- %s', today)
-        # Selección de contratos ******* Nota: revisar filtro -> por cada empleado sea solo un contrato
-        contracts = self.env['hr.contract'].search(['|', ('state', '=', 'open'), ('state', '=', 'close')]).filtered(
-            lambda c: datetime.strptime(c.date_start, '%Y-%m-%d').date().month == today.month and
-                      datetime.strptime(c.date_start, '%Y-%m-%d').date().day == today.day and
-                      c.x_tipo_novedad_cierre_contrato_id != 7 and
-                      c.x_tipo_novedad_cierre_contrato_id != 8)
-        _logger.debug('%s', contracts)
-        # Para cada contrato
-        for c in contracts:
-            _logger.debug('%s', c.x_tipo_novedad_contrato_id)
-            '''bag_size = c.annual_holiday
-            asignacion_previa = False
-            prefijo = ''
-            prefijo_ext = ''
-
-            if bag_size > 0:
-                # 1. obtener prefijos
-                if c.type_id.name.startswith( 'Nómina Local'.decode('utf-8') ):
-                    prefijo = 'VAC'
-                    prefijo_ext = 'Vacaciones'
-                elif c.type_id.name.startswith( 'Servicios Profesionales'.decode('utf-8') ):
-                    prefijo = 'DLI'
-                    prefijo_ext = 'Días libres'
-                # 2. obtener la bolsa de días
-                bolsa_dias = self.env['hr.holidays.status'].search([('code', '=', prefijo + year_str)])
-                # 3. CASO existe la bolsa de días -> consultar asignación previa
-                if bolsa_dias:
-                    asignacion_previa = self.env['hr.holidays'].search([('holiday_status_id', '=', bolsa_dias.id)])
-                # 4. CASO no existe la bolsa de días -> crear la bolsa
-                else:
-                    bolsa_dias = self.env['hr.holidays.status'].create({
-                        'name': prefijo_ext + ' ' + str(today - timedelta(days=365)).year + '-' + str(today.year),
-                        'code': prefijo + year_str,
-                        'color_name': 'lavender',
-                        'double_validation': False,
-                        'limit': False,
-                        'active': True
-                    })
-                # 5. asignar días bajo condiciones: bolsa días creada y sin asignación previa
-                if bolsa_dias and (asignacion_previa == False):
-                    # asignar días a la bolsa
-                    new_holiday = self.env['hr.holidays'].create({
-                        'name': 'Asignación de bolsa de días por cumplimiento de año laborado',
-                        'type': 'add',
-                        'holiday_type': 'employee',
-                        'holiday_status_id': bolsa_dias.id,
-                        'employee_id': c.employee_id.id,
-                        'department_id': c.department_id.id,
-                        'number_of_days_calendar': bag_size,
-                        'number_of_days_temp': bag_size,
-                        'number_of_days': bag_size,
-                        'state': 'validate'
-                    })
-                    _logger.debug('creado holiday %s', new_holiday.id)'''
-        _logger.debug('-------------------------------')
-        return
-
 # clase creada por alltic que vuelve solo lectura el campo horario en empleado
 class ciberc_resource(models.Model):
     _inherit = 'resource.resource'
