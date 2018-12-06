@@ -690,6 +690,44 @@ class CodeLeaveTypePayroll(models.Model):
         self.input_line_ids = input_lines
         return
 
+    # obtener sumatoria salarios para bono 14
+    @api.multi
+    def sum_salary_for_bono14(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
+        # date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
+        date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
+        date_from_bono = datetime(year=(date_to_payslip.year) - 1, month=7, day=1)  # tipo datetime
+        date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30)  # tipo datetime
+        result = 0.00
+
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+        contract = contract_p  # tipo hr_contract (obj)
+        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
+        payslip_ids = self.env['hr.payslip'].search([('contract_id', '=', contract.id)],
+                                                    limit=0)  # recordset vacío para concatenar
+
+        for contract_id in contract_ids:  # buscando nóminas
+            payslip_aux = self.env['hr.payslip'].search(
+                ['&', ('contract_id', '=', contract_id), ('date_from', '=', date_from_bono),
+                 ('date_to', '=', date_to_bono)])
+            payslip_ids = payslip_ids + payslip_aux
+
+        for payslip in payslip_ids:  # contando días
+            days = 0.00
+            for d in payslip.worked_days_line_ids:
+                days += d.number_of_days
+            date_to_current_payslip = fields.Datetime.from_string(payslip.date_to)
+            if date_to_current_payslip.month == 2:
+                if date_to_current_payslip.day == 28:
+                    days += 2
+                if date_to_current_payslip.day == 29:
+                    days += 1
+            if date_to_current_payslip.day == 31 and days == 16:
+                days -= 1
+            a = (payslip.contract_id.wage / 30 * days)
+            result += a
+
+        return result
+
     # obtener sumatoria comisiones para bono 14
     @api.multi
     def sum_commission_for_bono14(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
@@ -712,6 +750,44 @@ class CodeLeaveTypePayroll(models.Model):
             for input in payslip.input_line_ids:
                 if input.code == 'COM':
                     result += input.amount
+
+        return result
+
+    # obtener sumatoria salarios para aguinaldo
+    @api.multi
+    def sum_salary_for_aguinaldo(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
+        # date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
+        date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
+        date_from_bono = datetime(year=(date_to_payslip.year) - 1, month=12, day=1)  # tipo datetime
+        date_to_bono = datetime(year=date_to_payslip.year, month=11, day=30)  # tipo datetime
+        result = 0.00
+
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+        contract = contract_p  # tipo hr_contract (obj)
+        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
+        payslip_ids = self.env['hr.payslip'].search([('contract_id', '=', contract.id)],
+                                                    limit=0)  # recordset vacío para concatenar
+
+        for contract_id in contract_ids:  # buscando nóminas
+            payslip_aux = self.env['hr.payslip'].search(
+                ['&', ('contract_id', '=', contract_id), ('date_from', '=', date_from_bono),
+                 ('date_to', '=', date_to_bono)])
+            payslip_ids = payslip_ids + payslip_aux
+
+        for payslip in payslip_ids:  # contando días
+            days = 0.00
+            for d in payslip.worked_days_line_ids:
+                days += d.number_of_days
+            date_to_current_payslip = fields.Datetime.from_string(payslip.date_to)
+            if date_to_current_payslip.month == 2:
+                if date_to_current_payslip.day == 28:
+                    days += 2
+                if date_to_current_payslip.day == 29:
+                    days += 1
+            if date_to_current_payslip.day == 31 and days == 16:
+                days -= 1
+            a = (payslip.contract_id.wage / 30 * days)
+            result += a
 
         return result
 
