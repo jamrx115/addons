@@ -527,6 +527,7 @@ class CodeLeaveTypePayroll(models.Model):
         @param contract_ids: list of contract id
         @return: returns a list of dict containing the input that should be applied for the given contract between date_from and date_to
         """
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
 
         def was_on_leave_interval(employee_id, date_from, date_to):
             date_from = fields.Datetime.to_string(date_from)
@@ -576,11 +577,18 @@ class CodeLeaveTypePayroll(models.Model):
             nb_of_days = (day_to - day_from).days + 1
             country_emp_id = contract.employee_id.company_id.country_id.id
             holidays_ids = holidays.get_holidays_ids(day_from, day_to, country_emp_id)
-
+            #holidays_ids, day_from, day_to en UTC "usuario"
             for day in range(0, nb_of_days):
                 working_intervals_on_day = contract.working_hours.get_working_intervals_of_day(start_dt=day_from + timedelta(days=day))
-                for interval in working_intervals_on_day:
-                    interval_data.append((interval, was_on_leave_interval(contract.employee_id.id, interval[0], interval[1])))
+                for interval in working_intervals_on_day: # interval is tuple
+                    tuple_to_list = list(interval)
+                    aux_leaves = was_on_leave_interval(contract.employee_id.id, interval[0], interval[1])
+                    aux_interv_i=user_tz.fromutc(interval[0])
+                    tuple_to_list[0]=datetime.combine(aux_interv_i.date(), aux_interv_i.time())
+                    aux_interv_f=user_tz.fromutc(interval[1])
+                    tuple_to_list[1]=datetime.combine(aux_interv_f.date(), aux_interv_f.time())
+                    interval_updated = tuple(tuple_to_list)
+                    interval_data.append((interval_updated, aux_leaves)) # se cambia interval por interval_updated
 
             # Note: Here, the dates are in UTC-0
             for interval, ausencia in interval_data:
@@ -597,7 +605,9 @@ class CodeLeaveTypePayroll(models.Model):
                         else:
                             leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
                     else:
-                        ausencia_date_from = fields.Datetime.from_string(ausencia.date_from)
+                        aux_df_utczero = fields.Datetime.from_string(ausencia.date_from)
+                        aux_df_utc_user = user_tz.fromutc(aux_df_utczero)
+                        ausencia_date_from = datetime.combine(aux_df_utc_user.date(), aux_df_utc_user.time())
                         leaves[ausencia.holiday_status_id.name] = {
                             'name': ausencia.holiday_status_id.name,
                             'sequence': 5,
