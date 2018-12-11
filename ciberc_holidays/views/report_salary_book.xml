@@ -69,21 +69,21 @@
                                 <td><span t-esc="month[1]"/></td>
                                 <td><span t-esc="month[2]"/></td>
                                 <t t-if="month[0]">
-                                    <td><span t-esc="month[3]"  t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
-                                    <td><span t-esc="month[4]"/></td>
+                                    <td><b><span t-esc="month[3]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></b></td>
+                                    <td><b><span t-esc="month[4]"/></b></td>
                                     <td><span t-esc="month[5]"/></td>
                                     <td><span t-esc="month[6]"/></td>
                                     <td><span t-esc="month[7]"  t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
                                     <td><span t-esc="month[8]"  t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
                                     <td><span t-esc="month[9]"  t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
                                     <td><span t-esc="month[10]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
-                                    <td><span t-esc="month[11]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><b><span t-esc="month[11]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></b></td>
                                     <td><span t-esc="month[12]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
                                     <td><span t-esc="month[13]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
-                                    <td><span t-esc="month[14]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><b><span t-esc="month[14]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></b></td>
                                     <td><span t-esc="month[15]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
                                     <td><span t-esc="month[16]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
-                                    <td><span t-esc="month[17]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><b><span t-esc="month[17]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></b></td>
                                 </t>
                                 <t t-else="">
                                     <td></td>

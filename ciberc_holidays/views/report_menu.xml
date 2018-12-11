@@ -15,5 +15,6 @@
         report_type="qweb-pdf"
         name="ciberc_holidays.report_salary_book"
         file="ciberc_holidays.report_salary_book"
+        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
     />
 </odoo>

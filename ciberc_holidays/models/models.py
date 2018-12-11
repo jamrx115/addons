@@ -855,7 +855,7 @@ class HrEmployeePayslip(models.Model):
             date_from = datetime(day=1, month=m+1, year=current_year).date()
             date_to = datetime(day=calendar.monthrange(current_year, m+1)[1], month=m+1, year=current_year).date()
             pagos = self.env['hr.payslip'].search(
-                ['&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to), ('employee_id', '=', self.id)],
+                ['&', '&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to), ('employee_id', '=', self.id), ('state', '=', 'done')],
                 order="date_from")
             mes = m+1
             salario_mensual = 0
@@ -865,7 +865,6 @@ class HrEmployeePayslip(models.Model):
             h_total = 0
             # sección salario devengado
             s_recibido = 0
-            s_asuetos = 0
             s_ordinario = 0
             s_vacaciones = 0
             d_vacaciones = 0
@@ -888,11 +887,13 @@ class HrEmployeePayslip(models.Model):
                         h_normal += wd.number_of_hours
                     if wd.code.startswith('VAC') or wd.code.startswith('DLI'):
                         d_vacaciones += wd.number_of_days_calendar
-                s_ordinario = (salario_mensual / h_total) * h_normal
-                s_vacaciones = (salario_mensual / 30) * d_vacaciones
 
                 line_ids = nomina.line_ids
                 d_total += line_ids[0].total
+
+                s_ordinario = (salario_mensual / 30) * (d_total-d_vacaciones)
+                s_vacaciones = (salario_mensual / 30) * d_vacaciones
+
                 for line in line_ids:
                     if line.code == 'IGSS':
                         d_igss += line.total
@@ -905,7 +906,7 @@ class HrEmployeePayslip(models.Model):
 
             row = [moneda, mes,  calendar.month_name[mes], salario_mensual, d_total,
                    h_normal, 0.00,
-                   s_ordinario, 0.00, s_asuetos, s_vacaciones, (s_ordinario+s_asuetos+s_vacaciones),
+                   s_ordinario, 0.00, 0.00, s_vacaciones, (s_ordinario+s_vacaciones),
                    d_igss, (d_otros-d_igss), d_otros,
                    sum_agui, dec_372001, s_recibido]
             answer.append(row)
