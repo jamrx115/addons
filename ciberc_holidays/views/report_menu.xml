@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <report
-            id="button_report_holiday"
-            model="hr.holidays"
-            string="Comprobante de ausencia"
-            report_type="qweb-pdf"
-            name="ciberc_holidays.report_holiday"
-            file="ciberc_holidays.report_holiday"
-        />
+    <report
+        id="button_report_holiday"
+        model="hr.holidays"
+        string="Comprobante de ausencia"
+        report_type="qweb-pdf"
+        name="ciberc_holidays.report_holiday"
+        file="ciberc_holidays.report_holiday"
+    />
+    <report
+        id="button_report_salary_book"
+        model="hr.employee"
+        string="Libro de salarios"
+        report_type="qweb-pdf"
+        name="ciberc_holidays.report_salary_book"
+        file="ciberc_holidays.report_salary_book"
+    />
 </odoo>

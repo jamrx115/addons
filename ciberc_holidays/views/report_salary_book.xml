@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="report_salary_book">
+    <t t-call="report.html_container">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="report.external_layout">
+                <div class="page">
+                    <h2>Libro de salarios para trabajadores permanentes</h2>
+                    <p>Autorizado por el ministerio de trabajo y previsión social según artículo 102 del código del trabajo</p>
+
+                    <table class="table table-condensed table-bordered">
+                        <tr>
+                            <td><strong>Nombre del trabajador</strong></td>
+                            <td><span t-field="o.firstname"/> <span t-field="o.lastname"/></td>
+                            <td><strong>Edad</strong></td>
+                            <td><span t-esc="o.get_age()" /></td>
+                            <td><strong>Ocupación o puesto</strong></td>
+                            <td><span t-field="o.job_id"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Número de afiliación IGSS</strong></td>
+                            <td><span t-field="o.ssnid"/></td>
+                            <td><strong>Sexo</strong></td>
+                            <td><span t-field="o.gender"/></td>
+                            <td><strong>Fecha de ingreso</strong></td>
+                            <td><span t-field="o.joining_date"/></td>
+                        </tr>
+                        <tr>
+                            <td><strong>No de Cedula/ Cod. Unico de Ident</strong></td>
+                            <td><span t-field="o.identification_id"/></td>
+                            <td><strong>Nacionalidad</strong></td>
+                            <td><span t-field="o.country_id"/></td>
+                            <td><strong>Fecha finalización relación laboral</strong></td>
+                            <td></td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">No. Orden</th>
+                                <th rowspan="2">Periodo de trabajo</th>
+                                <th rowspan="2">Salario en quetzales</th>
+                                <th rowspan="2">Días Trabajados</th>
+                                <th colspan="2" class="text-center">Horas Trabajadas</th>
+                                <th colspan="4" class="text-center">Salario Devengado</th>
+                                <th rowspan="2">Salario Total</th>
+                                <th colspan="3" class="text-center">Deducciones Legales</th>
+                                <th rowspan="2">Decreto 42-92 Bono 14 Aguinaldo y otros</th>
+                                <th rowspan="2">Bonificación incentivo Dec. 37-2001</th>
+                                <th rowspan="2">Líquido a recibir</th>
+                                <th rowspan="2">Firma</th>
+                                <th rowspan="2">Observaciones</th>
+                            </tr>
+                            <tr>
+                                <th>Ordinarias</th>
+                                <th>Extra ordinarias</th>
+                                <th>Ordinario</th>
+                                <th>Extra ordinario</th>
+                                <th>Septimos y asuetos</th>
+                                <th>Vacaciones</th>
+                                <th>IGSS</th>
+                                <th>Otras deducciones</th>
+                                <th>Total deducciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.get_data()" t-as="month">
+                                <td><span t-esc="month[1]"/></td>
+                                <td><span t-esc="month[2]"/></td>
+                                <t t-if="month[0]">
+                                    <td><span t-esc="month[3]"  t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[4]"/></td>
+                                    <td><span t-esc="month[5]"/></td>
+                                    <td><span t-esc="month[6]"/></td>
+                                    <td><span t-esc="month[7]"  t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[8]"  t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[9]"  t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[10]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[11]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[12]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[13]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[14]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[15]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[16]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                    <td><span t-esc="month[17]" t-esc-options='{"widget": "monetary", "display_currency": month[0]}'/></td>
+                                </t>
+                                <t t-else="">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </t>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </t>
+</template>
+</odoo>

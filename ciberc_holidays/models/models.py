@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, AccessError
 
 import logging
+import calendar
 import babel
 import time
 import pytz
@@ -834,3 +835,83 @@ class HrEmployeePayslip(models.Model):
     _inherit = 'hr.employee'
 
     payslip_count = fields.Integer(compute='_compute_payslip_count', string='Payslips')
+
+    def get_age(self):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        fecha_nacimiento = fields.Datetime.from_string(self.birthday).date()
+        hoy = datetime.now(tz=user_tz).date()
+        return (hoy-fecha_nacimiento).days/365
+
+    def get_data(self):
+        current_year = datetime.now().year
+        answer=[]
+        for m in range(12):
+            date_from = datetime(day=1, month=m+1, year=current_year).date()
+            date_to = datetime(day=calendar.monthrange(current_year, m+1)[1], month=m+1, year=current_year).date()
+            pagos = self.env['hr.payslip'].search(
+                ['&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to), ('employee_id', '=', self.id)],
+                order="date_from")
+            mes = m+1
+            moneda = False
+
+            for nomina in pagos:
+                moneda = nomina.contract_id.x_currency_id
+
+            row = [moneda, mes, calendar.month_name[mes], 0.0,
+                   0.0,
+                   0.0, 0.0,
+                   0.0, 0.0, 0.0, 0.0, 0.0,
+                   0.0, 0.0, 0.0,
+                   0.0, 0.0, 0.0]
+            answer.append(row)
+        '''
+        current_year = datetime.now().year
+        answer=[]
+        date_from = datetime(day=1, month=1, year=current_year).date()
+        date_to = datetime(day=31, month=12, year=current_year).date()
+
+        pagos = self.env['hr.payslip'].search(['&','&',('date_from', '>=', date_from), ('date_to', '<=', date_to),
+                                                ('employee_id', '=', self.id)], order="date_from")
+        for nomina in pagos:
+            # variables auxiliares
+            mes = fields.Datetime.from_string(nomina.date_from).month
+            salario_mensual = nomina.contract_id.wage
+            s_asuetos = 0
+            d_igss = 0
+            d_otros = 0
+            horas_normal = 0
+            horas_total = 0
+            dias_vacaciones = 0
+            sum_agui = 0
+            dec_372001 = 0
+            s_recibido = 0
+            # dias trabajados
+            worked_days_line_ids = nomina.worked_days_line_ids
+            for wd in worked_days_line_ids:
+                horas_total += wd.number_of_hours
+                if wd.code == 'WORK100':
+                    horas_normal += wd.number_of_hours
+                if wd.code.startswith('VAC') or wd.code.startswith('DLI'):
+                    dias_vacaciones += wd.number_of_days_calendar
+            s_ordinario  = (salario_mensual/horas_total)*horas_normal
+            s_vacaciones = (salario_mensual/30)*dias_vacaciones
+            # descripción pago
+            line_ids = nomina.line_ids
+            for line in line_ids:
+                if line.code == 'IGSS':
+                    d_igss += line.total
+                if line.code == 'TOTALDED':
+                    d_otros += line.total
+                if line.code == 'BON37':
+                    dec_372001 += line.total
+                if line.code == 'NET':
+                    s_recibido += line.total
+            # fila reporte
+            row = [nomina.contract_id.x_currency_id, mes,  calendar.month_name[mes], salario_mensual, line_ids[0].total,
+                   horas_normal, 0.00,
+                   s_ordinario, 0.00, s_asuetos, s_vacaciones, (s_ordinario+s_asuetos+s_vacaciones),
+                   d_igss, (d_otros-d_igss), d_otros,
+                   sum_agui, dec_372001, s_recibido]
+            answer.append(row)
+        '''
+        return answer
