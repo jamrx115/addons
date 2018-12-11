@@ -26,6 +26,7 @@
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/mail_templates.xml',
+        'views/report_mintrab.xml',
         'views/report_salary_book.xml',
         'views/report_holiday_template.xml',
         'views/report_menu.xml',
