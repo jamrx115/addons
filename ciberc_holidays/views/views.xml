@@ -191,6 +191,17 @@
         </field>
     </record>
 
+    <!-- Widget reporte desde empleados - nuevo campo -->
+    <record id="view_hr_holidays_summary_employee_updated" model="ir.ui.view">
+        <field name="model">hr.holidays.summary.employee</field>
+        <field name="inherit_id" ref="hr_holidays.view_hr_holidays_summary_employee"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_from']" position="after">
+                <field name="date_to" />
+            </xpath>
+        </field>
+    </record>
+
     <!--
     hidde from odoo notebook or field pending_tasks (inherit view "Leave Request")
     hidde from odoo button book_ticket (inherit view "Leave Request")

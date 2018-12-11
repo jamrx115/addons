@@ -379,6 +379,12 @@ class ReportLeavesnewFieldbyDepartment(models.TransientModel):
 
     date_to = fields.Date(string='Hasta', required=True, default=lambda *a: time.strftime('%Y-%m-01'))
 
+#clase creada por alltic que agrega fecha fin para reporte
+class ReportLeavesnewFieldfromEmployee(models.TransientModel):
+    _inherit = 'hr.holidays.summary.employee'
+
+    date_to = fields.Date(string='Hasta', required=True, default=lambda *a: time.strftime('%Y-%m-01'))
+
 #clase creada por alltic que calcula datos para reporte de ausencias por fechas
 class ReportLeavesbyDepartment(models.AbstractModel):
     _inherit = 'report.hr_holidays.report_holidayssummary'
