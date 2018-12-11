@@ -2,10 +2,118 @@
 <odoo>
 <template id="report_mintrab">
     <t t-call="report.html_container">
-        <t t-foreach="docs" t-as="o">
+        <t t-foreach="docs" t-as="empleado">
             <t t-call="report.external_layout">
                 <div class="page">
                     <h2>Informe empleador MT</h2>
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>No. Empleado</th>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Nacionalidad</th>
+                                <th>Estado civil</th>
+                                <th>Documento identificación</th>
+                                <th>Número de Documento</th>
+                                <th>País origen</th>
+                                <th>Lugar Nacimiento</th>
+                                <th>NIT</th>
+                                <th>No. Afiliación IGSS</th>
+                                <th>Sexo (M) o (F)</th>
+                                <th>Fecha Nacimiento</th>
+                                <th>Cantidad de hijos</th>
+                                <th>Ha trabajado en el extranjero</th>
+                                <th>En qué forma</th>
+                                <th>País</th>
+                                <th>Motivo de finalización de la relación laboral en el extranjero</th>
+                                <th>Nivel académico</th>
+                                <th>Profesión</th>
+                                <th>Etnia</th>
+                                <th>Idioma</th>
+                                <th>Tipo contrato</th>
+                                <th>Fecha inicio labores</th>
+                                <th>Fecha reinicio labores</th>
+                                <th>Fecha retiro labores</th>
+                                <th>Puesto</th>
+                                <th>Jornada de trabajo</th>
+                                <th>Días laborados en el año</th>
+                                <th>Permiso de trabajo</th>
+                                <th>Salario anual nominal</th>
+                                <th>Bonificación Decreto 7889 (Q 250.00)</th>
+                                <th>Total horas extras anuales</th>
+                                <th>Valor de hora extra</th>
+                                <th>Monto aguinaldo decreto 7678</th>
+                                <th>Monto bono 14 decreto 4292</th>
+                                <th>Retribución por comisiones</th>
+                                <th>Viáticos</th>
+                                <th>Bonificaciones adicionales</th>
+                                <th>Retribución por vacaciones</th>
+                                <th>Retribución por indemnización</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span t-field="empleado.x_code"/></td>
+                                <td><span t-field="empleado.firstname"/></td>
+                                <td><span t-field="empleado.lastname"/></td>
+                                <td><span t-field="empleado.country_id"/></td>
+                                <t t-if="empleado.marital == 'single'">
+                                    <td><span>1</span></td>
+                                </t>
+                                <t t-elif="empleado.marital == 'married'">
+                                    <td><span>2</span></td>
+                                </t>
+                                <t t-else="">
+                                    <td></td>
+                                </t>
+                                <td></td><!--tipo doc identificacion-->
+                                <td><span t-field="empleado.identification_id"/></td>
+                                <td><span t-field="empleado.x_pais_nace.code_ext"/></td>
+                                <td><span t-field="empleado.x_birth_city_id.code"/></td>
+                                <td><span t-field="empleado.x_nit"/></td>
+                                <td><span t-field="empleado.ssnid"/></td>
+                                <t t-if="empleado.gender == 'male'">
+                                    <td><span>M</span></td>
+                                </t>
+                                <t t-elif="empleado.gender == 'female'">
+                                    <td><span>F</span></td>
+                                </t>
+                                <t t-else="">
+                                    <td></td>
+                                </t>
+                                <td><span t-field="empleado.birthday" t-field-options='{"format": "dd/MM/yyyy"}'/></td>
+                                <td></td><!--cantidad de hijos-->
+                                <td></td><!--ha trab extr-->
+                                <td></td><!--en que forma-->
+                                <td></td><!--pais-->
+                                <td></td><!--motivo fin extr-->
+                                <td></td><!--niv acad-->
+                                <td></td><!--profesion-->
+                                <td><span>4</span></td><!--etnia-->
+                                <td></td><!--idioma-->
+                                <td></td><!--tipo contrato-->
+                                <td></td><!--fecha inicio labores-->
+                                <td></td><!--fecha reinicio labores-->
+                                <td></td><!--fecha retiro labores-->
+                                <td></td><!--puesto-->
+                                <td></td><!--jornada-->
+                                <td></td><!--dias laborados anuales-->
+                                <td></td><!--permiso trabajo-->
+                                <td></td><!--salario anual nominal-->
+                                <td></td><!--bonif dec 7889 Q 250.00-->
+                                <td><span>0</span></td><!--total horas extras anuales-->
+                                <td><span>0</span></td><!--valor hora extra-->
+                                <td></td><!--monto agui decr 7678-->
+                                <td></td><!--monto bono 14 decr 4292-->
+                                <td></td><!--retrib comisiones-->
+                                <td><span>0</span></td><!--viaticos-->
+                                <td></td><!--bonif adicionales-->
+                                <td></td><!--retribuc vacaciones-->
+                                <td></td><!--retribuc indemnizacion-->
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </t>
         </t>

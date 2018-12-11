@@ -199,3 +199,9 @@ class HrLoanUpdated(models.Model):
                 date_start = datetime(year=date_base.year, month=date_base.month,
                                       day=self.get_installment_day(date_base))
         return True
+
+# actualización de países
+class ResCountryUpdated(models.Model):
+    _inherit = 'res.country'
+
+    code_ext = fields.Char('Código Ext.')
