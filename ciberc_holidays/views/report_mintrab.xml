@@ -54,11 +54,11 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span t-field="empleado.x_code"/></td>
-                                <td><span t-field="empleado.firstname"/></td>
-                                <td><span t-field="empleado.lastname"/></td>
-                                <td><span t-field="empleado.country_id"/></td>
-                                <t t-if="empleado.marital == 'single'">
+                                <td><span t-field="empleado.x_code"/></td><!--numero empleado-->
+                                <td><span t-field="empleado.firstname"/></td><!--nombres-->
+                                <td><span t-field="empleado.lastname"/></td><!--apellidos-->
+                                <td><span t-field="empleado.country_id"/></td><!--nacionalidad-->
+                                <t t-if="empleado.marital == 'single'"><!--estado civil-->
                                     <td><span>1</span></td>
                                 </t>
                                 <t t-elif="empleado.marital == 'married'">
@@ -68,12 +68,12 @@
                                     <td></td>
                                 </t>
                                 <td></td><!--tipo doc identificacion-->
-                                <td><span t-field="empleado.identification_id"/></td>
-                                <td><span t-field="empleado.x_pais_nace.code_ext"/></td>
-                                <td><span t-field="empleado.x_birth_city_id.code"/></td>
-                                <td><span t-field="empleado.x_nit"/></td>
-                                <td><span t-field="empleado.ssnid"/></td>
-                                <t t-if="empleado.gender == 'male'">
+                                <td><span t-field="empleado.identification_id"/></td><!--num doc identificacion-->
+                                <td><span t-field="empleado.x_pais_nace.code_ext"/></td><!--pais origen-->
+                                <td><span t-field="empleado.x_birth_city_id.code"/></td><!--ciudad nacimiento-->
+                                <td><span t-field="empleado.x_nit"/></td><!--nit-->
+                                <td><span t-field="empleado.ssnid"/></td><!--seguro social-->
+                                <t t-if="empleado.gender == 'male'"><!--sexo-->
                                     <td><span>M</span></td>
                                 </t>
                                 <t t-elif="empleado.gender == 'female'">
@@ -82,7 +82,7 @@
                                 <t t-else="">
                                     <td></td>
                                 </t>
-                                <td><span t-field="empleado.birthday" t-field-options='{"format": "dd/MM/yyyy"}'/></td>
+                                <td><span t-field="empleado.birthday" t-field-options='{"format": "dd/MM/yyyy"}'/></td><!--fecha nacimiento-->
                                 <td><span t-esc="len(empleado.fam_children_ids)"/></td><!--cantidad de hijos-->
                                 <td></td><!--ha trab extr-->
                                 <td></td><!--en que forma-->
@@ -93,30 +93,25 @@
                                 <td><span>4</span></td><!--etnia-->
                                 <td></td><!--idioma-->
                                 <td></td><!--tipo contrato-->
-                                <td><span t-field="empleado.joining_date" t-field-options='{"format": "dd/MM/yyyy"}'/></td>
+                                <td><span t-field="empleado.joining_date" t-field-options='{"format": "dd/MM/yyyy"}'/></td><!--fecha inicio labores-->
                                 <td></td><!--fecha reinicio labores-->
                                 <td></td><!--fecha retiro labores-->
                                 <td></td><!--puesto-->
-                                <td></td><!--jornada-->
-                                <td><span t-esc="empleado.get_worked_days()"/></td>
-                                <t t-if="empleado.contract_id.permit_no">
+                                <td>Diurna</td><!--jornada-->
+                                <td><span t-esc="empleado.get_filtered_lineid('DIASTRABAJO')"/></td><!--dias laborados año-->
+                                <t t-if="empleado.contract_id.permit_no"><!--permiso de trabajo-->
                                     <td><span t-field="empleado.contract_id.permit_no"/></td>
                                 </t>
                                 <t t-else="">
                                     <td></td>
                                 </t>
-                                <t t-if="empleado.contract_id.wage">
-                                    <td><span t-esc="12*empleado.contract_id.wage"/></td>
-                                </t>
-                                <t t-else="">
-                                    <td></td>
-                                </t>
-                                <td><span t-esc="empleado.get_dec_salary_aux()"/></td><!--bonif dec 7889 Q 250.00-->
+                                <td><span t-esc="empleado.get_filtered_lineid('NET')"/></td><!--salario anual nominal-->
+                                <td><span t-esc="empleado.get_filtered_lineid('BON37')"/></td><!--bonif dec 7889 Q 250.00-->
                                 <td><span>0</span></td><!--total horas extras anuales-->
                                 <td><span>0</span></td><!--valor hora extra-->
-                                <td></td><!--monto agui decr 7678-->
-                                <td></td><!--monto bono 14 decr 4292-->
-                                <td></td><!--retrib comisiones-->
+                                <td><span t-esc="empleado.get_filtered_lineid('AGUI')"/></td><!--monto agui decr 7678-->
+                                <td><span t-esc="empleado.get_filtered_lineid('BON14')"/></td><!--monto bono 14 decr 4292-->
+                                <td><span t-esc="empleado.get_filtered_lineid('COM')"/></td><!--retrib comisiones-->
                                 <td><span>0</span></td><!--viaticos-->
                                 <td></td><!--bonif adicionales-->
                                 <td></td><!--retribuc vacaciones-->
