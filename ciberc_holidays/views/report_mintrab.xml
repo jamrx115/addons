@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo><!--t-field-options='{"widget": "monetary", "display_currency": "empleado.contract_id.x_currency_id"}'-->
 <template id="report_mintrab">
     <t t-call="report.html_container">
         <t t-foreach="docs" t-as="empleado">
@@ -83,7 +83,7 @@
                                     <td></td>
                                 </t>
                                 <td><span t-field="empleado.birthday" t-field-options='{"format": "dd/MM/yyyy"}'/></td>
-                                <td></td><!--cantidad de hijos-->
+                                <td><span t-esc="len(empleado.fam_children_ids)"/></td><!--cantidad de hijos-->
                                 <td></td><!--ha trab extr-->
                                 <td></td><!--en que forma-->
                                 <td></td><!--pais-->
@@ -93,15 +93,25 @@
                                 <td><span>4</span></td><!--etnia-->
                                 <td></td><!--idioma-->
                                 <td></td><!--tipo contrato-->
-                                <td></td><!--fecha inicio labores-->
+                                <td><span t-field="empleado.joining_date" t-field-options='{"format": "dd/MM/yyyy"}'/></td>
                                 <td></td><!--fecha reinicio labores-->
                                 <td></td><!--fecha retiro labores-->
                                 <td></td><!--puesto-->
                                 <td></td><!--jornada-->
-                                <td></td><!--dias laborados anuales-->
-                                <td></td><!--permiso trabajo-->
-                                <td></td><!--salario anual nominal-->
-                                <td></td><!--bonif dec 7889 Q 250.00-->
+                                <td><span t-esc="empleado.get_worked_days()"/></td>
+                                <t t-if="empleado.contract_id.permit_no">
+                                    <td><span t-field="empleado.contract_id.permit_no"/></td>
+                                </t>
+                                <t t-else="">
+                                    <td></td>
+                                </t>
+                                <t t-if="empleado.contract_id.wage">
+                                    <td><span t-esc="12*empleado.contract_id.wage"/></td>
+                                </t>
+                                <t t-else="">
+                                    <td></td>
+                                </t>
+                                <td><span t-esc="empleado.get_dec_salary_aux()"/></td><!--bonif dec 7889 Q 250.00-->
                                 <td><span>0</span></td><!--total horas extras anuales-->
                                 <td><span>0</span></td><!--valor hora extra-->
                                 <td></td><!--monto agui decr 7678-->

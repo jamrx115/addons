@@ -848,8 +848,43 @@ class HrEmployeePayslip(models.Model):
         hoy = datetime.now(tz=user_tz).date()
         return (hoy-fecha_nacimiento).days/365
 
+    def get_worked_days(self):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        today = datetime.now(tz=user_tz).date()
+        start_year = datetime(day=1, month=1, year=today.year).date()
+        days = 0
+        contract_ids = self.env['hr.contract'].search([('employee_id', '=', self.id)])
+        for c in contract_ids:
+            c_date_start = fields.Datetime.from_string(c.date_start).date()
+            if c_date_start < start_year:
+                days += (today-start_year).days
+            else:
+                days += (today-c_date_start).days
+        return days
+
+    def get_dec_salary_aux(self):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        today = datetime.now(tz=user_tz).date()
+        aux = 0
+        for m in range(12):
+            mes = m+1
+            date_from = datetime(day=1, month=mes, year=today.year).date()
+            date_to = datetime(day=calendar.monthrange(today.year, mes)[1], month=mes, year=today.year).date()
+            pagos = self.env['hr.payslip'].search(
+                ['&', '&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to),
+                 ('employee_id', '=', self.id), ('state', '=', 'done')],
+                order="date_from")
+            for nomina in pagos:
+                line_ids = nomina.line_ids
+                for line in line_ids:
+                    if line.code == 'BON37':
+                        aux += line.total
+        return aux
+
     def get_data(self):
-        current_year = datetime.now().year
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        today = datetime.now(tz=user_tz).date()
+        current_year = today.year
         answer=[]
         for m in range(12):
             date_from = datetime(day=1, month=m+1, year=current_year).date()
