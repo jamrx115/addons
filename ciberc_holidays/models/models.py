@@ -710,38 +710,48 @@ class CodeLeaveTypePayroll(models.Model):
     # obtener sumatoria salarios para bono 14
     @api.multi
     def sum_salary_for_bono14(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
-        # date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
+        result = 0
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
-        date_from_bono = datetime(year=(date_to_payslip.year) - 1, month=7, day=1)  # tipo datetime
-        date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30)  # tipo datetime
-        result = 0.00
-
+        last_year = date_to_payslip.year -1
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
-        contract = contract_p  # tipo hr_contract (obj)
-        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
-        payslip_ids = self.env['hr.payslip'].search([('contract_id', '=', contract.id)],
-                                                    limit=0)  # recordset vacío para concatenar
+        meses = [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6]
+        for mes in meses:
+            dias = 0
+            if mes >= 7 and mes <= 12:
+                date_from_mes = datetime(year=last_year, month=mes, day=1)  # tipo datetime
+                date_to_mes = datetime(year=last_year, month=mes, day=calendar.monthrange(last_year, mes)[1])  # tipo datetime
+            else:
+                date_from_mes = datetime(year=date_to_payslip.year, month=mes, day=1)  # tipo datetime
+                date_to_mes = datetime(year=date_to_payslip.year, month=mes, day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
 
-        for contract_id in contract_ids:  # buscando nóminas
-            payslip_aux = self.env['hr.payslip'].search(
-                ['&', ('contract_id', '=', contract_id), ('date_from', '=', date_from_bono),
-                 ('date_to', '=', date_to_bono)])
-            payslip_ids = payslip_ids + payslip_aux
+            payslip_ids = self.env['hr.payslip'].search(['&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
+                                                              ('employee_id', '=', employee.id)])
+            for nomina in payslip_ids:
+                _logger.debug('nomina %s', nomina)
+                contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
+                contract_start = fields.Datetime.from_string(contract.date_start)  # tipo datetime
+                contract_end = False
+                if contract.date_end:
+                    contract_end = fields.Datetime.from_string(contract.date_end)  # tipo datetime
+                salario = contract.wage
 
-        for payslip in payslip_ids:  # contando días
-            days = 0.00
-            for d in payslip.worked_days_line_ids:
-                days += d.number_of_days
-            date_to_current_payslip = fields.Datetime.from_string(payslip.date_to)
-            if date_to_current_payslip.month == 2:
-                if date_to_current_payslip.day == 28:
-                    days += 2
-                if date_to_current_payslip.day == 29:
-                    days += 1
-            if date_to_current_payslip.day == 31 and days == 16:
-                days -= 1
-            a = (payslip.contract_id.wage / 30 * days)
-            result += a
+                if contract_start < date_from_mes:
+                    if contract_end:
+                        if date_to_mes < contract_end:
+                            dias = ((date_to_mes - date_from_mes).days) + 1
+                        else:
+                            dias = ((contract_end - date_from_mes).days) + 1
+                    else:
+                        dias = ((date_to_mes - date_from_mes).days) + 1
+                else:
+                    if contract_end:
+                        if date_to_mes < contract_end:
+                            dias = ((date_to_mes - contract_start).days) + 1
+                        else:
+                            dias = ((contract_end - contract_start).days) + 1
+                    else:
+                        dias = ((date_to_mes - contract_start).days) + 1
+                result += (salario / 30) * dias
 
         return result
 
@@ -773,38 +783,48 @@ class CodeLeaveTypePayroll(models.Model):
     # obtener sumatoria salarios para aguinaldo
     @api.multi
     def sum_salary_for_aguinaldo(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
-        # date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
+        result = 0
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
-        date_from_bono = datetime(year=(date_to_payslip.year) - 1, month=12, day=1)  # tipo datetime
-        date_to_bono = datetime(year=date_to_payslip.year, month=11, day=30)  # tipo datetime
-        result = 0.00
-
+        last_year = date_to_payslip.year - 1
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
-        contract = contract_p  # tipo hr_contract (obj)
-        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
-        payslip_ids = self.env['hr.payslip'].search([('contract_id', '=', contract.id)],
-                                                    limit=0)  # recordset vacío para concatenar
+        meses = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+        for mes in meses:
+            dias = 0
+            if mes == 12:
+                date_from_mes = datetime(year=last_year, month=mes, day=1)  # tipo datetime
+                date_to_mes = datetime(year=last_year, month=mes, day=calendar.monthrange(last_year, mes)[1])  # tipo datetime
+            else:
+                date_from_mes = datetime(year=date_to_payslip.year, month=mes, day=1)  # tipo datetime
+                date_to_mes = datetime(year=date_to_payslip.year, month=mes, day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
 
-        for contract_id in contract_ids:  # buscando nóminas
-            payslip_aux = self.env['hr.payslip'].search(
-                ['&', ('contract_id', '=', contract_id), ('date_from', '=', date_from_bono),
-                 ('date_to', '=', date_to_bono)])
-            payslip_ids = payslip_ids + payslip_aux
+            payslip_ids = self.env['hr.payslip'].search(['&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
+                                                              ('employee_id', '=', employee.id)])
+            for nomina in payslip_ids:
+                _logger.debug('nomina %s', nomina)
+                contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
+                contract_start = fields.Datetime.from_string(contract.date_start)  # tipo datetime
+                contract_end = False
+                if contract.date_end:
+                    contract_end = fields.Datetime.from_string(contract.date_end)  # tipo datetime
+                salario = contract.wage
 
-        for payslip in payslip_ids:  # contando días
-            days = 0.00
-            for d in payslip.worked_days_line_ids:
-                days += d.number_of_days
-            date_to_current_payslip = fields.Datetime.from_string(payslip.date_to)
-            if date_to_current_payslip.month == 2:
-                if date_to_current_payslip.day == 28:
-                    days += 2
-                if date_to_current_payslip.day == 29:
-                    days += 1
-            if date_to_current_payslip.day == 31 and days == 16:
-                days -= 1
-            a = (payslip.contract_id.wage / 30 * days)
-            result += a
+                if contract_start < date_from_mes:
+                    if contract_end:
+                        if date_to_mes < contract_end:
+                            dias = ((date_to_mes - date_from_mes).days) + 1
+                        else:
+                            dias = ((contract_end - date_from_mes).days) + 1
+                    else:
+                        dias = ((date_to_mes - date_from_mes).days) + 1
+                else:
+                    if contract_end:
+                        if date_to_mes < contract_end:
+                            dias = ((date_to_mes - contract_start).days) + 1
+                        else:
+                            dias = ((contract_end - contract_start).days) + 1
+                    else:
+                        dias = ((date_to_mes - contract_start).days) + 1
+                result += (salario / 30) * dias
 
         return result
 
