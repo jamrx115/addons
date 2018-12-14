@@ -724,8 +724,9 @@ class CodeLeaveTypePayroll(models.Model):
                 date_from_mes = datetime(year=date_to_payslip.year, month=mes, day=1)  # tipo datetime
                 date_to_mes = datetime(year=date_to_payslip.year, month=mes, day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
 
-            payslip_ids = self.env['hr.payslip'].search(['&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
-                                                              ('employee_id', '=', employee.id)])
+            payslip_ids = self.env['hr.payslip'].search(['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
+                                                                    ('employee_id', '=', employee.id),
+                                                               ('state', '=', 'done')])
             for nomina in payslip_ids:
                 _logger.debug('nomina %s', nomina)
                 contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
@@ -764,13 +765,17 @@ class CodeLeaveTypePayroll(models.Model):
         date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30) # tipo datetime
         result = 0.00
 
-        employee = self.env['hr.employee'].browse(employee_p) # tipo hr_employee
-        contract = contract_p # tipo hr_contract (obj)
-        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono) # tipo [int]
-        payslip_ids = self.env['hr.payslip'].search([('contract_id', '=', contract.id)], limit=0) # recordset vacío para concatenar
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
+        payslip_ids = self.env['hr.payslip'].search(['&', ('contract_id', '=', None), ('state', '=', 'done')],
+                                                    limit=0)  # recordset vacío para concatenar
 
         for contract_id in contract_ids:
-            payslip_aux = self.env['hr.payslip'].search(['&', ('contract_id', '=', contract_id), ('date_from', '=', date_from_bono), ('date_to', '=', date_to_bono)])
+            payslip_aux = self.env['hr.payslip'].search(
+                ['&', '&', '&', ('date_from', '>=', date_from_bono), ('date_to', '<=', date_to_bono),
+                 ('contract_id', '=', contract_id),
+                 ('state', '=', 'done')])
+
             payslip_ids = payslip_ids + payslip_aux
 
         for payslip in payslip_ids:
@@ -797,8 +802,10 @@ class CodeLeaveTypePayroll(models.Model):
                 date_from_mes = datetime(year=date_to_payslip.year, month=mes, day=1)  # tipo datetime
                 date_to_mes = datetime(year=date_to_payslip.year, month=mes, day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
 
-            payslip_ids = self.env['hr.payslip'].search(['&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
-                                                              ('employee_id', '=', employee.id)])
+            payslip_ids = self.env['hr.payslip'].search(['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
+                                                                  ('employee_id', '=', employee.id),
+                                                               ('state', '=', 'done')])
+
             for nomina in payslip_ids:
                 _logger.debug('nomina %s', nomina)
                 contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
@@ -838,15 +845,16 @@ class CodeLeaveTypePayroll(models.Model):
         result = 0.00
 
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
-        contract = contract_p  # tipo hr_contract (obj)
         contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
-        payslip_ids = self.env['hr.payslip'].search([('contract_id', '=', contract.id)],
+        payslip_ids = self.env['hr.payslip'].search(['&', ('contract_id', '=', None), ('state', '=', 'done')],
                                                     limit=0)  # recordset vacío para concatenar
 
         for contract_id in contract_ids:
             payslip_aux = self.env['hr.payslip'].search(
-                ['&', ('contract_id', '=', contract_id), ('date_from', '=', date_from_bono),
-                 ('date_to', '=', date_to_bono)])
+                ['&', '&', '&', ('date_from', '>=', date_from_bono), ('date_to', '<=', date_to_bono),
+                           ('contract_id', '=', contract_id),
+                       ('state', '=', 'done')])
+
             payslip_ids = payslip_ids + payslip_aux
 
         for payslip in payslip_ids:
