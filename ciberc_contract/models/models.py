@@ -69,6 +69,100 @@ class ciberc_contract(models.Model):
                 employee_obj.write({'joining_date': contract_obj.date_start})
             return res
 
+    # para la tarea programada
+    def contrato_sirve(self, contract):
+        sirve = False
+        contratos = self.env['hr.contract'].search([('employee_id', '=', contract.employee_id.id)]).filtered(
+            lambda c: datetime.strptime(c.date_start, '%Y-%m-%d').date() > datetime.strptime(contract.date_end, '%Y-%m-%d').date())
+        for c in contratos:
+            if not c.date_end:
+                return True
+            # falta el else
+        return sirve
+
+    def llenar_bolsas(self):
+        today = datetime.now().date()
+        year_str = str(today.year)[2:]  # [2:] = 18 y [1:] = 018
+        _logger.debug('------------------------------- %s', today)
+        # Selección de tipos de novedad contrato
+        tipo_novedad_despido_obj = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Despido')])
+        tipo_novedad_renuncia_obj = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Renuncia')])
+        tipo_novedad_vinculacion_obj = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
+
+        # filtro 1: contratos abiertos que coinciden en mes y día, de tipo novedad contrato vinculación, y sin fecha fin
+        birthday_contracts_p1 = self.env['hr.contract'].search([('state', '=', 'open')]).filtered(
+            lambda c: datetime.strptime(c.date_start, '%Y-%m-%d').date().month == today.month and
+                      datetime.strptime(c.date_start, '%Y-%m-%d').date().day == today.day and
+                      c.x_tipo_novedad_contrato_id.id == tipo_novedad_vinculacion_obj.id and
+                      not c.date_end)
+
+        # filtro 2: contratos cerrados que coinciden en mes y día, de tipo novedad contrato vinculación, con fecha fin y tipo de novedad de cierre de contrato distinto a despido o renuncia
+        birthday_contracts_p2_aux = self.env['hr.contract'].search([('state', '=', 'close')]).filtered(
+            lambda c: datetime.strptime(c.date_start, '%Y-%m-%d').date().month == today.month and
+                      datetime.strptime(c.date_start, '%Y-%m-%d').date().day == today.day and
+                      c.x_tipo_novedad_contrato_id.id == tipo_novedad_vinculacion_obj.id and
+                      c.date_end and
+                      c.x_tipo_novedad_cierre_contrato_id.id != tipo_novedad_despido_obj.id and
+                      c.x_tipo_novedad_cierre_contrato_id.id != tipo_novedad_renuncia_obj.id
+        )
+
+        birthday_contracts = []
+        for c in birthday_contracts_p1:
+            birthday_contracts.append(c)
+        for c in birthday_contracts_p2_aux:
+            incluir = self.contrato_sirve(c)
+            if incluir:
+                birthday_contracts.append(c)
+
+        for c in birthday_contracts:
+            _logger.debug('%s', c.x_tipo_novedad_contrato_id.name+' '+c.date_start)
+            bag_size = c.annual_holiday
+            asignacion_previa = False
+            prefijo = ''
+            prefijo_ext = ''
+
+            '''if bag_size > 0:
+                # 1. obtener prefijos
+                if c.type_id.name.startswith( 'Nómina Local'.decode('utf-8') ):
+                    prefijo = 'VAC'
+                    prefijo_ext = 'Vacaciones'
+                elif c.type_id.name.startswith( 'Servicios Profesionales'.decode('utf-8') ):
+                    prefijo = 'DLI'
+                    prefijo_ext = 'Días libres'
+                # 2. obtener la bolsa de días
+                bolsa_dias = self.env['hr.holidays.status'].search([('code', '=', prefijo + year_str)])
+                # 3. CASO existe la bolsa de días -> consultar asignación previa
+                if bolsa_dias:
+                    asignacion_previa = self.env['hr.holidays'].search([('holiday_status_id', '=', bolsa_dias.id)])
+                # 4. CASO no existe la bolsa de días -> crear la bolsa
+                else:
+                    bolsa_dias = self.env['hr.holidays.status'].create({
+                        'name': prefijo_ext + ' ' + str(today - timedelta(days=365)).year + '-' + str(today.year),
+                        'code': prefijo + year_str,
+                        'color_name': 'lavender',
+                        'double_validation': False,
+                        'limit': False,
+                        'active': True
+                    })
+                # 5. asignar días bajo condiciones: bolsa días creada y sin asignación previa
+                if bolsa_dias and (asignacion_previa == False):
+                    # asignar días a la bolsa
+                    new_holiday = self.env['hr.holidays'].create({
+                        'name': 'Asignación de bolsa de días por cumplimiento de año laborado',
+                        'type': 'add',
+                        'holiday_type': 'employee',
+                        'holiday_status_id': bolsa_dias.id,
+                        'employee_id': c.employee_id.id,
+                        'department_id': c.department_id.id,
+                        'number_of_days_calendar': bag_size,
+                        'number_of_days_temp': bag_size,
+                        'number_of_days': bag_size,
+                        'state': 'validate'
+                    })
+                    _logger.debug('creado holiday %s', new_holiday.id)'''
+        _logger.debug('-------------------------------')
+        return
+
 # clase creada por alltic que vuelve solo lectura el campo horario en empleado
 class ciberc_resource(models.Model):
     _inherit = 'resource.resource'
