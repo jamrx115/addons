@@ -2,8 +2,9 @@
 
 from odoo import models, fields, api, tools, _
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
+import pytz
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -205,3 +206,49 @@ class ResCountryUpdated(models.Model):
     _inherit = 'res.country'
 
     code_ext = fields.Char('Código Ext.')
+
+# actualización de vencimiento de pasaportes
+class EmployeeUpdated(models.Model):
+    _inherit = 'hr.employee'
+
+    def mail_reminder(self):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        now = datetime.now(tz=user_tz)
+        #now = datetime.now() + timedelta(days=1)
+        date_now = now.date()
+        match = self.search([])
+        for i in match:
+            if i.id_expiry_date:
+                exp_date = fields.Date.from_string(i.id_expiry_date) - timedelta(days=1)
+                if date_now >= exp_date:
+                    mail_content = "  Hello  " + i.name + ",<br>Your ID " + i.identification_id + "is going to expire on " + \
+                                   str(i.id_expiry_date) + ". Please renew it before expiry date"
+                    main_content = {
+                        'subject': _('ID-%s Expired On %s') % (i.identification_id, i.id_expiry_date),
+                        'author_id': self.env.user.partner_id.id,
+                        'body_html': mail_content,
+                        'email_to': i.work_email,
+                    }
+                    self.env['mail.mail'].create(main_content).send()
+        match1 = self.search([])
+        for i in match1:
+            if i.passport_expiry_date:
+                exp_date1 = fields.Date.from_string(i.passport_expiry_date)
+                exp_is_coming = exp_date1  - timedelta(days=140)
+                diferencia = (exp_date1-date_now).days
+                if date_now >= exp_is_coming:
+                    if diferencia > 0:
+                        mail_content = "Por medio del presente correo se le informa,  " + i.name + ", su pasaporte No. " + i.passport_id + " vence el " + \
+                                   str(i.passport_expiry_date) + " (aproximadamente en " +str(diferencia)+" dias). Se sugiere renovarlo antes de esta fecha"
+                        subject = _('Passport-%s Expired On %s') % (i.passport_id, i.passport_expiry_date)
+                    else:
+                        mail_content = "Por medio del presente correo se le informa,  " + i.name + ", su pasaporte No. " + i.passport_id + " ha expirado el " + \
+                                   str(i.passport_expiry_date) + " (hace " +str(-1*diferencia)+" dias). Se sugiere renovarlo lo antes posible"
+                        subject = ('Pasaporte %s vencido el %s') % (i.passport_id, i.passport_expiry_date)
+                    main_content = {
+                        'subject': subject,
+                        'author_id': self.env.user.partner_id.id,
+                        'body_html': mail_content,
+                        'email_to': i.work_email,
+                    }
+                    self.env['mail.mail'].create(main_content).send()
