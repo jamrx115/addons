@@ -13,7 +13,14 @@
                             <td><strong>Nombre del trabajador</strong></td>
                             <td><span t-field="o.firstname"/> <span t-field="o.lastname"/></td>
                             <td><strong>Edad</strong></td>
-                            <td><span t-esc="o.get_age()" /></td>
+
+                            <t t-if="o.birthday">
+                                <td><span t-esc="o.get_age()" /></td>
+                            </t>
+                            <t t-else="">
+                                <td></td>
+                            </t>
+
                             <td><strong>Ocupación o puesto</strong></td>
                             <td><span t-field="o.job_id"/></td>
                         </tr>

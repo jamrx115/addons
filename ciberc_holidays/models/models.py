@@ -938,7 +938,8 @@ class HrEmployeePayslip(models.Model):
                         d_vacaciones += wd.number_of_days_calendar
 
                 line_ids = nomina.line_ids
-                d_total += line_ids[0].total
+                if line_ids:
+                    d_total += line_ids[0].total
 
                 s_ordinario = (salario_mensual / 30) * (d_total-d_vacaciones)
                 s_vacaciones = (salario_mensual / 30) * d_vacaciones
