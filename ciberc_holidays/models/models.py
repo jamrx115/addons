@@ -528,6 +528,10 @@ class PayslipWorkedDaysUpdated(models.Model):
 class CodeLeaveTypePayroll(models.Model):
     _inherit = 'hr.payslip'
 
+    @api.multi
+    def action_payslip_verify(self):
+        return self.write({'state': 'verify'})
+
     @api.model
     def get_worked_day_lines(self, contract_ids, date_from, date_to):
         """
