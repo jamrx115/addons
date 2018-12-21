@@ -7,8 +7,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='wage']" position="after">
                 <field name="x_bonificacion" />
-                <field name="x_isr" invisible="1"/>
                 <field name="x_renta_ex_patrono" />
+                <field name="x_isr" />
             </xpath>
             <xpath expr="//group[@name='salary_and_advantages']" position="before">
                 <group name="novedades_contrato" string="Novedades del contrato">

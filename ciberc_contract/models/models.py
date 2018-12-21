@@ -34,7 +34,7 @@ class ciberc_contract(models.Model):
     x_comision = fields.Float(string='Comisión')
     x_dias_aguinaldo = fields.Float(string='Dias aguinaldo', readonly=True)
     x_dias_bono_14 = fields.Float(string='Días calculo Bono 14')
-    x_isr = fields.Float(string='Impuesto')
+    x_isr = fields.Float(string='Impuesto sobre la renta', help='Corresponde a valor mensual')
     x_meses_isr = fields.Float(string='Meses ISR')
     x_numero_contrato = fields.Char(string='Identificador Contrato Físico')
     x_renta_ex_patrono = fields.Float(string='Renta Ex-Patrono')
