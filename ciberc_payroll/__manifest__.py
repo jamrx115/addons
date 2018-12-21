@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "CIBERC - Holidays custom module",
+    'name': "CIBERC - Payroll custom module",
 
     'summary': """
-        Personalizaciones al modelo de ausencias""",
+        Personalizaciones al módulo de nómina""",
 
     'description': """
-        Personalizaciones al modelo de ausencias
+        Personalizaciones al módulo de nómina
     """,
 
     'author': "Alltic SAS",
@@ -19,14 +19,14 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','hr_holidays', 'mail'],
+    'depends': ['base','hr','hr_payroll', 'mail'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
         'views/views.xml',
-        'views/mail_templates.xml',
-        'views/report_holiday_template.xml',
+        'views/report_mintrab.xml',
+        'views/report_salary_book.xml',
         'views/report_menu.xml',
     ]
 }

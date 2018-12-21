@@ -8,22 +8,4 @@
         name="ciberc_holidays.report_holiday"
         file="ciberc_holidays.report_holiday"
     />
-    <report
-        id="button_report_salary_book"
-        model="hr.employee"
-        string="Libro de salarios"
-        report_type="qweb-pdf"
-        name="ciberc_holidays.report_salary_book"
-        file="ciberc_holidays.report_salary_book"
-        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
-    />
-    <report
-        id="button_report_mintrab"
-        model="hr.employee"
-        string="Informe empleador MT"
-        report_type="qweb-pdf"
-        name="ciberc_holidays.report_mintrab"
-        file="ciberc_holidays.report_mintrab"
-        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
-    />
 </odoo>
