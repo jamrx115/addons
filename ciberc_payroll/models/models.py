@@ -510,7 +510,7 @@ class HrEmployeePayslip(models.Model):
             horas_diarias = resource.calendar_id.working_hours_on_day(datetime(day=1, month=mes, year=current_year))
             h_normal = horas_diarias * d_total
 
-            row = [moneda, mes, calendar.month_name[mes], salario_mensual, d_total,
+            row = [moneda, mes, date_from.strftime("%B"), salario_mensual, d_total,
                    h_normal, 0.00,
                    s_ordinario, 0.00, 0.00, s_vacaciones, (s_ordinario + s_vacaciones),
                    d_igss, (d_otros - d_igss), d_otros,
