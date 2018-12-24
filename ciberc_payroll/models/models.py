@@ -173,7 +173,7 @@ class CodeLeaveTypePayroll(models.Model):
         date_to = self.date_to
 
         ttyme = datetime.fromtimestamp(time.mktime(time.strptime(date_from, "%Y-%m-%d")))
-        locale = self.env.context.get('lang') or 'en_US'
+        locale = self.env.context.get('lang') or 'es_CO'
         self.name = _('Salary Slip of %s for %s') % (
             employee.name, tools.ustr(babel.dates.format_date(date=ttyme, format='MMMM-y', locale=locale)))
         self.company_id = employee.company_id
@@ -456,6 +456,8 @@ class HrEmployeePayslip(models.Model):
                 ['&', '&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to),
                  ('employee_id', '=', self.id), ('state', '=', 'done')],
                 order="date_from")
+            locale = self.env.context.get('lang') or 'es_CO'
+            nombre_mes = ('%s') % (tools.ustr(babel.dates.format_date(date=date_from, format='MMMM', locale=locale)))
             mes = m + 1
             salario_mensual = 0
             moneda = False
@@ -510,7 +512,7 @@ class HrEmployeePayslip(models.Model):
             horas_diarias = resource.calendar_id.working_hours_on_day(datetime(day=1, month=mes, year=current_year))
             h_normal = horas_diarias * d_total
 
-            row = [moneda, mes, date_from.strftime("%B"), salario_mensual, d_total,
+            row = [moneda, mes, nombre_mes, salario_mensual, d_total,
                    h_normal, 0.00,
                    s_ordinario, 0.00, 0.00, s_vacaciones, (s_ordinario + s_vacaciones),
                    d_igss, (d_otros - d_igss), d_otros,
