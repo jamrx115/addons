@@ -482,19 +482,14 @@ class HrEmployeePayslip(models.Model):
                 worked_days_line_ids = nomina.worked_days_line_ids
                 for wd in worked_days_line_ids:
                     h_total += wd.number_of_hours
-                    if wd.code == 'WORK100':
-                        h_normal += wd.number_of_hours
                     if wd.code.startswith('VAC') or wd.code.startswith('DLI'):
                         d_vacaciones += wd.number_of_days_calendar
 
                 line_ids = nomina.line_ids
-                if line_ids:
-                    d_total += line_ids[0].total
-
-                s_ordinario = (salario_mensual / 30) * (d_total - d_vacaciones)
-                s_vacaciones = (salario_mensual / 30) * d_vacaciones
 
                 for line in line_ids:
+                    if line.code == 'DIASTRABAJO':
+                        d_total += line.total
                     if line.code == 'IGSS':
                         d_igss += line.total
                     if line.code == 'TOTALDED':
@@ -503,6 +498,13 @@ class HrEmployeePayslip(models.Model):
                         dec_372001 += line.total
                     if line.code == 'NET':
                         s_recibido += line.total
+
+                s_ordinario = (salario_mensual / 30) * (d_total - d_vacaciones)
+                s_vacaciones = (salario_mensual / 30) * d_vacaciones
+
+            resource = self.resource_id.sudo()
+            horas_diarias = resource.calendar_id.working_hours_on_day(datetime(day=1, month=mes, year=current_year))
+            h_normal = horas_diarias * d_total
 
             row = [moneda, mes, calendar.month_name[mes], salario_mensual, d_total,
                    h_normal, 0.00,
