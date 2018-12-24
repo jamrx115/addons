@@ -379,6 +379,46 @@ class HrEmployeePayslip(models.Model):
 
     payslip_count = fields.Integer(compute='_compute_payslip_count', string='Payslips')
 
+    def get_lastsixsalaries(self, employee_p, code):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        hoy = datetime.now(tz=user_tz).date()
+        date_to = datetime(year=hoy.year, month=hoy.month, day=calendar.monthrange(hoy.year, hoy.month)[1])
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+
+        guia = date_to - timedelta (days=180) # 30*6=180
+        date_from = datetime(year=guia.year, month=guia.month, day=1)
+        #_logger.debug('------------------------------- [%s, %s]', date_from, date_to)
+        nominas = self.env['hr.payslip'].search(
+            ['&', '&', '&', ('employee_id', '=', employee.id),
+                            ('state', '=', 'done'),
+                        ('date_from', '>=', date_from),
+                   ('date_to', '<=', date_to)],
+            order="date_from")
+        sum_salaries = 0
+
+        for nomina in nominas:
+            line_ids = nomina.line_ids
+            for line in line_ids:
+                if line.code == code:
+                    sum_salaries += line.total
+
+        return sum_salaries
+
+    def is_leap_year(self):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        current_year = datetime.now(tz=user_tz).year
+
+        if current_year % 4 == 0:
+            if current_year % 100 == 0:
+                if current_year % 400 == 0:
+                    return True
+                else:
+                    return False
+            else:
+                return True
+        else:
+            return False
+
     def get_age(self):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         fecha_nacimiento = fields.Datetime.from_string(self.birthday).date()
