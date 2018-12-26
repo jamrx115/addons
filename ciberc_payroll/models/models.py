@@ -372,14 +372,7 @@ class CodeLeaveTypePayroll(models.Model):
 
         return result
 
-
-# clase creada por alltic que permite obtener datos para reportes
-class HrEmployeePayslip(models.Model):
-    _inherit = 'hr.employee'
-
-    payslip_count = fields.Integer(compute='_compute_payslip_count', string='Payslips')
-
-    def get_lastsixsalaries(self, employee_p, code):
+    def get_lastsixpaysplips(self, employee_p, code):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         hoy = datetime.now(tz=user_tz).date()
         date_to = datetime(year=hoy.year, month=hoy.month, day=calendar.monthrange(hoy.year, hoy.month)[1])
@@ -403,6 +396,98 @@ class HrEmployeePayslip(models.Model):
                     sum_salaries += line.total
 
         return sum_salaries
+
+    def get_pending_holidays(self, employee_p):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        hoy = datetime.now(tz=user_tz).date()
+
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
+        holiday_status_ids = self.env['hr.holidays.status'].search(
+            ['|', ('code', '=like', 'VAC%'), ('code', '=like', 'DLI%')]).ids
+
+        employee = self.env['hr.employee'].browse(employee_p)
+        contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')
+        holidays = self.env['hr.holidays'].search(
+            ['&', '&', ('employee_id', '=', employee.id), ('state', '=', 'validate'),
+                  ('holiday_status_id', 'in', holiday_status_ids)], order = 'holiday_status_id')
+
+        global_pending_holidays = 0
+        aux_pending_holidays = 0
+        pending_holidays = {}
+
+        # contar vacaciones pendientes (agrupadas por bolsas de días)
+        if len(holidays)>0:
+            current_holiday_status = holidays[0].holiday_status_id
+            for h in holidays:
+                if h.holiday_status_id != current_holiday_status:
+                    current_holiday_status = h.holiday_status_id
+                    aux_pending_holidays = 0
+                global_pending_holidays += h.number_of_days
+                aux_pending_holidays += h.number_of_days
+                pending_holidays[current_holiday_status] = aux_pending_holidays
+
+        # si hoy > fecha de cumpleaños de contrato, calcular días adicionales de vacaciones generados
+        for c in contracts:
+            if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
+                date_start = fields.Datetime.from_string(c.date_start)
+                fecha_aux = datetime(year=hoy.year, month=date_start.month, day=date_start.day).date()
+                if hoy > fecha_aux:
+                    date_delta = (hoy - fecha_aux).days + 1.0
+                    global_pending_holidays += date_delta * 15.0 / 365.0
+                    break
+
+        # cerrar las vacaciones pendientes
+        for ph in pending_holidays:
+            pass
+
+        return global_pending_holidays
+
+    def get_pending_agui(self, employee_p):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        hoy = datetime.now(tz=user_tz).date() # tipo date
+        last_year = hoy.year - 1
+        inicio_aguinaldo = datetime(day=1, month=12, year=last_year).date()
+        fin_aguinaldo = datetime(day=30, month=11, year=hoy.year).date()
+        date_guia = hoy - timedelta(days=180)
+        _logger.debug('---------------- date_guia %s', date_guia)
+        start_contract = 1
+
+        employee = self.env['hr.employee'].browse(employee_p)
+        contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order='date_start desc')
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search(
+            [('name', '=', 'Vinculación laboral')])
+
+        for c in contracts:
+            if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
+                start_contract = fields.Datetime.from_string(c.date_start).day
+                date_guia = datetime(day=start_contract, month=date_guia.month, year=date_guia.year).date()
+                break
+
+        global_pending_agui = 0
+
+        _logger.debug('---------------- inicio_aguinaldo %s', inicio_aguinaldo)
+        _logger.debug('---------------- fin_aguinaldo %s', fin_aguinaldo)
+        for i in range (6):
+            _logger.debug('---------------- date_guia %s', date_guia)
+            date_guia = date_guia + timedelta(days=30)
+            date_guia = datetime(day=start_contract, month=date_guia.month, year=date_guia.year).date()
+            #if date_guia >= inicio_aguinaldo and date_guia <= fin_aguinaldo:
+            #    global_pending_agui += 0 #calendar.monthrange(date_guia.year, date_guia.month)[1]
+
+        return global_pending_agui
+
+    def calculate_pendsalary(self, employee_p, date_to_payslip):
+        date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+        answer = 1.00
+        return answer
+
+
+# clase creada por alltic que permite obtener datos para reportes
+class HrEmployeePayslip(models.Model):
+    _inherit = 'hr.employee'
+
+    payslip_count = fields.Integer(compute='_compute_payslip_count', string='Payslips')
 
     def is_leap_year(self):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
