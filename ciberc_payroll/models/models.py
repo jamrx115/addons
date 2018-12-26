@@ -538,9 +538,9 @@ class HrEmployeePayslip(models.Model):
             date_from = datetime(day=1, month=m + 1, year=current_year).date()
             date_to = datetime(day=calendar.monthrange(current_year, m + 1)[1], month=m + 1, year=current_year).date()
             pagos = self.env['hr.payslip'].search(
-                ['&', '&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to),
-                 ('employee_id', '=', self.id), ('state', '=', 'done')],
+                ['&', '&', ('date_to', '<=', date_to), ('employee_id', '=', self.id), ('state', '=', 'done')],
                 order="date_from")
+
             locale = self.env.context.get('lang') or 'es_CO'
             nombre_mes = ('%s') % (tools.ustr(babel.dates.format_date(date=date_from, format='MMMM', locale=locale)))
             mes = m + 1
