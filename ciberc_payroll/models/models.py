@@ -534,12 +534,21 @@ class HrEmployeePayslip(models.Model):
         today = datetime.now(tz=user_tz).date()
         current_year = today.year
         answer = []
+        struct_agui = self.env['hr.payroll.structure'].search([('code', '=', 'AGUINALDO GT')])
+        struct_bono = self.env['hr.payroll.structure'].search([('code', '=', 'BONO14 GT')])
         for m in range(12):
             date_from = datetime(day=1, month=m + 1, year=current_year).date()
             date_to = datetime(day=calendar.monthrange(current_year, m + 1)[1], month=m + 1, year=current_year).date()
-            pagos = self.env['hr.payslip'].search(
-                ['&', '&', ('date_to', '<=', date_to), ('employee_id', '=', self.id), ('state', '=', 'done')],
+            pagos_nominas = self.env['hr.payslip'].search(
+                ['&', '&', ('employee_id', '=', self.id), ('state', '=', 'done'),
+                      '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to)],
                 order="date_from")
+            pagos_bonos = self.env['hr.payslip'].search(
+                ['&', '&', ('employee_id', '=', self.id), ('state', '=', 'done'),
+                      '|', ('struct_id', '=', struct_agui.id), ('struct_id', '=', struct_bono.id),
+                      ('date_to', '=', date_to)],
+                order="date_from")
+            pagos = pagos_nominas + pagos_bonos
 
             locale = self.env.context.get('lang') or 'es_CO'
             nombre_mes = ('%s') % (tools.ustr(babel.dates.format_date(date=date_from, format='MMMM', locale=locale)))
