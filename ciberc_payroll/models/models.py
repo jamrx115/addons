@@ -596,8 +596,10 @@ class HrEmployeePayslip(models.Model):
                         s_recibido += line.total
                     if line.code == 'AGUI':
                         sum_agui += line.total
+                        s_recibido += line.total
                     if line.code == 'BON14':
                         sum_agui += line.total
+                        s_recibido += line.total
 
                 s_ordinario = (salario_mensual / 30) * (d_total - d_vacaciones)
                 s_vacaciones = (salario_mensual / 30) * d_vacaciones
