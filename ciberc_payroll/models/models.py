@@ -209,37 +209,38 @@ class CodeLeaveTypePayroll(models.Model):
         self.input_line_ids = input_lines
         return
 
-    # obtener sumatoria salarios para bono 14
+    # obtener sumatoria salarios
     @api.multi
-    def sum_salary_for_bono14(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
+    def sum_wage(self, employee_p, date_from_payslip, date_to_payslip, rule, order):
         result = 0
+        date_from_payslip = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
-        last_year = date_to_payslip.year - 1
+
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
-        meses = [7, 8, 9, 10, 11, 12, 1, 2, 3, 4, 5, 6]
+
+        if rule == 'BONO14' or rule == 'AGUINALDO':
+            meses1 = [mn for mn in range(date_from_payslip.month, 13)]
+            meses2 = [mn for mn in range(1, date_to_payslip.month + 1)]
+            meses = meses1 + meses2
+        else:
+            meses = [mn for mn in range(date_from_payslip.month, date_to_payslip.month + 1)]
+
         for mes in meses:
-            dias = 0
-            if mes >= 7 and mes <= 12:
-                date_from_mes = datetime(year=last_year, month=mes, day=1)  # tipo datetime
-                date_to_mes = datetime(year=last_year, month=mes,
-                                       day=calendar.monthrange(last_year, mes)[1])  # tipo datetime
-            else:
-                date_from_mes = datetime(year=date_to_payslip.year, month=mes, day=1)  # tipo datetime
-                date_to_mes = datetime(year=date_to_payslip.year, month=mes,
-                                       day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
+            date_from_mes = datetime(year=date_from_payslip.year, month=mes, day=1)  # tipo datetime
+            date_to_mes = datetime(year=date_to_payslip.year, month=mes,
+                                   day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
 
             payslip_ids = self.env['hr.payslip'].search(
                 ['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
                  ('employee_id', '=', employee.id),
                  ('state', '=', 'done')])
             for nomina in payslip_ids:
-                _logger.debug('nomina %s', nomina)
                 contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
+                salario = contract.wage
                 contract_start = fields.Datetime.from_string(contract.date_start)  # tipo datetime
                 contract_end = False
                 if contract.date_end:
                     contract_end = fields.Datetime.from_string(contract.date_end)  # tipo datetime
-                salario = contract.wage
 
                 if contract_start < date_from_mes:
                     if contract_end:
@@ -257,101 +258,34 @@ class CodeLeaveTypePayroll(models.Model):
                             dias = ((contract_end - contract_start).days) + 1
                     else:
                         dias = ((date_to_mes - contract_start).days) + 1
-                result += (salario / 30) * dias
 
-        return result
-
-    # obtener sumatoria comisiones para bono 14
-    @api.multi
-    def sum_commission_for_bono14(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
-        # date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
-        date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
-        date_from_bono = datetime(year=(date_to_payslip.year) - 1, month=7, day=1)  # tipo datetime
-        date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30)  # tipo datetime
-        result = 0.00
-
-        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
-        contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
-        payslip_ids = self.env['hr.payslip'].search(['&', ('contract_id', '=', None), ('state', '=', 'done')],
-                                                    limit=0)  # recordset vacío para concatenar
-
-        for contract_id in contract_ids:
-            payslip_aux = self.env['hr.payslip'].search(
-                ['&', '&', '&', ('date_from', '>=', date_from_bono), ('date_to', '<=', date_to_bono),
-                 ('contract_id', '=', contract_id),
-                 ('state', '=', 'done')])
-
-            payslip_ids = payslip_ids + payslip_aux
-
-        for payslip in payslip_ids:
-            for input in payslip.input_line_ids:
-                if input.code == 'COM':
-                    result += input.amount
-
-        return result
-
-    # obtener sumatoria salarios para aguinaldo
-    @api.multi
-    def sum_salary_for_aguinaldo(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
-        result = 0
-        date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
-        last_year = date_to_payslip.year - 1
-        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
-        meses = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-        for mes in meses:
-            dias = 0
-            if mes == 12:
-                date_from_mes = datetime(year=last_year, month=mes, day=1)  # tipo datetime
-                date_to_mes = datetime(year=last_year, month=mes,
-                                       day=calendar.monthrange(last_year, mes)[1])  # tipo datetime
-            else:
-                date_from_mes = datetime(year=date_to_payslip.year, month=mes, day=1)  # tipo datetime
-                date_to_mes = datetime(year=date_to_payslip.year, month=mes,
-                                       day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
-
-            payslip_ids = self.env['hr.payslip'].search(
-                ['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
-                 ('employee_id', '=', employee.id),
-                 ('state', '=', 'done')])
-
-            for nomina in payslip_ids:
-                _logger.debug('nomina %s', nomina)
-                contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
-                contract_start = fields.Datetime.from_string(contract.date_start)  # tipo datetime
-                contract_end = False
-                if contract.date_end:
-                    contract_end = fields.Datetime.from_string(contract.date_end)  # tipo datetime
-                salario = contract.wage
-
-                if contract_start < date_from_mes:
-                    if contract_end:
-                        if date_to_mes < contract_end:
-                            dias = ((date_to_mes - date_from_mes).days) + 1
-                        else:
-                            dias = ((contract_end - date_from_mes).days) + 1
-                    else:
-                        dias = ((date_to_mes - date_from_mes).days) + 1
+                if order == 'WAGE':
+                    result += (salario / 30) * dias
                 else:
-                    if contract_end:
-                        if date_to_mes < contract_end:
-                            dias = ((date_to_mes - contract_start).days) + 1
-                        else:
-                            dias = ((contract_end - contract_start).days) + 1
-                    else:
-                        dias = ((date_to_mes - contract_start).days) + 1
-                result += (salario / 30) * dias
+                    result += dias
 
         return result
 
-    # obtener sumatoria comisiones para aguinaldo
+    # obtener sumatoria comisiones
     @api.multi
-    def sum_commission_for_aguinaldo(self, employee_p, contract_p, date_from_payslip, date_to_payslip):
-        # date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
+    def sum_other(self, employee_p, date_from_payslip, date_to_payslip, rule, code):
+        date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
-        date_from_bono = datetime(year=(date_to_payslip.year) - 1, month=12, day=1)  # tipo datetime
-        date_to_bono = datetime(year=date_to_payslip.year, month=11, day=30)  # tipo datetime
-        result = 0.00
 
+        if rule == 'BONO14':
+            date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=7, day=1)  # tipo datetime
+            date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30)  # tipo datetime
+        elif rule == 'AGUINALDO':
+            date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=12, day=1)  # tipo datetime
+            date_to_bono = datetime(year=date_to_payslip.year, month=11, day=30)  # tipo datetime
+        elif rule == 'PRIMA1':
+            date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=1, day=1)  # tipo datetime
+            date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30)  # tipo datetime
+        else:
+            date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=7, day=1)  # tipo datetime
+            date_to_bono = datetime(year=date_to_payslip.year, month=12, day=31)  # tipo datetime
+
+        result = 0.00
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
         contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
         payslip_ids = self.env['hr.payslip'].search(['&', ('contract_id', '=', None), ('state', '=', 'done')],
@@ -367,7 +301,7 @@ class CodeLeaveTypePayroll(models.Model):
 
         for payslip in payslip_ids:
             for input in payslip.input_line_ids:
-                if input.code == 'COM':
+                if input.code == code:
                     result += input.amount
 
         return result
@@ -475,13 +409,6 @@ class CodeLeaveTypePayroll(models.Model):
             #    global_pending_agui += 0 #calendar.monthrange(date_guia.year, date_guia.month)[1]
 
         return global_pending_agui
-
-    def calculate_pendsalary(self, employee_p, date_to_payslip):
-        date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
-        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
-        answer = 1.00
-        return answer
-
 
 # clase creada por alltic que permite obtener datos para reportes
 class HrEmployeePayslip(models.Model):
