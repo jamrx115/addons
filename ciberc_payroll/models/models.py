@@ -300,9 +300,26 @@ class CodeLeaveTypePayroll(models.Model):
             payslip_ids = payslip_ids + payslip_aux
 
         for payslip in payslip_ids:
-            for input in payslip.input_line_ids:
+            for input in payslip.line_ids:
                 if input.code == code:
                     result += input.amount
+
+        return result
+
+    def get_lastfortnight(self, contract, date_from_payslip, code):
+        date_from_payslip = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
+        date_from = datetime(day=1, month=date_from_payslip.month, year=date_from_payslip.year)
+        date_to = date_from_payslip - timedelta(days=1)
+        result = 0.00
+
+        last_payslip = self.env['hr.payslip'].search(
+            ['&', '&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to),
+             ('contract_id', '=', contract.id),
+             ('state', '=', 'done')])
+
+        for input in last_payslip.line_ids:
+            if input.code == code:
+                result += input.amount
 
         return result
 
