@@ -6,15 +6,9 @@
             <t t-if="o.state=='validate'">
                 <t t-call="report.external_layout">
                     <div class="page">
-                        <h2>Comprobante ausencia <span t-field="o.employee_id"/></h2>
+                        <h2>Constancia de <span t-field="o.holiday_status_id"/></h2>
 
                         <table class="table table-condensed table-bordered">
-                            <tr>
-                                <td><strong>Descripción</strong></td>
-                                <td><span t-field="o.name"/></td>
-                                <td><strong>Motivo</strong></td>
-                                <td><span t-field="o.holiday_status_id"/></td>
-                            </tr>
                             <tr>
                                 <td><strong>Empleado</strong></td>
                                 <td><span t-field="o.employee_id"/></td>
@@ -22,10 +16,14 @@
                                 <td><span t-field="o.employee_id.department_id"/></td>
                             </tr>
                             <tr>
-                                <td><strong>Email</strong></td>
-                                <td><span t-field="o.employee_id.work_email"/></td>
                                 <td><strong>Identificación</strong></td>
                                 <td><span t-field="o.employee_id.identification_id"/></td>
+                                <td><strong>Email</strong></td>
+                                <td><span t-field="o.employee_id.work_email"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Descripción</strong></td>
+                                <td colspan="3"><span t-field="o.name"/></td>
                             </tr>
                             <tr>
                                 <td><strong>Inicio ausencia</strong></td>
@@ -36,19 +34,38 @@
                             <tr>
                                 <td><strong>Regreso</strong></td>
                                 <td><span t-field="o.date_return"/></td>
-                                <td><strong>Duración (días)</strong></td>
-                                <td><span t-field="o.number_of_days_temp"/></td>
+                                <td><strong>Duración</strong></td>
+                                <td><span t-field="o.number_of_days_temp"/> días</td>
                             </tr>
                         </table>
 
-                        <table class="table table-condensed table-bordered">
-                            <tr>
-                                <td><strong>Aprobado por</strong></td>
-                                <td><span t-field="o.manager_id"/></td>
-                                <td><strong>Confirmado por</strong></td>
-                                <td><span t-field="o.manager_id2"/></td>
-                            </tr>
-                        </table>
+                        <t t-if="'remove' == o.type">
+                            <table class="table table-condensed table-bordered">
+                                <tr>
+                                    <td><strong>Aprobado por</strong></td>
+                                    <td><span t-field="o.manager_id"/></td>
+                                    <td><strong>Confirmado por</strong></td>
+                                    <td><span t-field="o.manager_id2"/></td>
+                                </tr>
+                            </table>
+                        </t>
+
+                        <t t-else="">
+                            <table class="table table-condensed table-bordered">
+                                <tr>
+                                    <td><strong>Aprobado por</strong></td>
+                                    <td colspan="3"><span t-field="o.manager_id"/></td>
+                                </tr>
+                            </table>
+                        </t>
+
+                        <t t-if="'VAC' == o.holiday_status_id.code[:3]">
+                            <table class="table table-condensed table-bordered">
+                                <tr>
+                                    <td>Para los efectos legales del artículo 137 del Código de Trabajo, extiendo la presente constancia</td>
+                                </tr>
+                            </table>
+                        </t>
                     </div>
                 </t>
             </t>
