@@ -34,6 +34,8 @@ class CodeLeaveTypePayroll(models.Model):
         @return: returns a list of dict containing the input that should be applied for the given contract between date_from and date_to
         """
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        guatemala = self.env['res.country'].search([['name', '=', 'Guatemala']])
+        hours_half_holidays = 0.0
 
         def was_on_leave_interval(employee_id, date_from, date_to):
             date_from = fields.Datetime.to_string(date_from)
@@ -81,11 +83,11 @@ class CodeLeaveTypePayroll(models.Model):
                     day_to = day_to_payslip
             else:
                 day_to = day_to_payslip
-            nb_of_days = (day_to - day_from).days + 1
+            calendar_days = (day_to - day_from).days + 1
             country_emp_id = contract.employee_id.company_id.country_id.id
             holidays_ids = holidays.get_holidays_ids(day_from, day_to, country_emp_id)
             # holidays_ids, day_from, day_to en UTC "usuario"
-            for day in range(0, nb_of_days):
+            for day in range(0, calendar_days):
                 working_intervals_on_day = contract.working_hours.get_working_intervals_of_day(
                     start_dt=day_from + timedelta(days=day))
                 for interval in working_intervals_on_day:  # interval is tuple
@@ -112,6 +114,13 @@ class CodeLeaveTypePayroll(models.Model):
                             attendances['number_of_hours'] += hours
                         else:
                             leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
+
+                            if country_emp_id == guatemala.id:
+                                if ausencia.holiday_status_id.code[:3] == 'VAC' or ausencia.holiday_status_id.code[:3] == 'DLI':
+                                    if interval[0].month == 12 and (interval[0].day == 24 or interval[0].day == 31):
+                                        hours_half_holidays += hours / 2
+                                        leaves[ausencia.holiday_status_id.name]['number_of_hours'] -= hours / 2
+                                        attendances['number_of_hours'] += hours / 2
                     else:
                         aux_df_utczero = fields.Datetime.from_string(ausencia.date_from)
                         aux_df_utc_user = user_tz.fromutc(aux_df_utczero)
@@ -133,32 +142,28 @@ class CodeLeaveTypePayroll(models.Model):
                             attendances['number_of_hours'] += hours
                         else:
                             leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
+                            if country_emp_id == guatemala.id:
+                                if ausencia.holiday_status_id.code[:3] == 'VAC' or ausencia.holiday_status_id.code[:3] == 'DLI':
+                                    if interval[0].month == 12 and (interval[0].day == 24 or interval[0].day == 31):
+                                        hours_half_holidays += hours / 2
+                                        leaves[ausencia.holiday_status_id.name]['number_of_hours'] -= hours / 2
+                                        attendances['number_of_hours'] += hours / 2
                 else:
                     # no hay ausencia -> conteo WORK100
                     attendances['number_of_hours'] += hours
 
             leaves = [value for key, value in leaves.items()]
-
-            auxiliar_for_WORK100 = 0.00
+            aux_calendar_days = 0.0
+            
             for data in [attendances] + leaves:
-                data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day) \
-                    if uom_day and uom_hour \
-                    else data['number_of_hours'] / 8.0
-
+                data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day) if uom_day and uom_hour else data['number_of_hours'] / 8.0
                 if data['code'] != 'WORK100':
-                    calendar_delta = data['date_to'] - data['date_from']
-                    number_of_days_calendar = round(calendar_delta.days + float(calendar_delta.seconds) / 86400,
-                                                    2) + 1.00
-                    auxiliar_for_WORK100 += number_of_days_calendar
-                    data['number_of_days_calendar'] = number_of_days_calendar
+                    aux_calendar_days = uom_hour._compute_quantity(hours_half_holidays, uom_day) if uom_day and uom_hour else hours_half_holidays / 8.0
+                    data['number_of_days_calendar'] = aux_calendar_days
 
                 res.append(data)
 
-            res[0]['number_of_days_calendar'] = nb_of_days - auxiliar_for_WORK100
-            # Se traslada solución a regla salarial
-            # if day_to.day == 31:
-            #     res[0]['number_of_days'] = res[0]['number_of_days'] - 1
-            #     res[0]['number_of_days_calendar'] = res[0]['number_of_days_calendar'] - 1
+            res[0]['number_of_days_calendar'] = calendar_days - aux_calendar_days
 
         return res
 

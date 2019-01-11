@@ -126,6 +126,8 @@ class HolidaysUpdated(models.Model):
         """ Returns a float equals to the timedelta between two dates given as string."""
         from_dt = fields.Datetime.from_string(date_from)
         to_dt = fields.Datetime.from_string(date_to)
+        tipo_ausencia = self.holiday_status_id.code
+        guatemala = self.env['res.country'].search([['name', '=', 'Guatemala']])
 
         if employee_id:
             employee = self.env['hr.employee'].browse(employee_id)
@@ -143,19 +145,20 @@ class HolidaysUpdated(models.Model):
                 while date <= to_dt:
                     date_str = str(date.date())
                     holiday_obj = holidays_ids.filtered(lambda r: r.date == date_str)
+                    hours_range = self.get_hours(from_dt, to_dt, date)
+                    working_hours = resource.calendar_id.get_working_hours(hours_range[0], hours_range[1], resource_id=resource.id, compute_leaves=True)
 
                     if holiday_obj:
-                        f = self.get_hours(from_dt, to_dt, date)
-                        h_f = resource.calendar_id.get_working_hours(f[0], f[1], resource_id=resource.id, compute_leaves=True)
-                        subtrahend += h_f
+                        subtrahend += working_hours
                     elif date.weekday() == 5 and deduct_saturday:
-                        s = self.get_hours(from_dt, to_dt, date)
-                        h_s = resource.calendar_id.get_working_hours(s[0], s[1], resource_id=resource.id, compute_leaves=True)
-                        subtrahend += h_s
+                        subtrahend += working_hours
                     elif date.weekday() == 6 and deduct_sunday:
-                        d = self.get_hours(from_dt, to_dt, date)
-                        h_d = resource.calendar_id.get_working_hours(d[0], d[1], resource_id=resource.id, compute_leaves=True)
-                        subtrahend += h_d
+                        subtrahend += working_hours
+
+                    if tipo_ausencia and country_emp_id == guatemala.id:
+                        if tipo_ausencia[:3] == 'VAC' or tipo_ausencia[:3] == 'DLI':
+                            if date.month == 12 and (date.day == 24 or date.day == 31):
+                                subtrahend += working_hours / 2
 
                     date += delta
 
