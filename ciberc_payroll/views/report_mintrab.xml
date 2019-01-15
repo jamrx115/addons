@@ -109,13 +109,15 @@
                                 <td><span t-esc="empleado.get_filtered_lineid('BON37')"/></td><!--bonif dec 7889 Q 250.00-->
                                 <td><span>0</span></td><!--total horas extras anuales-->
                                 <td><span>0</span></td><!--valor hora extra-->
-                                <td><span t-esc="empleado.get_filtered_lineid('AGUI')"/></td><!--monto agui decr 7678-->
-                                <td><span t-esc="empleado.get_filtered_lineid('BON14')"/></td><!--monto bono 14 decr 4292-->
+                                <t t-set="total_agui" t-value="empleado.get_filtered_lineid('AGUI') + empleado.get_filtered_lineid('AGUIPE')"/><!--monto agui decr 7678-->
+                                <td><span t-esc="total_agui"/></td><!--monto agui decr 7678-->
+                                <t t-set="total_bon14" t-value="empleado.get_filtered_lineid('BON14') + empleado.get_filtered_lineid('BON14P')"/><!--monto bono 14 decr 4292-->
+                                <td><span t-esc="total_bon14"/></td><!--monto bono 14 decr 4292-->
                                 <td><span t-esc="empleado.get_filtered_lineid('COM')"/></td><!--retrib comisiones-->
                                 <td><span>0</span></td><!--viaticos-->
                                 <td><span t-esc="empleado.get_filtered_lineid('BON')"/></td><!--bonif adicionales-->
-                                <td></td><!--retribuc vacaciones-->
-                                <td></td><!--retribuc indemnizacion-->
+                                <td><span t-esc="empleado.get_filtered_lineid('VACPND')"/></td><!--retribuc vacaciones-->
+                                <td><span t-esc="empleado.get_filtered_lineid('INDEMN')"/></td><!--retribuc indemnizacion-->
                             </tr>
                         </t>
                     </tbody>

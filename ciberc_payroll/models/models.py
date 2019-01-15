@@ -597,14 +597,22 @@ class HrEmployeePayslip(models.Model):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         last_year = (datetime.now(tz=user_tz).date().year) - 1
         aux = 0
+        struct_agui = self.env['hr.payroll.structure'].search([('code', '=', 'AGUINALDO GT')])
+        struct_bono = self.env['hr.payroll.structure'].search([('code', '=', 'BONO14 GT')])
         for m in range(12):
             mes = m + 1
             date_from = datetime(day=1, month=mes, year=last_year).date()
             date_to = datetime(day=calendar.monthrange(last_year, mes)[1], month=mes, year=last_year).date()
-            pagos = self.env['hr.payslip'].search(
+            pagos_nominas = self.env['hr.payslip'].search(
                 ['&', '&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to),
                  ('employee_id', '=', self.id), ('state', '=', 'done')],
                 order="date_from")
+            pagos_bonos = self.env['hr.payslip'].search(
+                ['&', '&', ('employee_id', '=', self.id), ('state', '=', 'done'),
+                      '|', ('struct_id', '=', struct_agui.id), ('struct_id', '=', struct_bono.id),
+                      ('date_to', '=', date_to)],
+                order="date_from")
+            pagos = pagos_nominas + pagos_bonos
             for nomina in pagos:
                 line_ids = nomina.line_ids
                 for line in line_ids:
