@@ -17,19 +17,20 @@ class ciberc_tipo_novedad_contrato (models.Model):
 class ciberc_contract(models.Model):
     _inherit = 'hr.contract'
 
-    # actualizacion campo
+    # -override
     working_hours = fields.Many2one('resource.calendar', string='Working Schedule', required=True)
-    # -campo personalizado para vacaciones o días libres
+    # nuevo campo para vacaciones o días libres
     annual_holiday = fields.Integer('Días libres anuales',
                                     help='Vacaciones para contrato laboral y días libres para prestación de servicios')
-    # -campos personalizado para cuenta bancaria
+    # -nuevos campos para cuenta bancaria
     # bank_account_contract_id = fields.Many2one('res.partner.bank', string='Cuenta bancaria', help='Cuenta bancaria para pagos nómina', groups='hr.group_hr_user,base.group_user')
     x_bank_id = fields.Many2one('res.bank', string='Banco')
     x_cuenta_bancaria = fields.Char(string='Número cuenta bancaria')
     x_tipo_cuenta = fields.Char(string='Tipo cuenta')
     x_cod_swift = fields.Char(string='Código Swift')
     x_currency_id = fields.Many2one('res.currency', string='Moneda')
-    # -otros campos personalizados
+    
+    # -otros nuevos campos
     x_bonificacion = fields.Float(string='Bonificación')
     x_comision = fields.Float(string='Comisión')
     x_dias_aguinaldo = fields.Float(string='Dias aguinaldo', readonly=True)
@@ -45,6 +46,13 @@ class ciberc_contract(models.Model):
     x_renta_ex_patrono = fields.Float(string='Renta Ex-Patrono')
     x_tipo_novedad_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad creacion del contrato', required=True)
     x_tipo_novedad_cierre_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad cierre del contrato')
+
+    x_pagos_alim  = fields.Float(string='Pagos a 3ros por alimentación')
+    x_viat_ocasi  = fields.Float(string='Viáticos ocasionales reembolsables')
+    x_ahorros_afc = fields.Float(string='Ahorros cuentas AFC')
+    x_rentrab_ex  = fields.Float(string='Rentas de trabajo exentas')
+    x_int_viviend = fields.Float(string='Intereses en préstamos vivienda')
+    x_polizas_seg = fields.Float(string='Pólizas de seguros')
 
     # -override
     @api.model
