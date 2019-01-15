@@ -98,7 +98,7 @@
         </field>
     </record>
 
-    <!-- Vista tree Ausencias- varias actualizaciones -->
+    <!-- Vista tree Asignaciones- varias actualizaciones -->
     <record id="view_holiday_allocation_tree_updated" model="ir.ui.view">
         <field name="model">hr.holidays</field>
         <field name="inherit_id" ref="hr_holidays.view_holiday_allocation_tree"/>
@@ -108,7 +108,36 @@
                 <field name="category_id" position="replace"/>
 
                 <xpath expr="//field[@name='number_of_days']" position="replace">
-                    <field name="number_of_days" sum="Remaining Days"/>
+                    <field name="number_of_days"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <!-- Vista tree Peticiones- varias actualizaciones -->
+    <record id="view_holiday_tree_updated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='number_of_days']" position="replace">
+                    <field name="number_of_days"/>
+                </xpath>
+            </data>
+        </field>
+    </record>
+
+    <!-- Vista tree Resumen- varias actualizaciones -->
+    <record id="view_holiday_simple_tree_updated" model="ir.ui.view">
+        <field name="model">hr.holidays</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday_simple"/>
+        <field name="arch" type="xml">
+            <data>
+                <xpath expr="//field[@name='number_of_days']" position="replace">
+                    <field name="number_of_days"/>
+                </xpath>
+                <xpath expr="//field[@name='number_of_days_calendar']" position="replace">
+                    <field name="number_of_days_calendar"/>
                 </xpath>
             </data>
         </field>
@@ -122,6 +151,9 @@
             <data>
                 <button name="toggle_payslip_status" position="replace"/>
                 <field name="report_note" position="replace"/>
+                <xpath expr="//field[@name='number_of_days']" position="replace">
+                    <field name="number_of_days"/>
+                </xpath>
             </data>
         </field>
     </record>
