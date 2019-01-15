@@ -214,7 +214,7 @@ class CodeLeaveTypePayroll(models.Model):
         self.input_line_ids = input_lines
         return
 
-    # obtener sumatoria salarios
+    # obtener sumatoria salarios o dias cancelados
     @api.multi
     def sum_wage(self, employee_p, date_from_payslip, date_to_payslip, rule, order):
         result = 0
@@ -222,6 +222,8 @@ class CodeLeaveTypePayroll(models.Model):
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
 
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+        aux_year = date_from_payslip.year
+        aux_meses = 0
 
         if rule == 'BONO14' or rule == 'AGUINALDO':
             meses1 = [mn for mn in range(date_from_payslip.month, 13)]
@@ -230,15 +232,21 @@ class CodeLeaveTypePayroll(models.Model):
         else:
             meses = [mn for mn in range(date_from_payslip.month, date_to_payslip.month + 1)]
 
+        if meses:
+            aux_meses = meses[0]
+
         for mes in meses:
-            date_from_mes = datetime(year=date_from_payslip.year, month=mes, day=1)  # tipo datetime
-            date_to_mes = datetime(year=date_to_payslip.year, month=mes,
+            if aux_meses == 13:
+                aux_year = date_to_payslip.year
+            date_from_mes = datetime(year=aux_year, month=mes, day=1)  # tipo datetime
+            date_to_mes = datetime(year=aux_year, month=mes,
                                    day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
 
             payslip_ids = self.env['hr.payslip'].search(
                 ['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
                  ('employee_id', '=', employee.id),
                  ('state', '=', 'done')])
+
             for nomina in payslip_ids:
                 contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
                 salario = contract.wage
@@ -263,15 +271,27 @@ class CodeLeaveTypePayroll(models.Model):
                             dias = ((contract_end - contract_start).days) + 1
                     else:
                         dias = ((date_to_mes - contract_start).days) + 1
-
+                
+                # correccion dias
+                if date_from_mes.month == 2:
+                    if date_to_mes.day == 28:
+                        dias += 2
+                    if date_to_mes.day == 29:
+                        dias += 1
+                if date_to_mes.day == 31 and (dias >= 16):
+                    dias -= 1
+                
+                # calculando resutado
                 if order == 'WAGE':
                     result += (salario / 30) * dias
                 else:
                     result += dias
 
+            aux_meses +=1
+
         return result
 
-    # obtener sumatoria comisiones
+    # obtener sumatoria comisiones y otros code definidos en la 2da pestana de nomina
     @api.multi
     def sum_other(self, employee_p, date_from_payslip, date_to_payslip, rule, code):
         date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
@@ -311,6 +331,7 @@ class CodeLeaveTypePayroll(models.Model):
 
         return result
 
+    # obtener datos de pagos (line_ids) en ultima quincena
     def get_lastfortnight(self, contract, date_from_payslip, code):
         date_from_payslip = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
         date_from = datetime(day=1, month=date_from_payslip.month, year=date_from_payslip.year)
@@ -328,41 +349,119 @@ class CodeLeaveTypePayroll(models.Model):
 
         return result
 
-    def get_lastsixpaysplips(self, employee_p, code):
-        user_tz = pytz.timezone(self.env.user.partner_id.tz)
-        hoy = datetime.now(tz=user_tz).date()
-        date_to = datetime(year=hoy.year, month=hoy.month, day=calendar.monthrange(hoy.year, hoy.month)[1])
-        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+    # auxiliar de conteo
+    def auxiliar_for_sum(self, date_from_str, date_to_str, tiempo):
+        date_from = fields.Datetime.from_string(date_from_str).date()
+        date_to   = fields.Datetime.from_string(date_to_str).date()
+        sub = 0.0
+        if tiempo == 'DIAS':
+            sub = ((date_to-date_from).days)+1
+        else:
+            sub = ((date_to.month-date_from.month)%12)+1
+        return sub
 
-        guia = date_to - timedelta (days=180) # 30*6=180
-        date_from = datetime(year=guia.year, month=guia.month, day=1)
-        #_logger.debug('------------------------------- [%s, %s]', date_from, date_to)
+    # obtener datos de fechas para liquidacion, tipo_sumatoria es "PARCIAL" o "TOTAL", tiempo es "MESES" o "DIAS"
+    def get_time_forliq(self, employee_p, date_from_payslip, date_to_payslip, tipo_sumatoria, tiempo):
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
+        employee = self.env['hr.employee'].browse(employee_p)
+        contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')
+        suma = 0.0
+
+        # resultado para 'liquidacion'
+        if tipo_sumatoria == 'PARCIAL':
+            suma = self.auxiliar_for_sum(date_from_payslip, date_to_payslip, tiempo)
+        # resultado para 'total'
+        else:
+            for c in contracts:
+                if c.x_tipo_novedad_contrato_id.id != tipo_novedad_contrato_vinculacion.id:
+                    suma += self.auxiliar_for_sum(c.date_start, c.date_end, tiempo)
+                else:
+                    suma += self.auxiliar_for_sum(c.date_start, c.date_end, tiempo)
+                    break
+        return suma
+
+    # obtener sumatoria de salarios base (descomentar para descontar solamente vacaciones o dias libres)
+    def get_sum_basicforliq(self, employee_p, date_from_payslip, date_to_payslip):
+        holiday_status_codes = self.env['hr.holidays.status'].search(
+            ['|', ('code', '=like', 'VAC%'), ('code', '=like', 'DLI%')]).code
+        employee = self.env['hr.employee'].browse(employee_p)
+        contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)],order = 'date_start desc')
+
+        date_from   = fields.Datetime.from_string(date_from_payslip).date()
+        date_to     = fields.Datetime.from_string(date_to_payslip).date()
+        suma = 0.0
+
         nominas = self.env['hr.payslip'].search(
             ['&', '&', '&', ('employee_id', '=', employee.id),
                             ('state', '=', 'done'),
                         ('date_from', '>=', date_from),
                    ('date_to', '<=', date_to)],
             order="date_from")
-        sum_salaries = 0
+
+        for n in nominas:
+            date_from_c = fields.Datetime.from_string(n.contract_id.date_start).date()
+            #date_to_c   = fields.Datetime.from_string(n.contract_id.date_end).date()
+            date_from_n = fields.Datetime.from_string(n.date_from).date()
+            date_to_n   = fields.Datetime.from_string(n.date_to).date()
+            base_wage = n.contract_id.wage
+            dias = 0.00
+            if date_from_c < date_from:
+                dias_aux = (date_to-date_from).days +1
+                dias += dias_aux
+            else:
+                dias_aux = (date_to-date_from_c).days +1
+                dias += dias_aux
+            if date_from_n.month == 2:
+                if date_to_n.day == 28:
+                    dias += 2
+                if date_to_n.day == 29:
+                    dias += 1
+            if date_to_n.day == 31 and (dias_aux == 16 or dias_aux == 31):
+                dias -= 1
+            '''for line in n.worked_days_line_ids:
+                if line.code[:3] in holiday_status_codes:
+                    dias -= line.number_of_days_calendar'''
+            suma += (base_wage/30)*dias
+
+        return suma
+
+    # obtener datos de los ultimos 6 meses (para LIQ) segun el codigo de la 2da pestaña
+    # NOTA: los 6 meses están definidos por las fechas de la nómina
+    def get_lastsixpaysplips(self, employee_p, date_from_payslip, date_to_payslip, code):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        hoy = datetime.now(tz=user_tz).date()
+        date_from = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
+        date_to = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+
+        nominas = self.env['hr.payslip'].search(
+            ['&', '&', '&', ('employee_id', '=', employee.id),
+                            ('state', '=', 'done'),
+                        ('date_from', '>=', date_from),
+                   ('date_to', '<=', date_to)],
+            order="date_from")
+        summation = 0
 
         for nomina in nominas:
             line_ids = nomina.line_ids
             for line in line_ids:
                 if line.code == code:
-                    sum_salaries += line.total
+                    summation += line.total
 
-        return sum_salaries
+        return summation
 
-    def get_pending_holidays(self, employee_p):
+    # obtener datos de las vacaciones pendientes (para LIQ)
+    # PEND cerrar las vacaciones pendientes
+    def get_pending_holidays(self, employee_p, contract_p):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
-        hoy = datetime.now(tz=user_tz).date()
 
         tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
         holiday_status_ids = self.env['hr.holidays.status'].search(
             ['|', ('code', '=like', 'VAC%'), ('code', '=like', 'DLI%')]).ids
 
         employee = self.env['hr.employee'].browse(employee_p)
-        contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')
+        contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], 
+            order = 'date_start desc')
         holidays = self.env['hr.holidays'].search(
             ['&', '&', ('employee_id', '=', employee.id), ('state', '=', 'validate'),
                   ('holiday_status_id', 'in', holiday_status_ids)], order = 'holiday_status_id')
@@ -382,15 +481,18 @@ class CodeLeaveTypePayroll(models.Model):
                 aux_pending_holidays += h.number_of_days
                 pending_holidays[current_holiday_status] = aux_pending_holidays
 
-        # si hoy > fecha de cumpleaños de contrato, calcular días adicionales de vacaciones generados
-        for c in contracts:
+        # si date_end > fecha de cumpleaños de contrato, calcular días adicionales de vacaciones generados
+        for i, c in enumerate(contracts):
+            if i == 0:
+                date_end = fields.Datetime.from_string(c.date_end).date()
             if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
                 date_start = fields.Datetime.from_string(c.date_start)
-                fecha_aux = datetime(year=hoy.year, month=date_start.month, day=date_start.day).date()
-                if hoy > fecha_aux:
-                    date_delta = (hoy - fecha_aux).days + 1.0
+                fecha_aux = datetime(year=date_end.year, month=date_start.month, day=date_start.day).date()
+                if date_end > fecha_aux:
+                    date_delta = (date_end - fecha_aux).days + 1.0
                     global_pending_holidays += date_delta * 15.0 / 365.0
-                    break
+                break
+
 
         # cerrar las vacaciones pendientes
         for ph in pending_holidays:
@@ -398,37 +500,69 @@ class CodeLeaveTypePayroll(models.Model):
 
         return global_pending_holidays
 
-    def get_pending_agui(self, employee_p):
+    # obtener aguinaldos pendientes (para LIQ) 
+    # NOTA: actualmente el rango es dic a nov
+    def get_dayspending_agui(self, employee_pid, date_from_payslip, date_to_payslip):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
-        hoy = datetime.now(tz=user_tz).date() # tipo date
-        last_year = hoy.year - 1
-        inicio_aguinaldo = datetime(day=1, month=12, year=last_year).date()
-        fin_aguinaldo = datetime(day=30, month=11, year=hoy.year).date()
-        date_guia = hoy - timedelta(days=180)
-        _logger.debug('---------------- date_guia %s', date_guia)
-        start_contract = 1
-
-        employee = self.env['hr.employee'].browse(employee_p)
-        contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order='date_start desc')
-        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search(
-            [('name', '=', 'Vinculación laboral')])
-
-        for c in contracts:
-            if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
-                start_contract = fields.Datetime.from_string(c.date_start).day
-                date_guia = datetime(day=start_contract, month=date_guia.month, year=date_guia.year).date()
-                break
-
+        date_from_n = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
+        date_to_n = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
         global_pending_agui = 0
 
-        _logger.debug('---------------- inicio_aguinaldo %s', inicio_aguinaldo)
-        _logger.debug('---------------- fin_aguinaldo %s', fin_aguinaldo)
-        for i in range (6):
-            _logger.debug('---------------- date_guia %s', date_guia)
-            date_guia = date_guia + timedelta(days=30)
-            date_guia = datetime(day=start_contract, month=date_guia.month, year=date_guia.year).date()
-            #if date_guia >= inicio_aguinaldo and date_guia <= fin_aguinaldo:
-            #    global_pending_agui += 0 #calendar.monthrange(date_guia.year, date_guia.month)[1]
+        employee = self.env['hr.employee'].browse(employee_pid)
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search(
+            [('name', '=', 'Vinculación laboral')])
+        estructura_aguinaldo = self.env['hr.payroll.structure'].search(
+            [('name', 'like', '%Aguinaldo%')])
+
+        ultima_nomina = self.env['hr.payslip'].search(
+            ['&', '&', ('employee_id', '=', employee.id),
+                       ('state', '=', 'done'),
+                 ('struct_id', '=', estructura_aguinaldo.id)],
+            order="date_from desc", limit=1)
+        ultimo_contrato = self.env['hr.contract'].search(
+            [('employee_id', '=', employee.id)],order = 'date_start desc', limit=1)
+        
+        if len(ultima_nomina)>0:
+            date_to_na = fields.Datetime.from_string(ultima_nomina.date_to)  # tipo datetime
+            date_from = date_to_na + timedelta(days=1)
+            date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
+        else:
+            date_from = datetime(day=1, month=12, year=date_from_n.year-1)
+            date_to = fields.Datetime.from_string(ultima_nomina.contract_id.date_end)  # tipo datetime
+
+        global_pending_agui = (date_to-date_from).days+1
+
+        return global_pending_agui
+
+    # obtener bono14 pendientes (para LIQ) MOD
+    # NOTA: actualmente el rango es jul a jun
+    def get_dayspending_bono14(self, employee_pid, date_from_payslip, date_to_payslip):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        date_from_n = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
+        date_to_n = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
+        global_pending_agui = 0
+        employee = self.env['hr.employee'].browse(employee_pid)
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search(
+            [('name', '=', 'Vinculación laboral')])
+        estructura_bono14 = self.env['hr.payroll.structure'].search(
+            [('name', 'like', '%Bono 14%')])
+
+        ultima_nomina = self.env['hr.payslip'].search(
+            ['&', '&', ('employee_id', '=', employee.id),
+                       ('state', '=', 'done'),
+                 ('struct_id', '=', estructura_bono14.id)],
+            order="date_from desc", limit=1)
+        ultimo_contrato = self.env['hr.contract'].search([('employee_id', '=', employee.id)],order = 'date_start desc', limit=1)
+        
+        if len(ultima_nomina)==1:
+            date_to_na = fields.Datetime.from_string(ultima_nomina.date_to)  # tipo datetime
+            date_from = date_to_na + timedelta(days=1)
+            date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
+        else:
+            date_from = datetime(day=1, month=12, year=date_from_n.year-1)
+            date_to = fields.Datetime.from_string(ultima_nomina.contract_id.date_end)  # tipo datetime
+
+        global_pending_agui = (date_to-date_from).days+1
 
         return global_pending_agui
 
