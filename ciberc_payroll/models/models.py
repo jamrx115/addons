@@ -157,10 +157,11 @@ class CodeLeaveTypePayroll(models.Model):
             
             for data in [attendances] + leaves:
                 data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day) if uom_day and uom_hour else data['number_of_hours'] / 8.0
-                if data['code'] != 'WORK100':
-                    aux_calendar_days = uom_hour._compute_quantity(hours_half_holidays, uom_day) if uom_day and uom_hour else hours_half_holidays / 8.0
-                    data['number_of_days_calendar'] = aux_calendar_days
-
+                if str(data['code']) != 'WORK100':
+                    using_hours = data['number_of_hours'] - hours_half_holidays
+                    aux = uom_hour._compute_quantity(using_hours, uom_day) if uom_day and uom_hour else using_hours / 8.0
+                    data['number_of_days_calendar'] = aux
+                    aux_calendar_days += aux
                 res.append(data)
 
             res[0]['number_of_days_calendar'] = calendar_days - aux_calendar_days
