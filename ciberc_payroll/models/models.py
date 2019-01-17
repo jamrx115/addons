@@ -305,10 +305,13 @@ class CodeLeaveTypePayroll(models.Model):
             date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=12, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=11, day=30)  # tipo datetime
         elif rule == 'PRIMA1':
-            date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=1, day=1)  # tipo datetime
+            date_from_bono = datetime(year=date_from_payslip.year, month=1, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30)  # tipo datetime
+        elif rule == 'PRIMA2':
+            date_from_bono = datetime(year=date_from_payslip.year, month=7, day=1)  # tipo datetime
+            date_to_bono = datetime(year=date_to_payslip.year, month=12, day=31)  # tipo datetime
         else:
-            date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=7, day=1)  # tipo datetime
+            date_from_bono = datetime(year=date_from_payslip.year, month=1, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=12, day=31)  # tipo datetime
 
         result = 0.00
