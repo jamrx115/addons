@@ -40,19 +40,19 @@ class ciberc_contract(models.Model):
     x_medic_prep = fields.Integer(string='Descuento mensual')
     x_pensi_volu = fields.Boolean(string='Adicional por pensiones voluntarias', help='Aplica para salario >= 1 SMMLV')
     x_pensi_volun = fields.Integer(string='Descuento mensual')
-    x_medios = fields.Float(string='Medios')
+    x_medios = fields.Integer(string='Medios')
     x_meses_isr = fields.Float(string='Meses ISR')
     x_numero_contrato = fields.Char(string='Identificador Contrato Físico')
     x_renta_ex_patrono = fields.Float(string='Renta Ex-Patrono')
     x_tipo_novedad_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad creacion del contrato', required=True)
     x_tipo_novedad_cierre_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad cierre del contrato')
 
-    x_pagos_alim  = fields.Float(string='Pagos a 3ros por alimentación')
-    x_viat_ocasi  = fields.Float(string='Viáticos ocasionales reembolsables')
-    x_ahorros_afc = fields.Float(string='Ahorros cuentas AFC')
-    x_rentrab_ex  = fields.Float(string='Rentas de trabajo exentas')
-    x_int_viviend = fields.Float(string='Intereses en préstamos vivienda')
-    x_polizas_seg = fields.Float(string='Pólizas de seguros')
+    x_pagos_alim  = fields.Integer(string='Pagos a 3ros por alimentación')
+    x_viat_ocasi  = fields.Integer(string='Viáticos ocasionales reembolsables')
+    x_ahorros_afc = fields.Integer(string='Ahorros cuentas AFC')
+    x_rentrab_ex  = fields.Integer(string='Rentas de trabajo exentas')
+    x_int_viviend = fields.Integer(string='Intereses en préstamos vivienda')
+    x_polizas_seg = fields.Integer(string='Pólizas de seguros')
 
     # -override
     @api.model
