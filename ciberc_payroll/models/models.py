@@ -432,7 +432,7 @@ class CodeLeaveTypePayroll(models.Model):
 
     # obtener datos de los ultimos 6 meses (para LIQ) segun el codigo de la 2da pestaña
     # NOTA: los 6 meses están definidos por las fechas de la nómina
-    def get_lastsixpaysplips(self, employee_p, date_from_payslip, date_to_payslip, code):
+    def get_datapaysplips(self, employee_p, date_from_payslip, date_to_payslip, code):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         hoy = datetime.now(tz=user_tz).date()
         date_from = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
