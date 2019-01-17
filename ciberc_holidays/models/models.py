@@ -206,6 +206,8 @@ class HolidaysUpdated(models.Model):
             calendar_delta = to_dt - from_dt
             calendar_days = round(calendar_delta.total_seconds() / 86400 , 2)
             self.write({'number_of_days_calendar': calendar_days})
+        else:
+            self.write({'number_of_days_calendar': self.number_of_days})
 
         template = self.env.ref('ciberc_holidays.confirm_template')
         self.env['mail.template'].browse(template.id).send_mail(self.id)
