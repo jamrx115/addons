@@ -370,6 +370,7 @@ class CodeLeaveTypePayroll(models.Model):
         employee = self.env['hr.employee'].browse(employee_p)
         contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')
         suma = 0.0
+        date_end_str = date_to_payslip
 
         # resultado para 'liquidacion'
         if tipo_sumatoria == 'PARCIAL':
@@ -377,10 +378,10 @@ class CodeLeaveTypePayroll(models.Model):
         # resultado para 'total'
         else:
             for c in contracts:
-                if c.x_tipo_novedad_contrato_id.id != tipo_novedad_contrato_vinculacion.id:
-                    suma += self.auxiliar_for_sum(c.date_start, c.date_end, tiempo)
-                else:
-                    suma += self.auxiliar_for_sum(c.date_start, c.date_end, tiempo)
+                if c.date_end:
+                    date_end_str = c.date_end
+                suma += self.auxiliar_for_sum(c.date_start, date_end_str, tiempo)                
+                if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
                     break
         return suma
 
