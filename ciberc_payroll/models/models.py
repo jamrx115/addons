@@ -36,6 +36,7 @@ class CodeLeaveTypePayroll(models.Model):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         guatemala = self.env['res.country'].search([['name', '=', 'Guatemala']])
         hours_half_holidays = 0.0
+        hours_holiday_leaves = 0.0
 
         def was_on_leave_interval(employee_id, date_from, date_to):
             date_from = fields.Datetime.to_string(date_from)
@@ -112,6 +113,7 @@ class CodeLeaveTypePayroll(models.Model):
                         leaves[ausencia.holiday_status_id.name]['date_to'] = interval[1].date()
                         if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
                             attendances['number_of_hours'] += hours
+                            hours_holiday_leaves += hours
                         else:
                             leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
 
@@ -140,6 +142,7 @@ class CodeLeaveTypePayroll(models.Model):
                         }
                         if (interval[0].weekday() == 5) or (interval[0].weekday() == 6) or holiday_obj:
                             attendances['number_of_hours'] += hours
+                            hours_holiday_leaves += hours
                         else:
                             leaves[ausencia.holiday_status_id.name]['number_of_hours'] += hours
                             if country_emp_id == guatemala.id:
@@ -152,13 +155,14 @@ class CodeLeaveTypePayroll(models.Model):
                     # no hay ausencia -> conteo WORK100
                     attendances['number_of_hours'] += hours
 
+            days_holiday_leaves = uom_hour._compute_quantity(hours_holiday_leaves, uom_day) if uom_day and uom_hour else hours_holiday_leaves / 8.0
             leaves = [value for key, value in leaves.items()]
             aux_calendar_days = 0.0
             
             for data in [attendances] + leaves:
                 data['number_of_days'] = uom_hour._compute_quantity(data['number_of_hours'], uom_day) if uom_day and uom_hour else data['number_of_hours'] / 8.0
                 if str(data['code']) != 'WORK100':
-                    using_hours = data['number_of_hours'] - hours_half_holidays
+                    using_hours = data['number_of_hours'] - hours_half_holidays + hours_holiday_leaves
                     aux = uom_hour._compute_quantity(using_hours, uom_day) if uom_day and uom_hour else using_hours / 8.0
                     data['number_of_days_calendar'] = aux
                     aux_calendar_days += aux
