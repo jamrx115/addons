@@ -204,7 +204,7 @@ class HolidaysUpdated(models.Model):
             to_dt = fields.Datetime.from_string(self.date_to)
 
             calendar_delta = to_dt - from_dt
-            calendar_days = round(calendar_delta.total_seconds() / 86400 , 2)
+            calendar_days = -1 * round(calendar_delta.total_seconds() / 86400 , 2)
             self.write({'number_of_days_calendar': calendar_days})
         else:
             self.write({'number_of_days_calendar': self.number_of_days})
@@ -374,6 +374,25 @@ class HolidaysUpdated(models.Model):
         answer_tz_user = user_tz.localize(datetime(day.year, day.month, day.day, 0, 0, 0))  # tz user
         answer_tz_zero = answer_tz_user.astimezone(pytz.utc)  # tz zero
         answer = datetime.combine(answer_tz_zero.date(), answer_tz_zero.time())
+        return answer
+
+    #########################
+    # para constancia
+    #########################
+
+    # return remaining days (holiday_status_id es el tipo de ausencia)
+    def get_remaining_days(self, holiday_status, employee):
+        holiday_status_id = holiday_status.id
+        employee_id = employee.id
+        answer = 0
+
+        aprobadas_y_confirmadas = self.env['hr.holidays'].search(
+                ['&', '&', ('employee_id', '=', employee_id), ('holiday_status_id', '=', holiday_status_id),
+                      ('state', '=', 'validate')])
+
+        for registro in aprobadas_y_confirmadas:
+            answer += registro.number_of_days_calendar
+
         return answer
 
 #clase creada por alltic que agrega fecha fin para reporte

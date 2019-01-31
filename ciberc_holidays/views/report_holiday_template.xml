@@ -26,9 +26,9 @@
                                 <td colspan="3"><span t-field="o.name"/></td>
                             </tr>
                             <tr>
-                                <td><strong>Inicio ausencia</strong></td>
+                                <td><strong>Inicio</strong></td>
                                 <td><span t-field="o.date_from"/></td>
-                                <td><strong>Fin ausencia</strong></td>
+                                <td><strong>Fin</strong></td>
                                 <td><span t-field="o.date_to"/></td>
                             </tr>
                             <tr>
@@ -39,18 +39,14 @@
                             </tr>
                         </table>
 
-                        <t t-if="'remove' == o.type">
+                        <t t-if="'VAC' == o.holiday_status_id.code[:3] or 'DLI' == o.holiday_status_id.code[:3]">
                             <table class="table table-condensed table-bordered">
                                 <tr>
-                                    <td><strong>Aprobado por</strong></td>
-                                    <td><span t-field="o.manager_id"/></td>
-                                    <td><strong>Confirmado por</strong></td>
-                                    <td><span t-field="o.manager_id2"/></td>
+                                    <td><strong>Días pendientes</strong></td>
+                                    <td colspan="3"><span t-esc="o.get_remaining_days(o.holiday_status_id, o.employee_id)"/></td>
                                 </tr>
                             </table>
-                        </t>
 
-                        <t t-else="">
                             <table class="table table-condensed table-bordered">
                                 <tr>
                                     <td><strong>Aprobado por</strong></td>
@@ -66,6 +62,18 @@
                                 </tr>
                             </table>
                         </t>
+
+                        <t t-else="">
+                            <table class="table table-condensed table-bordered">
+                                <tr>
+                                    <td><strong>Aprobado por</strong></td>
+                                    <td><span t-field="o.manager_id"/></td>
+                                    <td><strong>Confirmado por</strong></td>
+                                    <td><span t-field="o.manager_id2"/></td>
+                                </tr>
+                            </table>
+                        </t>
+
                     </div>
                 </t>
             </t>
