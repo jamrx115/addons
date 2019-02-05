@@ -55,14 +55,6 @@
                             </table>
                         </t>
 
-                        <t t-if="'VAC' == o.holiday_status_id.code[:3]">
-                            <table class="table table-condensed table-bordered">
-                                <tr>
-                                    <td>Para los efectos legales del artículo 137 del Código de Trabajo, extiendo la presente constancia</td>
-                                </tr>
-                            </table>
-                        </t>
-
                         <t t-else="">
                             <table class="table table-condensed table-bordered">
                                 <tr>
@@ -74,6 +66,20 @@
                             </table>
                         </t>
 
+                        <t t-if="'VAC' == o.holiday_status_id.code[:3]">
+                            <table class="table table-condensed table-bordered">
+                                <tr>
+                                    <td>Para los efectos legales del artículo 137 del Código de Trabajo, extiendo la presente constancia</td>
+                                </tr>
+                            </table>
+                        </t>
+
+                        <table class="table table-condensed table-bordered">
+                            <tr>
+                                <td height="100" width="20%"><strong>Firma</strong></td>
+                                <td height="100" width="80%"></td>
+                            </tr>
+                        </table>
                     </div>
                 </t>
             </t>
