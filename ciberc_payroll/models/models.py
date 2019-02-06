@@ -576,6 +576,34 @@ class CodeLeaveTypePayroll(models.Model):
 
         return global_pending_agui
 
+    # trae valores de line_ids
+    @api.multi
+    def get_from_lineids(self, line_ids, code):
+        valor = line_ids.filtered(lambda r: r.salary_rule_id.code == code).total
+        if not valor:
+            valor = 0.0
+        return valor
+
+    # trae valores de line_ids en dólares
+    @api.multi
+    def get_from_lineids_dollar(self, date_from_str, date_to_str, line_ids, code):
+        line = line_ids.filtered(lambda r: r.salary_rule_id.code == code)
+        date_from_n = fields.Datetime.from_string(date_from_str)
+        date_to_n = fields.Datetime.from_string(date_to_str)
+        contract = line.contract_id
+
+        #_logger.debug('-------- eeee %s',contract.x_currency_id)
+        #for e in exampĺe:
+            #_logger.debug('-------- fecha %s tipo %s', e.name, type(e.name))
+
+        #trm = self.env['res.currency.rate'].search([ '&',
+            #'&', ('currency_id', '=', 3), ('company_id', '=', 1), 
+            #'&', ('name', '>=', date_from_n), ('name', '<=', date_to_n)])
+
+        #answer = round((line.total/trm.rate), 2)
+
+        return 0.0
+
 # clase creada por alltic que permite obtener datos para reportes
 class HrEmployeePayslip(models.Model):
     _inherit = 'hr.employee'

@@ -27,6 +27,7 @@
         'views/views.xml',
         'views/report_mintrab.xml',
         'views/report_salary_book.xml',
+        'views/report_payed_payslip.xml',
         'views/report_menu.xml',
     ]
 }
