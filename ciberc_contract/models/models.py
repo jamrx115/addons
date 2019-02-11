@@ -57,19 +57,25 @@ class ciberc_contract(models.Model):
     # -override
     @api.model
     def create(self, vals):
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
+
         res = super(ciberc_contract, self).create(vals)
         employee_obj = self.env['hr.employee'].search([('id', '=', vals['employee_id'])], limit=1)
         if vals['working_hours']:
             self.employee_id.resource_id.write({'calendar_id': self.working_hours.id})
 
         if vals['date_start']:
-            employee_obj.write({'joining_date': vals['date_start']})
+            if vals['x_tipo_novedad_contrato_id'] == tipo_novedad_contrato_vinculacion.id:
+                employee_obj.write({'joining_date': vals['date_start']})
 
         return res
 
     # -override
     @api.multi
     def write(self, vals):
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
+        _logger.debug('***************')
+        _logger.debug('tipo_novedad_contrato_vinculacion %s', tipo_novedad_contrato_vinculacion)
         res = super(ciberc_contract, self).write(vals)
 
         for contract_obj in self:
@@ -79,7 +85,8 @@ class ciberc_contract(models.Model):
                 contract_obj.employee_id.resource_id.write({'calendar_id': contract_obj.working_hours.id})
             # escribir la fecha de inicio de labores en datos de empleado
             if contract_obj.date_start:
-                employee_obj.write({'joining_date': contract_obj.date_start})
+                if contract_obj.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
+                    employee_obj.write({'joining_date': contract_obj.date_start})
             return res
 
     # para la tarea programada
