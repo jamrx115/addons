@@ -242,7 +242,7 @@ class CodeLeaveTypePayroll(models.Model):
             aux_meses = meses[0]
 
         for mes in meses:
-            if aux_meses == 13:
+            if aux_meses > 12:
                 aux_year = date_to_payslip.year
             date_from_mes = datetime(year=aux_year, month=mes, day=1)  # tipo datetime
             date_to_mes = datetime(year=aux_year, month=mes,
@@ -255,43 +255,44 @@ class CodeLeaveTypePayroll(models.Model):
 
             for nomina in payslip_ids:
                 contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
-                salario = contract.wage
-                contract_start = fields.Datetime.from_string(contract.date_start)  # tipo datetime
-                contract_end = False
-                if contract.date_end:
-                    contract_end = fields.Datetime.from_string(contract.date_end)  # tipo datetime
+                if contract:
+                    salario = contract.wage
+                    contract_start = fields.Datetime.from_string(contract.date_start)  # tipo datetime
+                    contract_end = False
+                    if contract.date_end:
+                        contract_end = fields.Datetime.from_string(contract.date_end)  # tipo datetime
 
-                if contract_start < date_from_mes:
-                    if contract_end:
-                        if date_to_mes < contract_end:
+                    if contract_start < date_from_mes:
+                        if contract_end:
+                            if date_to_mes < contract_end:
+                                dias = ((date_to_mes - date_from_mes).days) + 1
+                            else:
+                                dias = ((contract_end - date_from_mes).days) + 1
+                        else:
                             dias = ((date_to_mes - date_from_mes).days) + 1
-                        else:
-                            dias = ((contract_end - date_from_mes).days) + 1
                     else:
-                        dias = ((date_to_mes - date_from_mes).days) + 1
-                else:
-                    if contract_end:
-                        if date_to_mes < contract_end:
+                        if contract_end:
+                            if date_to_mes < contract_end:
+                                dias = ((date_to_mes - contract_start).days) + 1
+                            else:
+                                dias = ((contract_end - contract_start).days) + 1
+                        else:
                             dias = ((date_to_mes - contract_start).days) + 1
-                        else:
-                            dias = ((contract_end - contract_start).days) + 1
+                    
+                    # correccion dias
+                    if date_from_mes.month == 2:
+                        if date_to_mes.day == 28:
+                            dias += 2
+                        if date_to_mes.day == 29:
+                            dias += 1
+                    if date_to_mes.day == 31 and (dias >= 16):
+                        dias -= 1
+                    
+                    # calculando resutado
+                    if order == 'WAGE':
+                        result += (salario / 30) * dias
                     else:
-                        dias = ((date_to_mes - contract_start).days) + 1
-                
-                # correccion dias
-                if date_from_mes.month == 2:
-                    if date_to_mes.day == 28:
-                        dias += 2
-                    if date_to_mes.day == 29:
-                        dias += 1
-                if date_to_mes.day == 31 and (dias >= 16):
-                    dias -= 1
-                
-                # calculando resutado
-                if order == 'WAGE':
-                    result += (salario / 30) * dias
-                else:
-                    result += dias
+                        result += dias
 
             aux_meses +=1
 
