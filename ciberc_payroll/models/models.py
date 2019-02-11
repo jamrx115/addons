@@ -662,13 +662,13 @@ class HrEmployeePayslip(models.Model):
     def get_data(self):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         today = datetime.now(tz=user_tz).date()
-        current_year = today.year
+        search_year = (today.year) - 1
         answer = []
         struct_agui = self.env['hr.payroll.structure'].search([('code', '=', 'AGUINALDO GT')])
         struct_bono = self.env['hr.payroll.structure'].search([('code', '=', 'BONO14 GT')])
         for m in range(12):
-            date_from = datetime(day=1, month=m + 1, year=current_year).date()
-            date_to = datetime(day=calendar.monthrange(current_year, m + 1)[1], month=m + 1, year=current_year).date()
+            date_from = datetime(day=1, month=m + 1, year=search_year).date()
+            date_to = datetime(day=calendar.monthrange(search_year, m + 1)[1], month=m + 1, year=search_year).date()
             pagos_nominas = self.env['hr.payslip'].search(
                 ['&', '&', ('employee_id', '=', self.id), ('state', '=', 'done'),
                       '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to)],
@@ -735,7 +735,7 @@ class HrEmployeePayslip(models.Model):
                 s_vacaciones = (salario_mensual / 30) * d_vacaciones
 
             resource = self.resource_id.sudo()
-            horas_diarias = resource.calendar_id.working_hours_on_day(datetime(day=1, month=mes, year=current_year))
+            horas_diarias = resource.calendar_id.working_hours_on_day(datetime(day=1, month=mes, year=search_year))
             h_normal = horas_diarias * d_total
 
             row = [moneda, mes, nombre_mes, salario_mensual, d_total,
