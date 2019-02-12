@@ -21,7 +21,7 @@
     <report
         id="button_report_payed_payslip"
         model="hr.payslip"
-        string="Planilla Nóminas Pagadas"
+        string="Planilla Nómina"
         report_type="qweb-pdf"
         name="ciberc_payroll.report_payed_payslip"
         file="ciberc_payroll.report_payed_payslip"

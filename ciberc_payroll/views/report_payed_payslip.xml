@@ -4,31 +4,28 @@
     <t t-call="report.html_container">
         <t t-call="report.external_layout">
             <div class="page">
-                <h2>Planilla Nóminas Pagadas</h2>
+                <h2>Planilla Nómina</h2>
                 <table class="table table-striped table-bordered" style="font-size: 9px !important;">
                     <thead>
                         <tr>
                             <th>Nombre</th>
-                            <th style="min-width:60px;">F. ingreso</th>
                             <th>Área de trabajo</th>
                             <th>Puesto de trabajo</th>
+                            <th style="min-width:60px;">F. inicio nómina</th>
+                            <th style="min-width:60px;">F. fin nómina</th>
+                            <th style="min-width:60px;">F. ingreso</th>
                             <th style="min-width:60px;">Salario Base</th>
                             <th style="min-width:60px;">Salario Diario</th>
                             <th style="min-width:60px;">Días laborados</th>
                             <th style="min-width:60px;">Salario Nominal</th>
                             <th style="min-width:60px;">Comisiones</th>
                             <th style="min-width:60px;">Subtotal nominal</th>
-                            <th style="min-width:60px;">Boni Dto 37-2001</th>
-                            <th style="min-width:60px;">Bonificación</th>
                             <th style="min-width:60px;">Boni 78-89 y reformas</th>
                             <th style="min-width:60px;">Total ingresos</th>
                             <th style="min-width:60px;">IGSS</th>
                             <th style="min-width:60px;">ISR</th>
-                            <th style="min-width:60px;">Boleto ornato</th>
-                            <th style="min-width:60px;">Desc por anticipo</th>
+                            <th style="min-width:60px;">Descuentos</th>
                             <th style="min-width:60px;">Total desc.</th>
-                            <th style="min-width:60px;">Líquido a Recibir</th>
-                            <th style="min-width:60px;">Líquido a Recibir en $</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,28 +39,29 @@
                                 <t t-set="bon" t-value="nomina.get_from_lineids(nomina.line_ids, 'BON')" />
                                 <t t-set="sub_bonif" t-value="bon37 + bon" />
                                 <t t-set="ingresos" t-value="sub + sub_bonif" />
+                                <t t-set="ornato" t-value="nomina.get_from_lineids(nomina.line_ids, 'ORNATO')" />
+                                <t t-set="anticipo" t-value="nomina.get_from_lineids(nomina.line_ids, 'LO')" />
+                                <t t-set="otros_desc" t-value="ornato + anticipo" />
+                                <t t-set="moneda" t-value="nomina.get_currency(nomina.contract_id)" />
 
                                 <td><span t-field="nomina.employee_id.firstname"/> <span t-field="nomina.employee_id.lastname"/></td><!--nombre-->
-                                <td><span t-field="nomina.employee_id.joining_date"/></td><!--fecha de ingreso-->
                                 <td><span t-field="nomina.employee_id.department_id"/></td><!--area-->
                                 <td><span t-field="nomina.employee_id.job_id"/></td><!--puesto-->
-                                <td><span t-field="nomina.contract_id.wage"/></td><!--salario base-->
-                                <td><span t-esc="round(diario,2)"/></td><!--salario diario-->
+                                <td><span t-field="nomina.date_from"/></td><!--fecha inicio-->
+                                <td><span t-field="nomina.date_to"/></td><!--fecha fin-->
+                                <td><span t-field="nomina.employee_id.joining_date"/></td><!--fecha de ingreso-->
+                                <td><span t-field="nomina.contract_id.wage" t-field-options='{"widget": "monetary", "display_currency": moneda}'/></td><!--salario base-->
+                                <td><span t-esc="round(diario,2)" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--salario diario-->
                                 <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'DIASTRABAJO')" /></td>
-                                <td><span t-esc="salario" /></td><!--salario nomi-->
-                                <td><span t-esc="comisiones" /></td><!--comisio-->
-                                <td><span t-esc="sub" /></td><!--subtot nomi-->
-                                <td><span t-esc="bon37" /></td><!--bon37-->
-                                <td><span t-esc="bon" /></td><!--bonif-->
-                                <td><span t-esc="sub_bonif"/></td><!--sub bonif-->
-                                <td><span t-esc="ingresos"/></td><!--ingresos-->
-                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'IGSS')" /></td>
-                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'ISR')" /></td>
-                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'ORNATO')" /></td>
-                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'LO')" /></td>
-                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'TOTALDED')" /></td>
-                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'NET')" /></td>
-                                <td><span t-esc="nomina.get_from_lineids_dollar(nomina.date_from, nomina.date_to, nomina.line_ids, 'NET')" /></td>
+                                <td><span t-esc="salario" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--salario nomi-->
+                                <td><span t-esc="comisiones" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--comisio-->
+                                <td><span t-esc="sub" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--subtot nomi-->
+                                <td><span t-esc="sub_bonif" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--sub bonif-->
+                                <td><span t-esc="ingresos" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--ingresos-->
+                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'IGSS')" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td>
+                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'ISR')" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td>
+                                <td><span t-esc="otros_desc" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td>
+                                <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'TOTALDED')" t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td>
                             </tr>
                         </t>
                     </tbody>
