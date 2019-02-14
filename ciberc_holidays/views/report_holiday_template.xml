@@ -46,25 +46,14 @@
                                     <td colspan="3"><span t-esc="o.get_remaining_days(o.holiday_status_id, o.employee_id)"/></td>
                                 </tr>
                             </table>
-
-                            <table class="table table-condensed table-bordered">
-                                <tr>
-                                    <td><strong>Aprobado por</strong></td>
-                                    <td colspan="3"><span t-field="o.manager_id"/></td>
-                                </tr>
-                            </table>
                         </t>
 
-                        <t t-else="">
-                            <table class="table table-condensed table-bordered">
-                                <tr>
-                                    <td><strong>Aprobado por</strong></td>
-                                    <td><span t-field="o.manager_id"/></td>
-                                    <td><strong>Confirmado por</strong></td>
-                                    <td><span t-field="o.manager_id2"/></td>
-                                </tr>
-                            </table>
-                        </t>
+                        <table class="table table-condensed table-bordered">
+                            <tr>
+                                <td><strong>Aprobado por</strong></td>
+                                <td><span t-field="o.manager_id"/></td>
+                            </tr>
+                        </table>
 
                         <t t-if="'VAC' == o.holiday_status_id.code[:3]">
                             <table class="table table-condensed table-bordered">
