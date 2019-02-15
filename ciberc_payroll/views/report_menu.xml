@@ -19,12 +19,12 @@
         groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
     />
     <report
-        id="button_report_payed_payslip"
-        model="hr.payslip"
-        string="Planilla Nómina"
+        id="button_report_payed_paysliprun"
+        model="hr.payslip.run"
+        string="Planilla Nóminas Masivas"
         report_type="qweb-pdf"
-        name="ciberc_payroll.report_payed_payslip"
-        file="ciberc_payroll.report_payed_payslip"
+        name="ciberc_payroll.report_payed_paysliprun"
+        file="ciberc_payroll.report_payed_paysliprun"
         groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
     />
 </odoo>
