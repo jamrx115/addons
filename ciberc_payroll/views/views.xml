@@ -55,7 +55,7 @@
                     </tr>
                     <tr>
                         <td><strong>Departamento</strong></td>
-                        <td><span t-field="o.employee_id.department_id"/></td>
+                        <td><span t-field="o.employee_id.department_id.name"/></td>
                         <td><strong>Forma de pago</strong></td>
                         <td>Depósito en banco</td>
                     </tr>
@@ -65,18 +65,16 @@
                 <table class="table table-condensed">
                     <thead>
                         <tr>
-                            <th>Código</th>
                             <th>Descripción</th>
-                            <th>Monto</th>
                             <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
-                            <td><span t-field="line.code"/></td>
-                            <td><span t-field="line.name"/></td>
-                            <td><span t-esc="'%.2f'% line.amount"/></td>
-                            <td><span t-esc="'%.2f'% line.total"/></td>
+                            <t t-if="line.code!='BON37' and line.code!='BON'">
+                                <td><span t-field="line.name"/></td>
+                                <td><span t-esc="'%.2f'% line.total"/></td>
+                            </t>
                         </tr>
                     </tbody>
                 </table>
