@@ -731,3 +731,14 @@ class HrEmployeePayslip(models.Model):
                    sum_agui, dec_372001, s_recibido]
             answer.append(row)
         return answer
+
+# clase creada por alltic que permite los pagos masivos desde estado "en espera"
+class MultiPaySlipWizUpdated(models.TransientModel):
+    _inherit = 'multi.payslip.wizard'
+
+    @api.multi
+    def multi_payslip(self):
+        payslip_ids = self.env['hr.payslip'].browse(self._context.get('active_ids'))
+        for payslip in payslip_ids:
+            if payslip.state == 'verify':
+                payslip.action_payslip_done()

@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','hr_payroll', 'mail'],
+    'depends': ['base','hr','hr_payroll', 'mail', 'multi_payslip'],
 
     # always loaded
     'data': [
