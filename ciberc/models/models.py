@@ -290,7 +290,7 @@ class CertificationsEmployeeUpdated(models.Model):
         #now = datetime.now() + timedelta(days=1)
         date_now = now.date()
         match = self.search([])
-        for i in match1:
+        for i in match:
             if i.end_date:
                 exp_date1 = fields.Date.from_string(i.end_date)
                 exp_is_coming = exp_date1  - timedelta(days=180)
@@ -299,11 +299,11 @@ class CertificationsEmployeeUpdated(models.Model):
                     if diferencia > 0:
                         mail_content = "Por medio del presente correo se le informa,  " + i.employee_id.firstname + " " + i.employee_id.lastname + ", su certificado " + i.name + " No. " + i.certification + " vence el " + \
                                    str(i.end_date) + " (aproximadamente en " +str(diferencia)+" dias). Se sugiere renovarlo antes de esta fecha"
-                        subject = _('Certificación %s vencida el %s') % (i.passport_id, i.end_date)
+                        subject = _('Certificación %s No. %s vencida el %s') % (i.name, i.certification , i.end_date)
                     else:
                         mail_content = "Por medio del presente correo se le informa,  " + i.employee_id.firstname + " " + i.employee_id.lastname + ", su certificado " + i.name + " No. " + i.certification + " ha expirado el " + \
                                    str(i.end_date) + " (hace " +str(-1*diferencia)+" dias). Se sugiere renovarlo lo antes posible"
-                        subject = ('Certificación %s vencida el %s') % (i.passport_id, i.end_date)
+                        subject = ('Certificación %s No. %s vencida el %s') % (i.name, i.certification, i.end_date)
                     main_content = {
                         'subject': subject,
                         'author_id': self.env.user.partner_id.id,
