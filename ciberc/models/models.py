@@ -214,9 +214,11 @@ class EmployeeUpdated(models.Model):
     def mail_reminder(self):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         now = datetime.now(tz=user_tz)
-        #now = datetime.now() + timedelta(days=1)
+        # now = datetime.now() + timedelta(days=1)
         date_now = now.date()
         match = self.search([])
+
+        # vencimiento de ID
         for i in match:
             if i.id_expiry_date:
                 exp_date = fields.Date.from_string(i.id_expiry_date) - timedelta(days=1)
@@ -231,6 +233,8 @@ class EmployeeUpdated(models.Model):
                     }
                     self.env['mail.mail'].create(main_content).send()
         match1 = self.search([])
+        
+        # vencimiento de pasaporte
         for i in match1:
             if i.passport_expiry_date:
                 exp_date1 = fields.Date.from_string(i.passport_expiry_date)
@@ -238,11 +242,11 @@ class EmployeeUpdated(models.Model):
                 diferencia = (exp_date1-date_now).days
                 if date_now >= exp_is_coming:
                     if diferencia > 0:
-                        mail_content = "Por medio del presente correo se le informa,  " + i.name + ", su pasaporte No. " + i.passport_id + " vence el " + \
+                        mail_content = "Por medio del presente correo se le informa,  " + i.firstname + " " + i.lastname + ", su pasaporte No. " + i.passport_id + " vence el " + \
                                    str(i.passport_expiry_date) + " (aproximadamente en " +str(diferencia)+" dias). Se sugiere renovarlo antes de esta fecha"
-                        subject = _('Passport-%s Expired On %s') % (i.passport_id, i.passport_expiry_date)
+                        subject = _('Pasaporte %s vencido el %s') % (i.passport_id, i.passport_expiry_date)
                     else:
-                        mail_content = "Por medio del presente correo se le informa,  " + i.name + ", su pasaporte No. " + i.passport_id + " ha expirado el " + \
+                        mail_content = "Por medio del presente correo se le informa,  " + i.firstname + " " + i.lastname + ", su pasaporte No. " + i.passport_id + " ha expirado el " + \
                                    str(i.passport_expiry_date) + " (hace " +str(-1*diferencia)+" dias). Se sugiere renovarlo lo antes posible"
                         subject = ('Pasaporte %s vencido el %s') % (i.passport_id, i.passport_expiry_date)
                     main_content = {
@@ -250,5 +254,60 @@ class EmployeeUpdated(models.Model):
                         'author_id': self.env.user.partner_id.id,
                         'body_html': mail_content,
                         'email_to': i.work_email,
+                    }
+                    self.env['mail.mail'].create(main_content).send()
+
+        # vencimiento de visa
+        for i in match1:
+            if i.x_fecha_vence_visa:
+                exp_date1 = fields.Date.from_string(i.x_fecha_vence_visa)
+                exp_is_coming = exp_date1  - timedelta(days=180)
+                diferencia = (exp_date1-date_now).days
+                if date_now >= exp_is_coming:
+                    if diferencia > 0:
+                        mail_content = "Por medio del presente correo se le informa,  " + i.firstname + " " + i.lastname + ", su visa americana No. " + i.x_visa + " vence el " + \
+                                   str(i.x_fecha_vence_visa) + " (aproximadamente en " +str(diferencia)+" dias). Se sugiere renovarla antes de esta fecha"
+                        subject = _('Visa americana %s vencida el %s') % (i.x_visa, i.x_fecha_vence_visa)
+                    else:
+                        mail_content = "Por medio del presente correo se le informa,  " + i.firstname + " " + i.lastname + ", su visa americana No. " + i.x_visa + " ha expirado el " + \
+                                   str(i.x_fecha_vence_visa) + " (hace " +str(-1*diferencia)+" dias). Se sugiere renovarla lo antes posible"
+                        subject = ('Visa americana %s vencida el %s') % (i.x_visa, i.x_fecha_vence_visa)
+                    main_content = {
+                        'subject': subject,
+                        'author_id': self.env.user.partner_id.id,
+                        'body_html': mail_content,
+                        'email_to': i.work_email,
+                    }
+                    self.env['mail.mail'].create(main_content).send()
+
+# actualización de vencimiento de certificaciones
+class CertificationsEmployeeUpdated(models.Model):
+    _inherit = 'hr.certification'
+
+    def mail_reminder(self):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        now = datetime.now(tz=user_tz)
+        #now = datetime.now() + timedelta(days=1)
+        date_now = now.date()
+        match = self.search([])
+        for i in match1:
+            if i.end_date:
+                exp_date1 = fields.Date.from_string(i.end_date)
+                exp_is_coming = exp_date1  - timedelta(days=180)
+                diferencia = (exp_date1-date_now).days
+                if date_now >= exp_is_coming:
+                    if diferencia > 0:
+                        mail_content = "Por medio del presente correo se le informa,  " + i.employee_id.firstname + " " + i.employee_id.lastname + ", su certificado " + i.name + " No. " + i.certification + " vence el " + \
+                                   str(i.end_date) + " (aproximadamente en " +str(diferencia)+" dias). Se sugiere renovarlo antes de esta fecha"
+                        subject = _('Certificación %s vencida el %s') % (i.passport_id, i.end_date)
+                    else:
+                        mail_content = "Por medio del presente correo se le informa,  " + i.employee_id.firstname + " " + i.employee_id.lastname + ", su certificado " + i.name + " No. " + i.certification + " ha expirado el " + \
+                                   str(i.end_date) + " (hace " +str(-1*diferencia)+" dias). Se sugiere renovarlo lo antes posible"
+                        subject = ('Certificación %s vencida el %s') % (i.passport_id, i.end_date)
+                    main_content = {
+                        'subject': subject,
+                        'author_id': self.env.user.partner_id.id,
+                        'body_html': mail_content,
+                        'email_to': i.employee_id.work_email,
                     }
                     self.env['mail.mail'].create(main_content).send()
