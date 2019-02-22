@@ -54,6 +54,13 @@ class ciberc_contract(models.Model):
     x_int_viviend = fields.Integer(string='Intereses en préstamos vivienda')
     x_polizas_seg = fields.Integer(string='Pólizas de seguros')
 
+    x_benef_transp = fields.Float(string='Transporte')
+    x_benef_educat = fields.Float(string='Educación')
+    x_benef_comuni = fields.Float(string='Comunicaciones')
+    x_benef_vivien = fields.Float(string='Vivienda')
+    x_benef_salud  = fields.Float(string='Salud complementaria')
+    x_benef_otros  = fields.Float(string='Otros')
+
     # -override
     @api.model
     def create(self, vals):

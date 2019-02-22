@@ -31,6 +31,16 @@
                 </group>
             </xpath>
             <xpath expr="//notebook" position="inside">
+                <page string="Otros beneficios" name="otros_benefic_page">
+                    <group name="otros_benefic_group" string="Beneficios auxiliares para costos">
+                        <field name="x_benef_salud"/>
+                        <field name="x_benef_comuni"/>
+                        <field name="x_benef_transp"/>
+                        <field name="x_benef_vivien"/>
+                        <field name="x_benef_educat"/>
+                        <field name="x_benef_otros"/>
+                    </group>
+                </page>
                 <page string="Otros datos para RTEFTE" name="otros_rtefte">
                     <group name="ingr_noc_renta" string="Ingresos no constitutivos de renta">
                         <field name="x_viat_ocasi"/>
