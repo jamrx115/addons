@@ -35,7 +35,15 @@
                                 <td><strong>Regreso</strong></td>
                                 <td><span t-field="o.date_return"/></td>
                                 <td><strong>Duración</strong></td>
-                                <td><span t-field="o.number_of_days_temp"/> días</td>
+
+                                <t t-if="'VAC' == o.holiday_status_id.code[:3] or 'DLI' == o.holiday_status_id.code[:3]">
+                                    <t t-set="dias_calendario" t-value="o.number_of_days_calendar" />
+                                    <t t-set="valor_absoluto" t-value="dias_calendario * -1" />
+                                    <td><span t-esc="valor_absoluto"/> días</td>
+                                </t>
+                                <t t-else="">
+                                    <td><span t-field="o.number_of_days_temp"/> días</td>
+                                </t>
                             </tr>
                         </table>
 
