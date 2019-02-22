@@ -17,7 +17,21 @@
         </xpath>-->
         <xpath expr="//div[@class='page']" position="replace">
             <div class="page">
-                <h2>Nómina</h2>
+                <t t-if="'Local' in o.struct_id.name">
+                    <h2>Nómina Local</h2>
+                </t>
+                <t t-elif="'Servicios Profesionales' in o.struct_id.name">
+                    <h2>Honorarios Profesionales</h2>
+                </t>
+                <t t-elif="'Aguinaldo' in o.struct_id.name">
+                    <h2>Recibo de Aguinaldo</h2>
+                </t>
+                <t t-elif="'Bono 14' in o.struct_id.name">
+                    <h2>Recibo de Bono 14</h2>
+                </t>
+                <t t-else="">
+                    <h2>Recibo</h2>
+                </t>
                 <p t-field="o.name"/>
 
                 <div>

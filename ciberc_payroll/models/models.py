@@ -184,9 +184,30 @@ class CodeLeaveTypePayroll(models.Model):
         date_to = self.date_to
 
         ttyme = datetime.fromtimestamp(time.mktime(time.strptime(date_from, "%Y-%m-%d")))
+        tfyme = datetime.fromtimestamp(time.mktime(time.strptime(date_to, "%Y-%m-%d")))
         locale = self.env.context.get('lang') or 'es_CO'
-        self.name = _('Salary Slip of %s for %s') % (
-            employee.name, tools.ustr(babel.dates.format_date(date=ttyme, format='MMMM-y', locale=locale)))
+        # inicia personalizacion nombre
+        if self.struct_id:
+            if 'Local' in self.struct_id.name:
+                payslip_firstname = ('Nómina Local de %s para ').decode('utf8') % (employee.name)
+            elif 'Servicios Profesionales' in self.struct_id.name:
+                payslip_firstname = ('Honorarios profesionales de %s para ') % (employee.name)
+            elif 'Aguinaldo' in self.struct_id.name:
+                payslip_firstname = ('Aguinaldo de %s para ') % (employee.name)
+            elif 'Bono 14' in self.struct_id.name:
+                payslip_firstname = ('Bono 14 de %s para ') % (employee.name)
+            else:
+                payslip_firstname = ('Nómina de %s para ') % (employee.name)
+
+            self.name = payslip_firstname + ' a ' + ('%s - %s') % (
+                    tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
+                    tools.ustr(babel.dates.format_date(date=tfyme, format='d-MMMM-y', locale=locale)) )
+
+        else:
+            self.name = _('Salary Slip of %s for %s') % (
+                        employee.name, 
+                        tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)))
+        # fin personalizacion nombre
         self.company_id = employee.company_id
 
         if not self.env.context.get('contract') or not self.contract_id:
@@ -219,6 +240,87 @@ class CodeLeaveTypePayroll(models.Model):
             input_lines += input_lines.new(r)
         self.input_line_ids = input_lines
         return
+
+    @api.multi
+    def onchange_employee_id(self, date_from, date_to, employee_id=False, contract_id=False):
+        #defaults
+        res = {
+            'value': {
+                'line_ids': [],
+                #delete old input lines
+                'input_line_ids': map(lambda x: (2, x,), self.input_line_ids.ids),
+                #delete old worked days lines
+                'worked_days_line_ids': map(lambda x: (2, x,), self.worked_days_line_ids.ids),
+                #'details_by_salary_head':[], TODO put me back
+                'name': '',
+                'contract_id': False,
+                'struct_id': False,
+            }
+        }
+        if (not employee_id) or (not date_from) or (not date_to):
+            return res
+        ttyme = datetime.fromtimestamp(time.mktime(time.strptime(date_from, "%Y-%m-%d")))
+        tfyme = datetime.fromtimestamp(time.mktime(time.strptime(date_to, "%Y-%m-%d")))
+        employee = self.env['hr.employee'].browse(employee_id)
+        locale = self.env.context.get('lang') or 'en_US'
+        # inicia personalizacion nombre
+        if self.struct_id:
+            if 'Local' in self.struct_id.name:
+                payslip_firstname = ('Nómina Local de %s para ').decode('utf8') % (employee.name)
+            elif 'Servicios Profesionales' in self.struct_id.name:
+                payslip_firstname = ('Honorarios profesionales de %s para ') % (employee.name)
+            elif 'Aguinaldo' in self.struct_id.name:
+                payslip_firstname = ('Aguinaldo de %s para ') % (employee.name)
+            elif 'Bono 14' in self.struct_id.name:
+                payslip_firstname = ('Bono 14 de %s para ') % (employee.name)
+            else:
+                payslip_firstname = ('Nómina de %s para ') % (employee.name)
+
+            self.name = payslip_firstname + ' a ' + ('%s - %s') % (
+                    tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
+                    tools.ustr(babel.dates.format_date(date=tfyme, format='d-MMMM-y', locale=locale)) )
+
+        else:
+            self.name = _('Salary Slip of %s for %s') % (
+                        employee.name, 
+                        tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)))
+        # fin personalizacion nombre
+        res['value'].update({
+            'name': payslip_name,
+            'company_id': employee.company_id.id,
+        })
+
+        if not self.env.context.get('contract'):
+            #fill with the first contract of the employee
+            contract_ids = self.get_contract(employee, date_from, date_to)
+        else:
+            if contract_id:
+                #set the list of contract for which the input have to be filled
+                contract_ids = [contract_id]
+            else:
+                #if we don't give the contract, then the input to fill should be for all current contracts of the employee
+                contract_ids = self.get_contract(employee, date_from, date_to)
+
+        if not contract_ids:
+            return res
+        contract = self.env['hr.contract'].browse(contract_ids[0])
+        res['value'].update({
+            'contract_id': contract.id
+        })
+        struct = contract.struct_id
+        if not struct:
+            return res
+        res['value'].update({
+            'struct_id': struct.id,
+        })
+        #computation of the salary input
+        worked_days_line_ids = self.get_worked_day_lines(contract_ids, date_from, date_to)
+        input_line_ids = self.get_inputs(contract_ids, date_from, date_to)
+        res['value'].update({
+            'worked_days_line_ids': worked_days_line_ids,
+            'input_line_ids': input_line_ids,
+        })
+        return res
 
     # obtener sumatoria salarios o dias cancelados
     @api.multi
