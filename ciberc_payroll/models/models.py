@@ -787,7 +787,7 @@ class HrEmployeePayslip(models.Model):
             d_otros = 0
             # sección final
             sum_agui = 0
-            dec_372001 = 0
+            sum_bonos = 0 # bono 37-2001 + otros bonos = bono 78-89 y reformas
 
             for nomina in pagos:
                 moneda = nomina.contract_id.x_currency_id
@@ -809,7 +809,9 @@ class HrEmployeePayslip(models.Model):
                     if line.code == 'TOTALDED':
                         d_otros += line.total
                     if line.code == 'BON37':
-                        dec_372001 += line.total
+                        sum_bonos += line.total
+                    if line.code == 'BON':
+                        sum_bonos += line.total
                     if line.code == 'NET':
                         s_recibido += line.total
                     if line.code == 'AGUI':
@@ -826,11 +828,18 @@ class HrEmployeePayslip(models.Model):
             horas_diarias = resource.calendar_id.working_hours_on_day(datetime(day=1, month=mes, year=search_year))
             h_normal = horas_diarias * d_total
 
+            # 0. moneda 1. No. Orden 2. Periodo de trabajo 3. Salario en quetzales 4. Días Trabajados
+            # 5. Horas Trabajadas / Ordinarias 6. HT / Extra ordinarias
+            # 7. Salario Devengado / Ordinario 8. SD /  Extra ordinario 
+            #     9. SD / Septimos y asuetos 10. SD / Vacaciones 11. Salario Total
+            # 12. Deducciones Legales / IGSS 13. DL / Otras deducciones 14. DL / Total deducciones
+            # 15. Bono 14 + Aguinaldo 16. Bonificación Dec. 37-2001 17. Líquido a recibir
+
             row = [moneda, mes, nombre_mes, salario_mensual, d_total,
                    h_normal, 0.00,
                    s_ordinario, 0.00, 0.00, s_vacaciones, (s_ordinario + s_vacaciones),
                    d_igss, (d_otros - d_igss), d_otros,
-                   sum_agui, dec_372001, s_recibido]
+                   sum_agui, sum_bonos, s_recibido]
             answer.append(row)
         return answer
 
