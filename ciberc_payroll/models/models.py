@@ -263,6 +263,7 @@ class CodeLeaveTypePayroll(models.Model):
         tfyme = datetime.fromtimestamp(time.mktime(time.strptime(date_to, "%Y-%m-%d")))
         employee = self.env['hr.employee'].browse(employee_id)
         locale = self.env.context.get('lang') or 'en_US'
+        payslip_name = ''
         # inicia personalizacion nombre
         if self.struct_id:
             if 'Local' in self.struct_id.name:
@@ -276,17 +277,15 @@ class CodeLeaveTypePayroll(models.Model):
             else:
                 payslip_firstname = ('Nómina de %s para ') % (employee.name)
 
-            self.name = payslip_firstname + ' a ' + ('%s - %s') % (
+            payslip_name = payslip_firstname + ' a ' + ('%s - %s') % (
                     tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
                     tools.ustr(babel.dates.format_date(date=tfyme, format='d-MMMM-y', locale=locale)) )
 
-        #else:
-            #self.name = _('Salary Slip of %s for %s') % (
-                        #employee.name, 
-                        #tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)))
+        else:
+            payslip_name = _('Salary Slip of %s for %s') % (employee.name, tools.ustr(babel.dates.format_date(date=ttyme, format='MMMM-y', locale=locale)))
         # fin personalizacion nombre
         res['value'].update({
-            'name': self.name,
+            'name': payslip_name,
             'company_id': employee.company_id.id,
         })
 
