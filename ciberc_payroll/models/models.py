@@ -280,13 +280,13 @@ class CodeLeaveTypePayroll(models.Model):
                     tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
                     tools.ustr(babel.dates.format_date(date=tfyme, format='d-MMMM-y', locale=locale)) )
 
-        else:
-            self.name = _('Salary Slip of %s for %s') % (
-                        employee.name, 
-                        tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)))
+        #else:
+            #self.name = _('Salary Slip of %s for %s') % (
+                        #employee.name, 
+                        #tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)))
         # fin personalizacion nombre
         res['value'].update({
-            'name': payslip_name,
+            'name': self.name,
             'company_id': employee.company_id.id,
         })
 
