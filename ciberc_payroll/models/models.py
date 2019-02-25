@@ -720,12 +720,27 @@ class HrEmployeePayslip(models.Model):
         hoy = datetime.now(tz=user_tz).date()
         return (hoy - fecha_nacimiento).days / 365
 
+    def get_worked_days_by_year(self, employee_id):
+        user_tz = pytz.timezone(self.env.user.partner_id.tz)
+        year_p = (datetime.now(tz=user_tz).date().year) - 1
+        days = 0.0
+        for m in range(12):
+            mes = m + 1
+            date_from = datetime(day=1, month=mes, year=year_p)
+            date_to = datetime(day=calendar.monthrange(year_p, mes)[1], month=mes, year=year_p)
+
+            contract = self.env['hr.payslip'].get_contract(employee_id, date_from, date_to)
+            if contract:
+                days += self.env['hr.holidays']._get_number_of_days(str(date_from), str(date_to), self.id)
+        return days
+
     def get_filtered_lineid(self, code):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         last_year = (datetime.now(tz=user_tz).date().year) - 1
         aux = 0
         struct_agui = self.env['hr.payroll.structure'].search([('code', '=', 'AGUINALDO GT')])
         struct_bono = self.env['hr.payroll.structure'].search([('code', '=', 'BONO14 GT')])
+
         for m in range(12):
             mes = m + 1
             date_from = datetime(day=1, month=mes, year=last_year).date()
