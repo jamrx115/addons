@@ -311,3 +311,42 @@ class CertificationsEmployeeUpdated(models.Model):
                         'email_to': i.employee_id.work_email,
                     }
                     self.env['mail.mail'].create(main_content).send()
+
+# clase creada por alltic que actualiza responsables con cambio de jefe
+class DepartmentResponsable(models.Model):
+    _inherit = 'hr.department'
+
+    @api.multi
+    @api.onchange('manager_id')
+    def _onchange_manager_id(self):
+        _logger.debug('***************')
+        old_manager_obj = self._origin.manager_id # hr_employee
+        new_manager_obj = self.manager_id # hr_employee
+
+        # 0. reiniciando jefes involucrados
+        new_manager_obj.write({'parent_id': None})
+        old_manager_obj.write({'parent_id': None})
+
+        _logger.debug('0. nuevo jefe %s', new_manager_obj)
+        _logger.debug('0. antiguo jefe %s', old_manager_obj)
+
+        # 1. actualizando antiguo jefe
+        old_manager_obj.write({'parent_id': new_manager_obj.id})
+
+        _logger.debug('1. antiguo jefe %s', old_manager_obj)
+        _logger.debug('1. jefe antiguo jefe %s', old_manager_obj.parent_id)
+
+        # 2. actualizando nuevo jefe
+        if self.parent_id:
+            new_parent = parent_id.manager_id
+            new_manager_obj.write({'parent_id': new_parent.id})
+
+        _logger.debug('2. nuevo jefe %s', new_manager_obj)
+        _logger.debug('2. jefe nuevo jefe %s', new_manager_obj.parent_id)
+
+        # 3. actualizando subordinados
+        employees = self.env['hr.employee'].search([['parent_id', '=', old_manager_obj.id]])
+        for e in employees:
+            e.parent_id = new_manager_obj.id
+
+        _logger.debug('***************')
