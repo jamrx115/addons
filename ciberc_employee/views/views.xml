@@ -34,6 +34,18 @@
         </field>
     </record>
 
+    <!-- Responsable -->
+    <record id="view_employee_form_responsable" model="ir.ui.view">
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="groups_id" eval="[(6, 0, [ref('ciberc.group_hr_admin')])]" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Listado Estados/Departamentos -->
 
     <record id="states_view_tree" model="ir.ui.view">
