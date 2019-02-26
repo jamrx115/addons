@@ -199,7 +199,7 @@ class CodeLeaveTypePayroll(models.Model):
             else:
                 payslip_firstname = ('Nómina de %s para ') % (employee.name)
 
-            self.name = payslip_firstname + ' a ' + ('%s - %s') % (
+            self.name = payslip_firstname + ' ' + ('%s a %s') % (
                     tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
                     tools.ustr(babel.dates.format_date(date=tfyme, format='d-MMMM-y', locale=locale)) )
 
@@ -263,31 +263,6 @@ class CodeLeaveTypePayroll(models.Model):
         tfyme = datetime.fromtimestamp(time.mktime(time.strptime(date_to, "%Y-%m-%d")))
         employee = self.env['hr.employee'].browse(employee_id)
         locale = self.env.context.get('lang') or 'en_US'
-        payslip_name = ''
-        # inicia personalizacion nombre
-        if self.struct_id:
-            if 'Local' in self.struct_id.name:
-                payslip_firstname = ('Nómina Local de %s para ').decode('utf8') % (employee.name)
-            elif 'Servicios Profesionales' in self.struct_id.name:
-                payslip_firstname = ('Honorarios profesionales de %s para ') % (employee.name)
-            elif 'Aguinaldo' in self.struct_id.name:
-                payslip_firstname = ('Aguinaldo de %s para ') % (employee.name)
-            elif 'Bono 14' in self.struct_id.name:
-                payslip_firstname = ('Bono 14 de %s para ') % (employee.name)
-            else:
-                payslip_firstname = ('Nómina de %s para ') % (employee.name)
-
-            payslip_name = payslip_firstname + ' a ' + ('%s - %s') % (
-                    tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
-                    tools.ustr(babel.dates.format_date(date=tfyme, format='d-MMMM-y', locale=locale)) )
-
-        else:
-            payslip_name = _('Salary Slip of %s for %s') % (employee.name, tools.ustr(babel.dates.format_date(date=ttyme, format='MMMM-y', locale=locale)))
-        # fin personalizacion nombre
-        res['value'].update({
-            'name': payslip_name,
-            'company_id': employee.company_id.id,
-        })
 
         if not self.env.context.get('contract'):
             #fill with the first contract of the employee
@@ -312,6 +287,36 @@ class CodeLeaveTypePayroll(models.Model):
         res['value'].update({
             'struct_id': struct.id,
         })
+
+        payslip_name = ''
+        
+        # inicia personalizacion nombre
+        if res['value']['struct_id']:
+            struct = self.env['hr.payroll.structure'].browse(res['value']['struct_id'])
+            if 'Local' in struct.name:
+                payslip_firstname = ('Nómina Local de %s para ').decode('utf8') % (employee.name)
+            elif 'Servicios Profesionales' in self.struct_id.name:
+                payslip_firstname = ('Honorarios profesionales de %s para ') % (employee.name)
+            elif 'Aguinaldo' in self.struct_id.name:
+                payslip_firstname = ('Aguinaldo de %s para ') % (employee.name)
+            elif 'Bono 14' in self.struct_id.name:
+                payslip_firstname = ('Bono 14 de %s para ') % (employee.name)
+            else:
+                payslip_firstname = ('Nómina de %s para ') % (employee.name)
+
+            payslip_name = payslip_firstname + ' ' + ('%s a %s') % (
+                    tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
+                    tools.ustr(babel.dates.format_date(date=tfyme, format='d-MMMM-y', locale=locale)) )
+
+        else:
+            payslip_name = _('Salary Slip of %s for %s') % (employee.name, tools.ustr(babel.dates.format_date(date=ttyme, format='MMMM-y', locale=locale)))
+
+        # fin personalizacion nombre
+        res['value'].update({
+            'name': payslip_name,
+            'company_id': employee.company_id.id,
+        })
+
         #computation of the salary input
         worked_days_line_ids = self.get_worked_day_lines(contract_ids, date_from, date_to)
         input_line_ids = self.get_inputs(contract_ids, date_from, date_to)
