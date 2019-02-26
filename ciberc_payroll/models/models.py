@@ -631,6 +631,7 @@ class CodeLeaveTypePayroll(models.Model):
         estructura_aguinaldo = self.env['hr.payroll.structure'].search(
             [('name', 'like', '%Aguinaldo%')])
 
+        # ultima nomina pagada
         ultima_nomina = self.env['hr.payslip'].search(
             ['&', '&', ('employee_id', '=', employee.id),
                        ('state', '=', 'done'),
@@ -638,14 +639,17 @@ class CodeLeaveTypePayroll(models.Model):
             order="date_from desc", limit=1)
         ultimo_contrato = self.env['hr.contract'].search(
             [('employee_id', '=', employee.id)],order = 'date_start desc', limit=1)
-        
+
         if len(ultima_nomina)>0:
+            # existe
             date_to_na = fields.Datetime.from_string(ultima_nomina.date_to)  # tipo datetime
             date_from = date_to_na + timedelta(days=1)
             date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
         else:
+            # no existe nominas de aguinaldo pagadas
+            # debe existir contrato
             date_from = datetime(day=1, month=12, year=date_from_n.year-1)
-            date_to = fields.Datetime.from_string(ultima_nomina.contract_id.date_end)  # tipo datetime
+            date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
 
         global_pending_agui = (date_to-date_from).days+1
 
@@ -671,13 +675,17 @@ class CodeLeaveTypePayroll(models.Model):
             order="date_from desc", limit=1)
         ultimo_contrato = self.env['hr.contract'].search([('employee_id', '=', employee.id)],order = 'date_start desc', limit=1)
         
+        # ultima nomina pagada
         if len(ultima_nomina)==1:
+            # existe
             date_to_na = fields.Datetime.from_string(ultima_nomina.date_to)  # tipo datetime
             date_from = date_to_na + timedelta(days=1)
             date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
         else:
+            # no existe nominas de aguinaldo pagadas
+            # debe existir contrato
             date_from = datetime(day=1, month=12, year=date_from_n.year-1)
-            date_to = fields.Datetime.from_string(ultima_nomina.contract_id.date_end)  # tipo datetime
+            date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
 
         global_pending_agui = (date_to-date_from).days+1
 
