@@ -295,11 +295,11 @@ class CodeLeaveTypePayroll(models.Model):
             struct = self.env['hr.payroll.structure'].browse(res['value']['struct_id'])
             if 'Local' in struct.name:
                 payslip_firstname = ('Nómina Local de %s para ').decode('utf8') % (employee.name)
-            elif 'Servicios Profesionales' in self.struct_id.name:
+            elif 'Servicios Profesionales' in struct.name:
                 payslip_firstname = ('Honorarios profesionales de %s para ') % (employee.name)
-            elif 'Aguinaldo' in self.struct_id.name:
+            elif 'Aguinaldo' in struct.name:
                 payslip_firstname = ('Aguinaldo de %s para ') % (employee.name)
-            elif 'Bono 14' in self.struct_id.name:
+            elif 'Bono 14' in struct.name:
                 payslip_firstname = ('Bono 14 de %s para ') % (employee.name)
             else:
                 payslip_firstname = ('Nómina de %s para ') % (employee.name)
