@@ -197,7 +197,7 @@ class CodeLeaveTypePayroll(models.Model):
             elif 'Bono 14' in self.struct_id.name:
                 payslip_firstname = ('Bono 14 de %s para ') % (employee.name)
             else:
-                payslip_firstname = ('Nómina de %s para ') % (employee.name)
+                payslip_firstname = ('Nómina de %s para ').decode('utf8') % (employee.name)
 
             self.name = payslip_firstname + ' ' + ('%s a %s') % (
                     tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
@@ -302,7 +302,7 @@ class CodeLeaveTypePayroll(models.Model):
             elif 'Bono 14' in struct.name:
                 payslip_firstname = ('Bono 14 de %s para ') % (employee.name)
             else:
-                payslip_firstname = ('Nómina de %s para ') % (employee.name)
+                payslip_firstname = ('Nómina de %s para ').decode('utf8') % (employee.name)
 
             payslip_name = payslip_firstname + ' ' + ('%s a %s') % (
                     tools.ustr(babel.dates.format_date(date=ttyme, format='d-MMMM-y', locale=locale)),
