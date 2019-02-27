@@ -338,7 +338,7 @@ class DepartmentResponsable(models.Model):
 
         # 2. actualizando nuevo jefe
         if self.parent_id:
-            new_parent = parent_id.manager_id
+            new_parent = self.parent_id.manager_id
             new_manager_obj.write({'parent_id': new_parent.id})
 
         _logger.debug('2. nuevo jefe %s', new_manager_obj)
