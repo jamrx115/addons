@@ -216,9 +216,9 @@ class EmployeeUpdated(models.Model):
         now = datetime.now(tz=user_tz)
         # now = datetime.now() + timedelta(days=1)
         date_now = now.date()
-        match = self.search([])
 
         # vencimiento de ID
+        match = self.search([])
         for i in match:
             if i.id_expiry_date:
                 exp_date = fields.Date.from_string(i.id_expiry_date) - timedelta(days=1)
@@ -232,9 +232,9 @@ class EmployeeUpdated(models.Model):
                         'email_to': i.work_email,
                     }
                     self.env['mail.mail'].create(main_content).send()
-        match1 = self.search([])
         
         # vencimiento de pasaporte
+        match1 = self.search([])
         for i in match1:
             if i.passport_expiry_date:
                 exp_date1 = fields.Date.from_string(i.passport_expiry_date)
@@ -258,7 +258,8 @@ class EmployeeUpdated(models.Model):
                     self.env['mail.mail'].create(main_content).send()
 
         # vencimiento de visa
-        for i in match1:
+        match2 = self.search([])
+        for i in match2:
             if i.x_fecha_vence_visa:
                 exp_date1 = fields.Date.from_string(i.x_fecha_vence_visa)
                 exp_is_coming = exp_date1  - timedelta(days=180)
@@ -289,6 +290,7 @@ class CertificationsEmployeeUpdated(models.Model):
         now = datetime.now(tz=user_tz)
         #now = datetime.now() + timedelta(days=1)
         date_now = now.date()
+        
         match = self.search([])
         for i in match:
             if i.end_date:
