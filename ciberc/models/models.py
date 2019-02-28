@@ -262,7 +262,7 @@ class EmployeeUpdated(models.Model):
         for i in match2:
             if i.x_fecha_vence_visa:
                 exp_date1 = fields.Date.from_string(i.x_fecha_vence_visa)
-                exp_is_coming = exp_date1  - timedelta(days=180)
+                exp_is_coming = exp_date1  - timedelta(days=270)
                 diferencia = (exp_date1-date_now).days
                 if date_now >= exp_is_coming:
                     if diferencia > 0:
@@ -295,7 +295,7 @@ class CertificationsEmployeeUpdated(models.Model):
         for i in match:
             if i.end_date:
                 exp_date1 = fields.Date.from_string(i.end_date)
-                exp_is_coming = exp_date1  - timedelta(days=180)
+                exp_is_coming = exp_date1  - timedelta(days=270)
                 diferencia = (exp_date1-date_now).days
                 if date_now >= exp_is_coming:
                     if diferencia > 0:
