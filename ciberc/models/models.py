@@ -238,7 +238,7 @@ class EmployeeUpdated(models.Model):
         for i in match1:
             if i.passport_expiry_date:
                 exp_date1 = fields.Date.from_string(i.passport_expiry_date)
-                exp_is_coming = exp_date1  - timedelta(days=180)
+                exp_is_coming = exp_date1  - timedelta(days=270)
                 diferencia = (exp_date1-date_now).days
                 if date_now >= exp_is_coming:
                     if diferencia > 0:
