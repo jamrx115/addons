@@ -405,16 +405,20 @@ class CodeLeaveTypePayroll(models.Model):
         return result
 
     # obtener sumatoria comisiones y otros code definidos en la 2da pestana de nomina
+    # se usa en aguinaldo GT bono14 GT, cesantias CO, primas CO
     @api.multi
     def sum_other(self, employee_p, date_from_payslip, date_to_payslip, rule, code):
+        _logger.debug('***************')
+        _logger.debug('rule %s', rule)
+        _logger.debug('code %s', code)
         date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
 
         if rule == 'BONO14':
-            date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=7, day=1)  # tipo datetime
+            date_from_bono = datetime(year=(date_from_payslip.year), month=7, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30)  # tipo datetime
         elif rule == 'AGUINALDO':
-            date_from_bono = datetime(year=(date_from_payslip.year) - 1, month=12, day=1)  # tipo datetime
+            date_from_bono = datetime(year=(date_from_payslip.year), month=12, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=11, day=30)  # tipo datetime
         elif rule == 'PRIMA1':
             date_from_bono = datetime(year=date_from_payslip.year, month=1, day=1)  # tipo datetime
@@ -429,8 +433,9 @@ class CodeLeaveTypePayroll(models.Model):
         result = 0.00
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
         contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
-        payslip_ids = self.env['hr.payslip'].search(['&', ('contract_id', '=', None), ('state', '=', 'done')],
-                                                    limit=0)  # recordset vacío para concatenar
+        payslip_ids = self.env['hr.payslip'].search(
+            ['&', ('contract_id', '=', None), ('state', '=', 'done')],
+            limit=0)  # recordset vacío para concatenar
 
         for contract_id in contract_ids:
             payslip_aux = self.env['hr.payslip'].search(
@@ -441,10 +446,13 @@ class CodeLeaveTypePayroll(models.Model):
             payslip_ids = payslip_ids + payslip_aux
 
         for payslip in payslip_ids:
-            for input in payslip.line_ids:
-                if input.code == code:
-                    result += input.amount
+            _logger.debug('fechas %s - %s', payslip.date_from, payslip.date_to)
+            for input_line in payslip.line_ids:
+                if input_line.code == code:
+                    result += input_line.amount
+                    _logger.debug('acumulado %s', input_line.amount)
 
+        _logger.debug('***************')
         return result
 
     # obtener datos de pagos (line_ids) en ultima quincena
