@@ -329,6 +329,9 @@ class CodeLeaveTypePayroll(models.Model):
     # obtener sumatoria salarios o dias cancelados
     @api.multi
     def sum_wage(self, employee_p, date_from_payslip, date_to_payslip, rule, order):
+        _logger.debug('***************')
+        _logger.debug('rule %s', rule)
+        _logger.debug('order %s', order)
         result = 0
         date_from_payslip = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
@@ -396,9 +399,13 @@ class CodeLeaveTypePayroll(models.Model):
                     
                     # calculando resutado
                     if order == 'WAGE':
-                        result += (salario / 30) * dias
+                        result += ((salario / 30) * dias)
+                        _logger.debug('fechas %s - %s salario %s', nomina.date_from, nomina.date_to, ((salario / 30) * dias))
                     else:
                         result += dias
+                        _logger.debug('valor dias %s', dias)
+
+                    _logger.debug('acumulado %s', result)
 
             aux_meses +=1
 
@@ -450,7 +457,8 @@ class CodeLeaveTypePayroll(models.Model):
             for input_line in payslip.line_ids:
                 if input_line.code == code:
                     result += input_line.amount
-                    _logger.debug('acumulado %s', input_line.amount)
+                    _logger.debug('valor %s', input_line.amount)
+                    _logger.debug('acumulado %s', result)
 
         _logger.debug('***************')
         return result
