@@ -5,20 +5,278 @@
         <field name="inherit_id" ref="hr_recruitment.crm_case_form_view_job"/>
         <field name="arch" type="xml">
             <data>
+                <xpath expr="//form" position="replace">
+                    <form string="Jobs - Recruitment Form">
+                        <header>
+                            <button string="Create Employee" name="create_employee_from_applicant" type="object" class="oe_highlight" attrs="{'invisible': ['|',('emp_id', '!=', False),('active', '=', False)]}"/>
+                            <button string="Refuse" name="archive_applicant" type="object" attrs="{'invisible': [('active', '=', False)]}"/>
+                            <button string="Reopen Application" name="reset_applicant" type="object" attrs="{'invisible': [('active', '=', True)]}"/>
+                            <field name="stage_id" widget="statusbar" clickable="True" options="{'fold_field': 'fold'}" attrs="{'invisible': [('active', '=', False),('emp_id', '=', False)]}"  groups="hr_recruitment.group_hr_recruitment_user,ciberc_recruitment.group_hr_recruitment_user_admin"/>
+                        </header>
+                        <sheet>
+                            <div class="oe_button_box" name="button_box">
+                                <button name="action_makeMeeting" class="oe_stat_button" icon="fa-calendar" type="object" help="Schedule interview with this applicant">
+                                    <div class="o_form_field o_stat_info">
+                                        <span class="o_stat_text">Meetings</span>
+                                    </div>
+                                </button>
+                                <button name="action_get_attachment_tree_view" class="oe_stat_button" icon="fa-book" type="object">
+                                    <field name="attachment_number" widget="statinfo" string="Documents"/>
+                                </button>
+                                <button name="action_get_created_employee" class="oe_stat_button" icon="fa-user" type="object" attrs="{'invisible': [('emp_id', '=', False)]}">
+                                    <field name="employee_name" widget="statinfo" string="Employee"/>
+                                </button>
+                                <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive" attrs="{'invisible': [('active', '=', True)]}">
+                                    <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                                </button>
+                            </div>
+                            <div class="oe_title">
+                                <label for="name" class="oe_edit_only"/>
+                                <h1><field name="name"/></h1>
+                                <h2 class="o_row">
+                                    <div>
+                                        <label for="categ_ids"/>
+                                        <field name="categ_ids" widget="many2many_tags"/>
+                                    </div>
+                                </h2>
+                                <group>
+                                    <field name="create_date"/>
+                                    <field name="job_id" attrs="{'required':['&amp;',('x_bolsa_de_empleo','=', False),('x_candidatura_esp','=', False)]}" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                                    <field name="department_id" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/>
+                                </group>
+                            </div>
+
+                            <field name="x_bolsa_de_empleo" invisible="1"/>
+                            <field name="x_candidatura_esp" invisible="1"/>
+
+                            <div attrs="{'invisible':['|',('x_bolsa_de_empleo','!=',False),('x_candidatura_esp','!=',False)]}">
+                                <div groups="hr_recruitment.group_hr_recruitment_manager,hr_recruitment.group_hr_recruitment_user,ciberc_recruitment.group_hr_recruitment_user_admin" attrs="{'invisible':[('x_tipo_de_cliente','!=','cliente_interno')]}">
+                                    <h2 style="color:#728FCC; font-weight:bold">Aprobación FO 104</h2><br/>
+                                    <field name="x_esta_aprobacion"/><br/>
+                                </div>
+                                <h2 style="text-align:center; font-weight: bold;">FO 104</h2>
+                                <h4 style="text-align:center">(Formato de requisición de personal)</h4>
+
+                                <h2 style="color:#728FCC; font-weight:bold">1.</h2><br/>
+                                <label for="x_code_applicant"/><br/>
+                                <field name="x_code_applicant"/><br/>
+                                <label for="x_tipo_de_cliente"/><br/>
+                                <field name="x_tipo_de_cliente" attrs="{'required':['&amp;',('x_bolsa_de_empleo','=', False),('x_candidatura_esp','=', False)]}"/><br/>
+                                <label for="x_pid_proyecto"/><br/>
+                                <field name="x_pid_proyecto"/><br/>
+                                <label for="x_tipo_de_plaza" /><br/>
+                                <field name="x_tipo_de_plaza" attrs="{'required':['&amp;',('x_bolsa_de_empleo','=', False),('x_candidatura_esp','=', False)]}"/><br/>
+                                <div groups="hr_recruitment.group_hr_recruitment_user,ciberc_recruitment.group_hr_recruitment_user_admin">
+                                    <label for="user_id"/><br/>
+                                    <field name="user_id"/>
+                                </div>
+                                <!-- style="margin-top: 60px"     sirve para hacer margen en los grupos -->
+                                <h2 style="color:#728FCC; font-weight:bold">2.</h2><br/>
+                                <label for="x_profesional_reemplaza"/><br/>
+                                <field name="x_profesional_reemplaza"/><br/>
+                                <label for="x_ultimo_dia"/><br/>
+                                <field name="x_ultimo_dia"/><br/>
+
+                                <h2 style="color:#728FCC; font-weight:bold">3. Datos generales</h2><br/>
+                                <label for="x_pais"/><br/>
+                                <field name="x_pais"/><br/>
+                                <label for="x_perfil_cargo"/><br/>
+                                <field name="x_perfil_cargo"/><br/>
+                                <label for="x_usuario_final"/><br/>
+                                <field name="x_usuario_final"/><br/>
+                                <label for="x_fecha_cierre"/><br/>
+                                <field name="x_fecha_cierre"/><br/>
+                                <label for="x_fecha_inicio"/><br/>
+                                <field name="x_fecha_inicio"/><br/>
+                                <label for="x_genero"/><br/>
+                                <field name="x_genero"/><br/>
+                                <label for="x_rango_edad"/><br/>
+                                <field name="x_rango_edad"/><br/>
+                                <label for="x_modalidad_plaza"/><br/>
+                                <field name="x_modalidad_plaza"/><br/>
+                                <label for="x_num_plazas"/><br/>
+                                <field name="x_num_plazas"/><br/>
+                                <label for="x_meses"/><br/>
+                                <field name="x_meses"/><br/>
+                                <label for="x_posibilidad_renovacion"/><br/>
+                                <field name="x_posibilidad_renovacion"/><br/>
+
+                                <div groups="hr_recruitment.group_hr_recruitment_user,ciberc_recruitment.group_hr_recruitment_user_admin">
+                                    <h2 style="color:#728FCC; font-weight:bold">Salario</h2><br/>
+                                    <label for="salary_proposed"/>
+                                    <div>
+                                        <field name="salary_proposed" class="oe_inline"/>
+                                        <span class="oe_inline" attrs="{'invisible':[('salary_proposed_extra','=',False)]}"> + </span>
+                                        <field name="salary_proposed_extra" class="oe_inline" placeholder="Extra advantages..."/>
+                                    </div>
+                                </div>
+
+                                <h2 style="color:#728FCC; font-weight:bold">4. Requisitos del puesto</h2><br/>
+                                <label for="x_nivel_educa"/><br/>
+                                <field name="x_nivel_educa"/><br/>
+                                <label for="x_profesion"/><br/>
+                                <field name="x_profesion"/><br/>
+                                <label for="x_experiencia"/><br/>
+                                <field name="x_experiencia"/><br/>
+                                <label for="x_conocimientos"/><br/>
+                                <field name="x_conocimientos"/><br/>
+                                <label for="x_otro_idioma"/><br/>
+                                <field name="x_otro_idioma"/><br/>
+
+                                <h2 style="color:#728FCC; font-weight:bold">5. Competencias específicas</h2>
+                                <h4 style="margin-left: 25px">(Requisitos específicos personal técnico)</h4><br/><br/>
+                                <label for="x_tecnologia_dominio"/><br/>
+                                <field name="x_tecnologia_dominio"/><br/>
+                                <label for="x_referencia_tecnologia"/><br/>
+                                <field name="x_referencia_tecnologia"/><br/>
+                                <label for="x_competencia_marca"/><br/>
+                                <field name="x_competencia_marca"/><br/>
+                                <label for="x_grado"/><br/>
+                                <field name="x_grado"/><br/>
+                                <label for="x_nivel"/><br/>
+                                <field name="x_nivel"/><br/>
+                                <label for="x_nivel_minima"/><br/>
+                                <field name="x_nivel_minima"/><br/>
+                                <label for="x_nivel_maxima"/><br/>
+                                <field name="x_nivel_maxima"/><br/>
+                                <label for="x_horario"/><br/>
+                                <field name="x_horario"/><br/>
+
+                                <h2 style="color:#728FCC; font-weight:bold">6. Herramientas de trabajo y espacio físico</h2>
+                                <h4 style="margin-left: 25px">(Debe detallar que herramientas requiere esta posición y si ocupará espacio en oficina)</h4><br/><br/>
+                                <label for="x_espacio_oficina"/><br/>
+                                <field name="x_espacio_oficina"/><br/>
+                                <label for="x_herramientas_oficina"/><br/>
+                                <field name="x_herramientas_oficina"/><br/>
+
+                                <h2 style="color:#728FCC; font-weight:bold">7.</h2><br/>
+                                <label for="x_caracteristicas"/><br/>
+                                <field name="x_caracteristicas"/><br/>
+
+                                <h2 style="color:#728FCC; font-weight:bold">8.</h2><br/>
+                                <label for="x_se_espera"/><br/>
+                                <field name="x_se_espera"/><br/>
+                                <div attrs="{'invisible':[('x_tipo_de_cliente','!=','cliente_interno')]}">
+                                    <h2 style="color:#728FCC; font-weight:bold">9. Solicitud de Aprobación</h2><br/>
+                                    <label for="x_approver" string="Necesita Vo. Bo. de"/><br/>
+                                    <field name="x_approver" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}"/><br/>
+                                    <group>
+                                        <note>
+                                            <br/>
+                                            <b>Puesto nuevo =</b> (Área de operaciones o comercial) => Vo. Bo. de Sandra Patricia Valencia Bedoya<br/><br/>
+                                            <b>Puesto nuevo =</b> (Área de administrativa o financiera) => Vo. Bo. de Yazmin Acuña Donato<br/><br/>
+                                            <b>Reemplazo =</b> Vo. Bo. de gerente de área  <br/><br/>
+                                            <b>Estudio de mercado =</b> No requiere aprobación  <br/><br/>
+                                        </note>
+                                    </group>
+                                </div>
+                            </div>
+
+
+
+                            <div attrs="{'invisible':[('create_date', '=', False)]}">
+                                <div attrs="{'invisible':[('x_code_applicant', '!=', False)]}">
+
+                                    <!-- .......................................... CANDIDATURA ..................................... -->
+
+                                    <div groups="hr_recruitment.group_hr_recruitment_user,ciberc_recruitment.group_hr_recruitment_user_admin">
+                                        <!--<hr style="border-width: 7px"/>-->
+                                        <br/><h2 style="text-align:center; font-weight: bold;">CANDIDATURA</h2>
+
+                                        <group>
+                                            <group string="Datos del candidato">
+                                                <field name="partner_name"/>                                                
+                                                <field name="firstname"/>
+                                                <field name="lastname"/>
+                                                <field name="x_area_interes"/>
+                                                <!--<field name="job_id"/>-->
+                                                <field name="email_from" widget="email"/>
+                                                <field name="partner_phone"/>
+                                                <field name="x_telefono_movil"/>
+                                                <field name="type_id" placeholder="Degree"/>
+                                                <field name="x_residence_country" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                                                <field name="x_fo_asociado"/>
+                                            </group>
+                                            <group style="margin-top: 60px">
+                                                <label for="title_action"/>
+                                                <div>
+                                                    <field name="date_action"/>
+                                                    <field name="title_action" class="oe_inline" placeholder="e.g. Call for interview"/>
+                                                </div>
+                                                <field name="priority" widget="priority"/>
+                                                <field name="medium_id"/>
+                                                <field name="source_id"/>
+                                                <field name="reference"/>
+                                                <field name="x_interest_country" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                                            </group>
+                                            <group string="Salario">
+                                                <label for="salary_expected"/>
+                                                <div>
+                                                    <field name="salary_expected" class="oe_inline"/>
+                                                    <span class="oe_inline" attrs="{'invisible':[('salary_expected_extra','=',False)]}"> + </span>
+                                                    <field name="salary_expected_extra" class="oe_inline" placeholder="Extra advantages..."/>
+                                                </div>
+                                                <field name="availability"/>
+                                                <field name="emp_id" invisible="1"/>
+                                            </group>
+                                        </group>
+                                        <div>
+                                            <h2 style="color:#728FCC; font-weight:bold">Conocimientos</h2><br/>
+                                            <label for="x_tipos_certificaciones"/><br/>
+                                            <field name="x_tipos_certificaciones" widget="many2many_tags"/><br/>
+
+                                            <label for="x_automatizacion_conocimientos"/><br/>
+                                            <field name="x_automatizacion_conocimientos" widget="many2many_tags"/><br/>
+
+                                            <label for="x_administrativo_conocimientos"/><br/>
+                                            <field name="x_administrativo_conocimientos" widget="many2many_tags"/><br/>
+
+                                            <label for="x_tecnologias_conocimientos"/><br/>
+                                            <field name="x_tecnologias_conocimientos" widget="many2many_tags"/><br/>
+
+                                            <label for="x_so_conocimientos"/><br/>
+                                            <field name="x_so_conocimientos" widget="many2many_tags"/><br/>
+
+                                            <label for="x_programacion_conocimientos"/><br/>
+                                            <field name="x_programacion_conocimientos" widget="many2many_tags"/><br/>
+
+                                            <label for="x_metodologias_conocimientos"/><br/>
+                                            <field name="x_metodologias_conocimientos" widget="many2many_tags"/><br/>
+
+                                            <label for="x_hipervisores_conocimientos"/><br/>
+                                            <field name="x_hipervisores_conocimientos" widget="many2many_tags"/><br/>
+
+                                            <label for="x_experiencia_conocimientos"/><br/>
+                                            <field name="x_experiencia_conocimientos" widget="many2many_tags"/><br/>
+
+                                            <label for="x_comercial_conocimientos"/><br/>
+                                            <field name="x_comercial_conocimientos" widget="many2many_tags"/><br/>
+                                        </div>
+                                        <div groups="hr_recruitment.group_hr_recruitment_user,ciberc_recruitment.group_hr_recruitment_user_admin">
+                                            <hr style="border-width: 7px"/>
+                                            <br/><h2 style="text-align:center; font-weight: bold;">OFERTA Y PRE-OFERTA</h2>
+                                            <group >
+                                                <field name="x_contratacion"/>
+                                                <field name="x_oferta"/>
+                                                <field name="x_preoferta"/>
+                                            </group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </sheet>
+                        <div class="oe_chatter">
+                            <field name="message_follower_ids" widget="mail_followers"/>
+                            <field name="message_ids" widget="mail_thread"/>
+                        </div>
+                    </form>
+                </xpath>
+
+                <!-- cambios atributos -->
                 <xpath expr="//field[@name='partner_name']" position="attributes">
                     <attribute name="invisible">1</attribute>
                     <attribute name="no_label">1</attribute>
                     <attribute name="required">0</attribute>
-                </xpath>
-                <xpath expr="//field[@name='partner_name']" position="after">
-                    <field name="firstname"/>
-                    <field name="lastname"/>
-                </xpath>
-                <xpath expr="//field[@name='reference']" position="after">
-                    <field name="x_interest_country" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
-                </xpath>
-                <xpath expr="//field[@name='x_fo_asociado']" position="before">
-                    <field name="x_residence_country" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
                 </xpath>
             </data>
         </field>

@@ -694,8 +694,8 @@ var CalendarView = View.extend({
                 date_stop_day = new Date(Date.UTC(event_end.getFullYear(),event_end.getMonth(),event_end.getDate()));                    
             }
             else {
-                date_start_day = new Date(event.start.getFullYear(),event.start.getMonth(),event.start.getDate(),7);
-                date_stop_day = new Date(event_end.getFullYear(),event_end.getMonth(),event_end.getDate(),19);
+                date_start_day = new Date(event.start.getFullYear(),event.start.getMonth(),event.start.getDate(),0);
+                date_stop_day = new Date(event_end.getFullYear(),event_end.getMonth(),event_end.getDate(),23,59,59);
             }
             data[this.date_start] = time.auto_date_to_str(date_start_day, this.fields[this.date_start].type);
             if (this.date_stop) {
