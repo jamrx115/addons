@@ -135,8 +135,6 @@
             <data>
                 <xpath expr="//field[@name='number_of_days']" position="replace">
                     <field name="number_of_days"/>
-                </xpath>
-                <xpath expr="//field[@name='number_of_days_calendar']" position="replace">
                     <field name="number_of_days_calendar"/>
                 </xpath>
             </data>
