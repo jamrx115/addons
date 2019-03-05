@@ -6,11 +6,14 @@
             <t t-if="o.state=='close'">
                 <t t-call="report.external_layout">
                     <div class="page">
-                        <h3>Planilla de <span t-field="o.date_start" t-field-options='{"format": "d"}'/> al <span t-field="o.date_end" t-field-options='{"format": "d"}'/> de <span t-field="o.date_end" t-field-options='{"format": "MMMM yyyy"}'/></h3>
+                        <h3>Planilla <span t-field="o.name"/></h3>
+                        <h4><span t-field="o.date_start" t-field-options='{"format": "d MMMM yyyy"}'/> al 
+                            <span t-field="o.date_end"   t-field-options='{"format": "d MMMM yyyy"}'/></h4>
 
                         <table class="table table-striped table-bordered" style="font-size: 9px !important;">
                             <thead>
                                 <tr>
+                                    <th>Nro</th>
                                     <th>Empleado</th>
                                     <th style="min-width:60px;">F. ingreso</th>
                                     <th>Departamento</th>
@@ -27,6 +30,7 @@
                                     <th style="min-width:60px;">ISR</th>
                                     <th style="min-width:60px;">Descuentos</th>
                                     <th style="min-width:60px;">Total desc.</th>
+                                    <th style="min-width:60px;">Liquido a recibir.</th>
                                 </tr>
                             </thead>
 
@@ -47,10 +51,11 @@
                                         <t t-set="otros_desc" t-value="ornato + anticipo + embargo" />
                                         <t t-set="moneda" t-value="nomina.get_currency(nomina.contract_id)" />
 
+                                        <td><span t-esc="nomina_index+1"/></td>
                                         <td><span t-field="nomina.employee_id.firstname"/>
                                             <span t-field="nomina.employee_id.lastname"/></td><!--nombre-->
                                         <td><span t-field="nomina.employee_id.joining_date"/></td><!--fecha de ingreso-->
-                                        <td><span t-field="nomina.employee_id.department_id"/></td><!--departamento-->
+                                        <td><span t-field="nomina.employee_id.department_id.name"/></td><!--departamento-->
                                         <td><span t-field="nomina.employee_id.job_id"/></td><!--puesto-->
                                         <td><span t-field="nomina.contract_id.wage" 
                                                   t-field-options='{"widget": "monetary", "display_currency": moneda}'/></td><!--s base-->
@@ -75,6 +80,8 @@
                                                   t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--otros desc -->
                                         <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'TOTALDED')"
                                                   t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--total desc-->
+                                        <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'NET')"
+                                                  t-esc-options='{"widget": "monetary", "display_currency": moneda}' /></td><!--total a recibir-->
                                     </tr>
                                 </t>
                             </tbody>
