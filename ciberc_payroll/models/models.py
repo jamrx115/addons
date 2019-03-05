@@ -818,7 +818,7 @@ class HrEmployeePayslip(models.Model):
             pagos = pagos_nominas + pagos_bonos + pago_indemnizacion
 
             locale = self.env.context.get('lang') or 'es_CO'
-            nombre_mes = ('%s') % (tools.ustr(babel.dates.format_date(date=date_from, format='MMMM', locale=locale)))
+            nombre_mes = ('%s') % (tools.ustr(babel.dates.format_date(date=date_from, format='MMMM yyyy', locale=locale)))
             mes = m + 1
             salario_contrato = 0
             moneda = False
