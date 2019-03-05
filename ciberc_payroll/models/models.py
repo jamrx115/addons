@@ -405,7 +405,7 @@ class CodeLeaveTypePayroll(models.Model):
                         result += dias
                         _logger.debug('valor dias %s', dias)
 
-                    _logger.debug('acumulado %s', result)
+                    _logger.debug('subtotal %s', result)
 
             aux_meses +=1
 
@@ -458,7 +458,7 @@ class CodeLeaveTypePayroll(models.Model):
                 if input_line.code == code:
                     result += input_line.amount
                     _logger.debug('valor %s', input_line.amount)
-                    _logger.debug('acumulado %s', result)
+                    _logger.debug('subtotal %s', result)
 
         _logger.debug('***************')
         return result
@@ -797,6 +797,7 @@ class HrEmployeePayslip(models.Model):
         answer = []
         struct_agui = self.env['hr.payroll.structure'].search([('code', '=', 'AGUINALDO GT')])
         struct_bono = self.env['hr.payroll.structure'].search([('code', '=', 'BONO14 GT')])
+        struct_liq_ids = self.env['hr.payroll.structure'].search([('code', '=like', 'LIQUIDACION%')]).ids
         for m in range(12):
             date_from = datetime(day=1, month=m + 1, year=search_year).date()
             date_to = datetime(day=calendar.monthrange(search_year, m + 1)[1], month=m + 1, year=search_year).date()
@@ -804,72 +805,80 @@ class HrEmployeePayslip(models.Model):
                 ['&', '&', ('employee_id', '=', self.id), ('state', '=', 'done'),
                       '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to)],
                 order="date_from")
+            pago_indemnizacion = self.env['hr.payslip'].search(
+                ['&', '&', '&', ('employee_id', '=', self.id), ('state', '=', 'done'),
+                           '&', ('date_from', '<=', date_from), ('date_to', '<=', date_to),
+                      ('struct_id', 'in', struct_liq_ids)],
+                order="date_from")
             pagos_bonos = self.env['hr.payslip'].search(
                 ['&', '&', ('employee_id', '=', self.id), ('state', '=', 'done'),
                       '|', ('struct_id', '=', struct_agui.id), ('struct_id', '=', struct_bono.id),
                       ('date_to', '=', date_to)],
                 order="date_from")
-            pagos = pagos_nominas + pagos_bonos
+            pagos = pagos_nominas + pagos_bonos + pago_indemnizacion
 
             locale = self.env.context.get('lang') or 'es_CO'
             nombre_mes = ('%s') % (tools.ustr(babel.dates.format_date(date=date_from, format='MMMM', locale=locale)))
             mes = m + 1
-            salario_mensual = 0
+            salario_contrato = 0
             moneda = False
-            # sección horas trabajadas
-            h_normal = 0
-            h_total = 0
-            # sección salario devengado
-            s_recibido = 0
-            s_ordinario = 0
-            s_vacaciones = 0
-            d_vacaciones = 0
-            d_total = 0
-            # sección deducciones legales
-            d_igss = 0
-            d_otros = 0
-            # sección final
-            sum_agui = 0
-            sum_bonos = 0 # bono 37-2001 + otros bonos = bono 78-89 y reformas
+            # ---------- sección horas trabajadas
+            horas_normal = 0
+            # ---------- sección salario devengado
+            dias_total = 0
+            salario_ordinario = 0
+            salario_comisiones = 0
+            liq_vacpnd = 0
+            # ---------- sección deducciones legales
+            deducc_igss = 0
+            deducc_total = 0
+            # ---------- sección final
+            suma_otros = 0    # aguinaldo + bono 14 + liq_indemn
+            suma_bono7889 = 0 # bono 37-2001 + otros bonos = bono 78-89 y reformas
+            subtotal = 0
 
             for nomina in pagos:
                 moneda = nomina.contract_id.x_currency_id
-                salario_mensual = nomina.contract_id.wage
-
-                worked_days_line_ids = nomina.worked_days_line_ids
-                for wd in worked_days_line_ids:
-                    h_total += wd.number_of_hours
-                    if wd.code.startswith('VAC') or wd.code.startswith('DLI'):
-                        d_vacaciones += wd.number_of_days_calendar
+                salario_contrato = nomina.contract_id.wage
 
                 line_ids = nomina.line_ids
 
                 for line in line_ids:
-                    if line.code == 'DIASTRABAJO':
-                        d_total += line.total
-                    if line.code == 'IGSS':
-                        d_igss += line.total
-                    if line.code == 'TOTALDED':
-                        d_otros += line.total
-                    if line.code == 'BON37':
-                        sum_bonos += line.total
-                    if line.code == 'BON':
-                        sum_bonos += line.total
-                    if line.code == 'NET':
-                        s_recibido += line.total
-                    if line.code == 'AGUI':
-                        sum_agui += line.total
-                        s_recibido += line.total
-                    if line.code == 'BON14':
-                        sum_agui += line.total
-                        s_recibido += line.total
 
-                s_ordinario = (salario_mensual / 30) * (d_total - d_vacaciones)
-                s_vacaciones = (salario_mensual / 30) * d_vacaciones
+                    if line.code == 'DIASTRABAJO':
+                        dias_total += line.total
+                    if line.code == 'COM':
+                        salario_comisiones += line.total
+                    if line.code == 'IGSS':
+                        deducc_igss += line.total
+                    if line.code == 'TOTALDED':
+                        deducc_total += line.total
+
+                    if line.code == 'BON37':
+                        suma_bono7889 += line.total
+                    if line.code == 'BON':
+                        suma_bono7889 += line.total
+
+                    if line.code == 'AGUI':
+                        suma_otros += line.total
+                    if line.code == 'BON14':
+                        suma_otros += line.total
+
+                    if line.code == 'AGUIPE':
+                        suma_otros += line.total
+                    if line.code == 'BON14P':
+                        suma_otros += line.total
+                    if line.code == 'INDEMN':
+                        suma_otros += line.total
+                    if line.code == 'VACPND':
+                        liq_vacpnd += line.total
+
+                salario_ordinario = (salario_contrato / 30) * (dias_total)
+                subtotal = salario_ordinario + salario_comisiones + liq_vacpnd
 
             resource = self.resource_id.sudo()
             horas_diarias = resource.calendar_id.working_hours_on_day(datetime(day=1, month=mes, year=search_year))
-            h_normal = horas_diarias * d_total
+            horas_normal = horas_diarias * dias_total
 
             # 0. moneda 1. No. Orden 2. Periodo de trabajo 3. Salario en quetzales 4. Días Trabajados
             # 5. Horas Trabajadas / Ordinarias 6. HT / Extra ordinarias
@@ -878,11 +887,11 @@ class HrEmployeePayslip(models.Model):
             # 12. Deducciones Legales / IGSS 13. DL / Otras deducciones 14. DL / Total deducciones
             # 15. Bono 14 + Aguinaldo 16. Bonificación Dec. 37-2001 17. Líquido a recibir
 
-            row = [moneda, mes, nombre_mes, salario_mensual, d_total,
-                   h_normal, 0.00,
-                   s_ordinario, 0.00, 0.00, s_vacaciones, (s_ordinario + s_vacaciones),
-                   d_igss, (d_otros - d_igss), d_otros,
-                   sum_agui, sum_bonos, s_recibido]
+            row = [moneda, mes, nombre_mes, salario_contrato, dias_total,
+                   horas_normal, 0.00,
+                   salario_ordinario, salario_comisiones, 0.00, liq_vacpnd, subtotal,
+                   deducc_igss, (deducc_total - deducc_igss), deducc_total,
+                   suma_otros, suma_bono7889, (subtotal+deducc_total+suma_otros+suma_bono7889)]
             answer.append(row)
         return answer
 
