@@ -10,15 +10,6 @@
         groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
     />
     <report
-        id="button_report_mintrab"
-        model="hr.employee"
-        string="Informe empleador MT"
-        report_type="qweb-pdf"
-        name="ciberc_payroll.report_mintrab"
-        file="ciberc_payroll.report_mintrab"
-        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
-    />
-    <report
         id="button_report_payed_paysliprun"
         model="hr.payslip.run"
         string="Planilla Nóminas Masivas"
