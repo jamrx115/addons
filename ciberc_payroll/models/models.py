@@ -586,6 +586,7 @@ class CodeLeaveTypePayroll(models.Model):
     # obtener datos de las vacaciones pendientes (para LIQ)
     # PEND cerrar las vacaciones pendientes
     def get_pending_holidays(self, employee_p, contract_p):
+        _logger.debug('***************')
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
 
         tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
@@ -621,11 +622,14 @@ class CodeLeaveTypePayroll(models.Model):
             if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
                 date_start = fields.Datetime.from_string(c.date_start)
                 fecha_aux = datetime(year=date_end.year, month=date_start.month, day=date_start.day).date()
+                _logger.debug('date_end %s', date_end)
+                _logger.debug('fecha_aux %s', fecha_aux)
                 if date_end > fecha_aux:
                     date_delta = (date_end - fecha_aux).days + 1.0
                     global_pending_holidays += date_delta * 15.0 / 365.0
                 break
-
+        
+        _logger.debug('global_pending_holidays %s', global_pending_holidays)
 
         # cerrar las vacaciones pendientes
         for ph in pending_holidays:
