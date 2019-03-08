@@ -56,7 +56,7 @@ class ciberc_contract(models.Model):
 
     x_benef_transp = fields.Float(string='Transporte')
     x_benef_educat = fields.Float(string='Educación')
-    x_benef_comuni = fields.Float(string='Movil')
+    x_benef_comuni = fields.Float(string='Móvil')
     x_benef_intern = fields.Float(string='Internet')
     x_benef_vivien = fields.Float(string='Vivienda')
     x_benef_salud  = fields.Float(string='Seguro médico')
