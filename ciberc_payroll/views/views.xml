@@ -94,8 +94,12 @@
         <field name="model">hr.salary.rule</field>
         <field name="inherit_id" ref="hr_payroll.hr_salary_rule_list"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='register_id']" position="replace"/>
             <xpath expr="//field[@name='sequence']" position="attributes">
                 <attribute name="invisible" eval="0"/>
+            </xpath>
+            <xpath expr="//field[@name='sequence']" position="after">
+                <field name="company_id"/>
             </xpath>
         </field>
     </record>
