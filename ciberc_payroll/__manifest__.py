@@ -27,6 +27,7 @@
         'views/views.xml',
         'views/qweb.xml',
         'views/report_salary_book.xml',
+        'views/report_salary_book_current.xml',
         'views/report_payed_paysliprun.xml',
         'views/report_menu.xml',
     ]

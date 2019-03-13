@@ -794,10 +794,13 @@ class HrEmployeePayslip(models.Model):
                         aux += line.total
         return aux
 
-    def get_data(self):
+    def get_data(self, year_p):
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
         today = datetime.now(tz=user_tz).date()
-        search_year = (today.year) - 1
+        if year_p == 'ACTUAL':
+            search_year = today.year
+        else:
+            search_year = (today.year) - 1
         answer = []
         struct_agui = self.env['hr.payroll.structure'].search([('code', '=', 'AGUINALDO GT')])
         struct_bono = self.env['hr.payroll.structure'].search([('code', '=', 'BONO14 GT')])

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<template id="report_salary_book">
+<template id="report_salary_book_current">
     <t t-call="report.html_container">
         <t t-foreach="docs" t-as="o">
             <t t-call="report.external_layout">
@@ -69,7 +69,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.get_data('ANTERIOR')" t-as="month">
+                            <tr t-foreach="o.get_data('ACTUAL')" t-as="month">
                                 <td><span t-esc="month[1]"/></td>
                                 <td><span t-esc="month[2]"/></td>
                                 <t t-if="month[0]">
