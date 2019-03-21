@@ -667,8 +667,10 @@ class CodeLeaveTypePayroll(models.Model):
             date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
         else:
             # no existe nominas de aguinaldo pagadas
-            # debe existir contrato
+            # debe existir contrato !!
             date_from = datetime(day=1, month=12, year=date_to_n.year-1)
+            if employee.joining_date > date_from:
+                date_from = employee.joining_date
             date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
 
         global_pending_agui = (date_to-date_from).days+1
@@ -705,6 +707,8 @@ class CodeLeaveTypePayroll(models.Model):
             # no existe nominas de aguinaldo pagadas
             # debe existir contrato
             date_from = datetime(day=1, month=7, year=date_to_n.year-1)
+            if employee.joining_date > date_from:
+                date_from = employee.joining_date
             date_to = fields.Datetime.from_string(ultimo_contrato.date_end)  # tipo datetime
 
         global_pending_agui = (date_to-date_from).days+1
