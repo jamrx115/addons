@@ -62,7 +62,7 @@
                             <t t-set="mes_i" t-value="time.strftime('%m %Y',time.strptime(o.date_from,'%Y-%m-%d'))" />
                             <t t-set="mes_f" t-value="time.strftime('%m %Y',time.strptime(o.date_to,'%Y-%m-%d'))" />
 
-                            <td><strong>Periodo de pago</strong></td>
+                            <td><strong>Periodo</strong></td>
 
                             <t t-if="mes_i == mes_f">
                                 <td>
@@ -111,6 +111,14 @@
                             <td><strong>Forma de pago</strong></td>
                             <td>Depósito en banco</td>
                         </tr>
+                        <t t-if="'Liquid' in o.struct_id.name">
+                            <tr>
+                                <td> <strong>Inicio contrato</strong> </td>
+                                <td> <span t-field="o.employee_id.joining_date" t-field-options="{'format': 'dd MMMM yyyy'}"/> </td>
+                                <td> <strong>Fin contrato</strong> </td>
+                                <td> <span t-field="o.contract_id.date_end" t-field-options="{'format': 'dd MMMM yyyy'}"/> </td>
+                            </tr>
+                        </t>
                     </table>
                 </div>
 
