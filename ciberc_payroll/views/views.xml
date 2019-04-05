@@ -115,5 +115,27 @@
             </xpath>
         </field>
     </record>
+    
+    <!-- ******************* updating multipayslips ******************-->
+    <record id="multi_payslip_confirm_form_wizard_updated" model="ir.ui.view">
+        <field name="model">multi.payslip.wizard</field>
+        <field name="inherit_id" ref="multi_payslip.multi_payslip_confirm_form_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='multi_payslip']" position="replace">
+                <button name="multi_payslip" string="Confirmar" type="object" class="oe_highlight" groups="hr_payroll.group_hr_payroll_user,ciberc_payroll.group_ciberc_payroll_approver" />
+            </xpath>
+        </field>
+    </record>
+
+    <record id="multi_payslip_confirm_msg_for_notapprovers" model="ir.ui.view">
+        <field name="model">multi.payslip.wizard</field>
+        <field name="inherit_id" ref="multi_payslip.multi_payslip_confirm_form_wizard"/>
+        <field name="groups_id" eval="[(6, 0, [ref('hr_payroll.group_hr_payroll_manager')])]" />
+        <field name="arch" type="xml">
+            <xpath expr="//h3" position="replace">
+                <h4>Usted no tiene permisos para realizar la acción de pagos masivos, consulte con un Responsable Aprobador u Oficial.</h4>
+            </xpath>
+        </field>
+    </record>
 
 </openerp>
