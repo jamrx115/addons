@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<!-- ... CREACIÓN DE LOS GRUPOS DE ACCESO ...-->
+		<record id="group_ciberc_payroll_approver" model="res.groups">
+			<field name="name">Responsable Aprobador</field>
+			<field name="category_id" ref="base.module_category_hr_payroll"/>
+			<field name="implied_ids" eval="[(4, ref('hr.group_hr_user'))]"/>
+        </record>
+
+        <!-- ... CREACIÓN DE LAS REGLAS DE REGISTRO...-->
+        <record id="record_rule_own_company_approver" model="ir.rule">
+            <field name="name">Sólo gestiona nóminas para su compañía - Aprobador</field>
+            <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+            <field name="groups" eval="[(4, ref('ciberc_payroll.group_ciberc_payroll_approver'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">[('company_id', '=', user.company_id.id)]</field>
+        </record>
+        <record id="record_rule_own_company_noapprover" model="ir.rule">
+            <field name="name">Sólo gestiona nóminas para su compañía - No aprobador</field>
+            <field name="model_id" ref="hr_payroll.model_hr_payslip"/>
+            <field name="groups" eval="[(4, ref('hr_payroll.group_hr_payroll_manager'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">[('company_id', '=', user.company_id.id)]</field>
+        </record>
+	</data>
+</odoo>

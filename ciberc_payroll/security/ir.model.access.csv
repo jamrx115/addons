@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_payroll_structure,hr.payroll.structure.approver,model_hr_payroll_structure,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_contribution_register,hr.contribution.register.approver,model_hr_contribution_register,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_salary_rule_category,hr.salary.rule.category.approver,model_hr_salary_rule_category,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_payslip,hr.payslip.approver,model_hr_payslip,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_payslip_line,hr.payslip.line.approver,model_hr_payslip_line,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_payslip_input_user,hr.payslip.input.approver,model_hr_payslip_input,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_salary_rule_user,hr.salary.rule.approver,model_hr_salary_rule,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_payslip_worked_days,hr.payslip.worked_days.approver,model_hr_payslip_worked_days,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_payslip_run,hr.payslip.run.approver,model_hr_payslip_run,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
+access_hr_rule_input,hr.rule.input.approver,model_hr_rule_input,ciberc_payroll.group_ciberc_payroll_approver,1,1,1,1
