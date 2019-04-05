@@ -3,10 +3,10 @@
     <!-- ******************* updating groups ******************-->
     <menuitem id="hr_payroll.menu_hr_payroll_configuration" name="Configuración"
               parent="hr_payroll.menu_hr_payroll_root" sequence="100"
-              groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
+              groups="hr_payroll.group_hr_payroll_user,ciberc_payroll.group_ciberc_payroll_approver"/>
     <menuitem id="hr_payroll.menu_department_tree" action="hr_payroll.action_view_hr_payslip_form"
               parent="hr_payroll.menu_hr_payroll_root"
-              groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
+              groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager,ciberc_payroll.group_ciberc_payroll_approver"/>
 
     <!-- ******************* updating views ******************-->
     <!-- payslip - distance_from_holiday -->
@@ -16,17 +16,17 @@
         <field name="arch" type="xml">
             <!-- Cambios botones y estados -->
             <xpath expr="//button[@name='action_payslip_done']" position="before">
-                <button string="Enviar a Aprobación" name="action_payslip_verify" type='object' states="draft" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
+                <button string="Enviar a Aprobación" name="action_payslip_verify" type='object' states="draft" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager,ciberc_payroll.group_ciberc_payroll_approver"/>
             </xpath>
             <xpath expr="//button[@name='compute_sheet']" position="replace"/>
             <xpath expr="//button[@name='action_payslip_verify']" position="before">
-                <button string="Calcular nómina" name="compute_sheet" type="object" states="draft" class="oe_highlight" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
+                <button string="Calcular nómina" name="compute_sheet" type="object" states="draft" class="oe_highlight" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager,ciberc_payroll.group_ciberc_payroll_approver"/>
             </xpath>
             <xpath expr="//button[@name='action_payslip_done']" position="replace">
-                <button string="Confirmar" name="action_payslip_done" type="object" states="verify" groups="hr_payroll.group_hr_payroll_user"/>
+                <button string="Confirmar" name="action_payslip_done" type="object" states="verify" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
             </xpath>
             <xpath expr="//button[@name='action_payslip_cancel']" position="replace">
-                <button string="Rechazar" name="action_payslip_cancel" type="object" states="verify" groups="hr_payroll.group_hr_payroll_user"/>
+                <button string="Rechazar" name="action_payslip_cancel" type="object" states="verify" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
             </xpath>
             <xpath expr="//field[@name='state']" position="attributes"><!-- barra de estados -->
                 <attribute name="statusbar_visible" eval="draft,verify,confirm,done,cancel"/><!-- confirm? -->

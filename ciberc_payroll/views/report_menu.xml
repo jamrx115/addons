@@ -7,7 +7,7 @@
         report_type="qweb-pdf"
         name="ciberc_payroll.report_salary_book"
         file="ciberc_payroll.report_salary_book"
-        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
+        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager,ciberc_payroll.group_ciberc_payroll_approver"
     />
     <report
         id="button_report_salary_book_current"
@@ -16,7 +16,7 @@
         report_type="qweb-pdf"
         name="ciberc_payroll.report_salary_book_current"
         file="ciberc_payroll.report_salary_book_current"
-        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
+        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager,ciberc_payroll.group_ciberc_payroll_approver"
     />
     <report
         id="button_report_payed_paysliprun"
@@ -25,6 +25,6 @@
         report_type="qweb-pdf"
         name="ciberc_payroll.report_payed_paysliprun"
         file="ciberc_payroll.report_payed_paysliprun"
-        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"
+        groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager,ciberc_payroll.group_ciberc_payroll_approver"
     />
 </odoo>
