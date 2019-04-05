@@ -23,10 +23,10 @@
                 <button string="Calcular nómina" name="compute_sheet" type="object" states="draft" class="oe_highlight" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager,ciberc_payroll.group_ciberc_payroll_approver"/>
             </xpath>
             <xpath expr="//button[@name='action_payslip_done']" position="replace">
-                <button string="Confirmar" name="action_payslip_done" type="object" states="verify" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
+                <button string="Confirmar" name="action_payslip_done" type="object" states="verify" groups="hr_payroll.group_hr_payroll_user,ciberc_payroll.group_ciberc_payroll_approver"/>
             </xpath>
             <xpath expr="//button[@name='action_payslip_cancel']" position="replace">
-                <button string="Rechazar" name="action_payslip_cancel" type="object" states="verify" groups="hr_payroll.group_hr_payroll_user,hr_payroll.group_hr_payroll_manager"/>
+                <button string="Rechazar" name="action_payslip_cancel" type="object" states="verify" groups="hr_payroll.group_hr_payroll_user,ciberc_payroll.group_ciberc_payroll_approver"/>
             </xpath>
             <xpath expr="//field[@name='state']" position="attributes"><!-- barra de estados -->
                 <attribute name="statusbar_visible" eval="draft,verify,confirm,done,cancel"/><!-- confirm? -->
