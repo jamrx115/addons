@@ -36,9 +36,9 @@ class ciberc_contract(models.Model):
     x_dias_aguinaldo = fields.Float(string='Dias aguinaldo', readonly=True)
     x_dias_bono_14 = fields.Float(string='Días calculo Bono 14')
     x_isr = fields.Float(string='Impuesto sobre la renta', help='Descontable mensual')
-    x_medic_pre  = fields.Boolean(string='Adicional por servicios médicos', help='Aplica para salario > 2 SMMLV')
+    x_medic_pre  = fields.Boolean(string='Descuento por servicios médicos', help='Aplica para salario > 2 SMMLV')
     x_medic_prep = fields.Integer(string='Descuento mensual')
-    x_pensi_volu = fields.Boolean(string='Adicional por pensiones voluntarias', help='Aplica para salario >= 1 SMMLV')
+    x_pensi_volu = fields.Boolean(string='Descuento por pensiones voluntarias', help='Aplica para salario >= 1 SMMLV')
     x_pensi_volun = fields.Integer(string='Descuento mensual')
     x_medios = fields.Integer(string='Medios')
     x_meses_isr = fields.Float(string='Meses ISR')
@@ -47,13 +47,16 @@ class ciberc_contract(models.Model):
     x_tipo_novedad_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad creacion del contrato', required=True)
     x_tipo_novedad_cierre_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad cierre del contrato')
 
+    # RTE FTE COLOMBIA
     x_pagos_alim  = fields.Integer(string='Pagos a 3ros por alimentación')
     x_viat_ocasi  = fields.Integer(string='Viáticos ocasionales reembolsables')
     x_ahorros_afc = fields.Integer(string='Ahorros cuentas AFC')
     x_rentrab_ex  = fields.Integer(string='Rentas de trabajo exentas')
     x_int_viviend = fields.Integer(string='Intereses en préstamos vivienda')
     x_polizas_seg = fields.Integer(string='Pólizas de seguros')
+    x_ben_medprep = fields.Integer(string='Beneficio base de retención por Medicina Prepagada')
 
+    # COSTOS PROYECTOS
     x_benef_transp = fields.Float(string='Transporte')
     x_benef_educat = fields.Float(string='Educación')
     x_benef_comuni = fields.Float(string='Móvil')

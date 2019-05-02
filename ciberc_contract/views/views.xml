@@ -53,6 +53,7 @@
                         <field name="x_rentrab_ex"/>
                     </group>
                     <group name="deducciones" string="Deducciones">
+                        <field name="x_ben_medprep"/>
                         <field name="x_pagos_alim"/>
                         <field name="x_int_viviend"/>
                         <field name="x_polizas_seg"/>
