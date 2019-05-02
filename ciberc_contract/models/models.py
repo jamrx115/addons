@@ -50,7 +50,7 @@ class ciberc_contract(models.Model):
     # RTE FTE COLOMBIA
     x_pagos_alim  = fields.Integer(string='Pagos a 3ros por alimentación', help='Aplica para Colombia')
     x_viat_ocasi  = fields.Integer(string='Viáticos ocasionales reembolsables', help='Aplica para Colombia')
-    x_ahorros_afc = fields.Integer(string='Ahorros cuentas AFC', help='Aplica para Colombia')
+    x_ahorros_afc = fields.Integer(string='Ahorros cuentas AFC', help='Aplica para Colombia, valor descontable mensual')
     x_rentrab_ex  = fields.Integer(string='Rentas de trabajo exentas', help='Aplica para Colombia')
     x_int_viviend = fields.Integer(string='Intereses en préstamos vivienda', help='Aplica para Colombia')
     x_polizas_seg = fields.Integer(string='Pólizas de seguros', help='Aplica para Colombia')
