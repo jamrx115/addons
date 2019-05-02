@@ -14,6 +14,7 @@
                 <field name="x_pensi_volu" />
                 <field name="x_pensi_volun" attrs="{'invisible':[('x_pensi_volu', '==', False)]}"/>
                 <field name="x_medios"     />
+                <field name="x_ss_medprep" />
             </xpath>
             <xpath expr="//group[@name='salary_and_advantages']" position="before">
                 <group name="novedades_contrato" string="Novedades del contrato">
