@@ -229,6 +229,9 @@
                 <field name="date" position="attributes">
                    <attribute name="readonly">0</attribute>                   
                 </field>
+                <field name="type_evaluation" position="attributes">
+                   <attribute name="readonly">0</attribute>                   
+                </field>
                 <field name="name" position="attributes">
                    <attribute name="readonly">0</attribute>                   
                 </field>
