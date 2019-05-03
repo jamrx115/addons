@@ -330,7 +330,7 @@ class CodeLeaveTypePayroll(models.Model):
     @api.multi
     def sum_wage(self, employee_p, date_from_payslip, date_to_payslip, rule, order):
         _logger.debug('***************')
-        _logger.debug('rule %s', rule)
+        #_logger.debug('rule %s', rule)
         _logger.debug('order %s', order)
         result = 0
         date_from_payslip = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
@@ -339,13 +339,20 @@ class CodeLeaveTypePayroll(models.Model):
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
         aux_year = date_from_payslip.year
         aux_meses = 0
+        dias = 0
 
         if rule == 'BONO14' or rule == 'AGUINALDO':
             meses1 = [mn for mn in range(date_from_payslip.month, 13)]
             meses2 = [mn for mn in range(1, date_to_payslip.month + 1)]
             meses = meses1 + meses2
+        elif rule == 'PRIMA1':
+            meses = [mn for mn in range(1, date_to_payslip.month + 1)]
+        elif rule == 'PRIMA2':
+            meses = [mn for mn in range(date_from_payslip.month, 13)]
         else:
             meses = [mn for mn in range(date_from_payslip.month, date_to_payslip.month + 1)]
+
+        #_logger.debug('meses %s', meses)
 
         if meses:
             aux_meses = meses[0]
@@ -357,6 +364,8 @@ class CodeLeaveTypePayroll(models.Model):
             date_to_mes = datetime(year=aux_year, month=mes,
                                    day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
 
+            #_logger.debug('fechas %s - %s', date_from_mes, date_to_mes)
+
             payslip_ids = self.env['hr.payslip'].search(
                 ['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
                  ('employee_id', '=', employee.id),
@@ -364,6 +373,9 @@ class CodeLeaveTypePayroll(models.Model):
 
             for nomina in payslip_ids:
                 contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
+                date_from_payslip = fields.Datetime.from_string(nomina.date_from)
+                date_to_payslip = fields.Datetime.from_string(nomina.date_to)
+
                 if contract:
                     salario = contract.wage
                     contract_start = fields.Datetime.from_string(contract.date_start)  # tipo datetime
@@ -371,43 +383,50 @@ class CodeLeaveTypePayroll(models.Model):
                     if contract.date_end:
                         contract_end = fields.Datetime.from_string(contract.date_end)  # tipo datetime
 
-                    if contract_start < date_from_mes:
+                    if contract_start < date_from_payslip:
                         if contract_end:
-                            if date_to_mes < contract_end:
-                                dias = ((date_to_mes - date_from_mes).days) + 1
+                            if date_to_payslip < contract_end:
+                                dias = ((date_to_payslip - date_from_payslip).days) + 1
                             else:
-                                dias = ((contract_end - date_from_mes).days) + 1
+                                dias = ((contract_end - date_from_payslip).days) + 1
                         else:
-                            dias = ((date_to_mes - date_from_mes).days) + 1
+                            dias = ((date_to_payslip - date_from_payslip).days) + 1
                     else:
                         if contract_end:
-                            if date_to_mes < contract_end:
-                                dias = ((date_to_mes - contract_start).days) + 1
+                            if date_to_payslip < contract_end:
+                                dias = ((date_to_payslip - contract_start).days) + 1
                             else:
                                 dias = ((contract_end - contract_start).days) + 1
                         else:
-                            dias = ((date_to_mes - contract_start).days) + 1
+                            dias = ((date_to_payslip - contract_start).days) + 1
                     
-                    # correccion dias
-                    if date_from_mes.month == 2:
-                        if date_to_mes.day == 28:
+                    # correccion dias para redondear a 30
+                    if date_from_payslip.month == 2:
+                        if date_to_payslip.day == 28:
+                            _logger.debug('feb 28')
                             dias += 2
-                        if date_to_mes.day == 29:
+                        if date_to_payslip.day == 29:
+                            _logger.debug('feb 29 ')
                             dias += 1
-                    if date_to_mes.day == 31 and (dias >= 16):
+                    if date_to_payslip.day == 31 and (dias >= 16):
+                        _logger.debug('mes 31')
                         dias -= 1
                     
                     # calculando resutado
                     if order == 'WAGE':
                         result += ((salario / 30) * dias)
+                        _logger.debug('')
                         _logger.debug('fechas %s - %s salario %s', nomina.date_from, nomina.date_to, ((salario / 30) * dias))
                     else:
                         result += dias
-                        _logger.debug('valor dias %s', dias)
+                        _logger.debug('')
+                        _logger.debug('fechas %s - %s valor dias %s', nomina.date_from, nomina.date_to, dias)
 
                     _logger.debug('subtotal %s', result)
 
             aux_meses +=1
+
+        _logger.debug('***************')
 
         return result
 
@@ -416,7 +435,7 @@ class CodeLeaveTypePayroll(models.Model):
     @api.multi
     def sum_other(self, employee_p, date_from_payslip, date_to_payslip, rule, code):
         _logger.debug('***************')
-        _logger.debug('rule %s', rule)
+        #_logger.debug('rule %s', rule)
         _logger.debug('code %s', code)
         date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
@@ -586,7 +605,7 @@ class CodeLeaveTypePayroll(models.Model):
     # obtener datos de las vacaciones pendientes (para LIQ)
     # PEND cerrar las vacaciones pendientes
     def get_pending_holidays(self, employee_p, contract_p):
-        _logger.debug('***************')
+        #_logger.debug('***************')
         user_tz = pytz.timezone(self.env.user.partner_id.tz)
 
         tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
@@ -622,14 +641,14 @@ class CodeLeaveTypePayroll(models.Model):
             if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
                 date_start = fields.Datetime.from_string(c.date_start)
                 fecha_aux = datetime(year=date_end.year, month=date_start.month, day=date_start.day).date()
-                _logger.debug('date_end %s', date_end)
-                _logger.debug('fecha_aux %s', fecha_aux)
+                #_logger.debug('date_end %s', date_end)
+                #_logger.debug('fecha_aux %s', fecha_aux)
                 if date_end > fecha_aux:
                     date_delta = (date_end - fecha_aux).days + 1.0
                     global_pending_holidays += date_delta * 15.0 / 365.0
                 break
         
-        _logger.debug('global_pending_holidays %s', global_pending_holidays)
+        #_logger.debug('global_pending_holidays %s', global_pending_holidays)
 
         # cerrar las vacaciones pendientes
         for ph in pending_holidays:
