@@ -50,14 +50,29 @@
                         <field name="x_viat_ocasi"/>
                     </group>
                     <group name="rentas_exentas" string="Rentas exentas">
-                        <field name="x_ahorros_afc"/>
-                        <field name="x_rentrab_ex"/>
+                        <group>
+                            <field name="x_ahorros_afc"/>
+                        </group>
+                        <group>
+                            <field name="x_rentrab_ex"/>
+                        </group>
                     </group>
                     <group name="deducciones" string="Deducciones">
-                        <field name="x_ben_medprep"/>
-                        <field name="x_pagos_alim"/>
-                        <field name="x_int_viviend"/>
-                        <field name="x_polizas_seg"/>
+                        <group>
+                            <field name="x_ben_medprep"/>
+                        </group>
+                        <group>
+                            <label for="x_porcent_ali"/>
+                            <div>
+                                <field name="x_porcent_ali" class="oe_inline"/> (%%)
+                            </div>
+                        </group>                     
+                        <group>
+                            <field name="x_int_viviend"/>
+                        </group>
+                        <group>
+                            <field name="x_polizas_seg"/>
+                        </group>
                     </group>
                 </page>
             </xpath>

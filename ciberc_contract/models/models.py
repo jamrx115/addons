@@ -48,7 +48,7 @@ class ciberc_contract(models.Model):
     x_tipo_novedad_cierre_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad cierre del contrato')
 
     # RTE FTE COLOMBIA
-    x_pagos_alim  = fields.Integer(string='Pagos a 3ros por alimentación', help='Aplica para Colombia')
+    x_porcent_ali = fields.Float(string='Porcentaje alimentación dependientes', help='Aplica para Colombia')
     x_viat_ocasi  = fields.Integer(string='Viáticos ocasionales reembolsables', help='Aplica para Colombia')
     x_ahorros_afc = fields.Integer(string='Ahorros cuentas AFC', help='Aplica para Colombia, valor descontable mensual')
     x_rentrab_ex  = fields.Integer(string='Rentas de trabajo exentas', help='Aplica para Colombia')
