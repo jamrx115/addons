@@ -40,6 +40,7 @@ class ciberc_contract(models.Model):
     x_medic_prep = fields.Integer(string='Descuento mensual', help='Aplica para Colombia')
     x_pensi_volu = fields.Boolean(string='Descuento por pensiones voluntarias', help='Aplica para salario >= 1 SMMLV')
     x_pensi_volun = fields.Integer(string='Descuento mensual', help='Aplica para Colombia')
+    x_embargoc_b = fields.Boolean(string='Descuento por embargo *', help='Aplica para Colombia')
     x_medios = fields.Integer(string='Medios')
     x_meses_isr = fields.Float(string='Meses ISR')
     x_numero_contrato = fields.Char(string='Identificador Contrato Físico')
