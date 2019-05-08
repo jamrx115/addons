@@ -489,15 +489,20 @@ class CodeLeaveTypePayroll(models.Model):
         date_to = date_from_payslip - timedelta(days=1)
         result = 0.00
 
+        #last_payslip = self.env['hr.payslip'].search(
+            #['&', '&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to),
+             #('contract_id', '=', contract.id),
+             #('state', '=', 'done')])
+
         last_payslip = self.env['hr.payslip'].search(
             ['&', '&', '&', ('date_from', '>=', date_from), ('date_to', '<=', date_to),
-             ('contract_id', '=', contract.id),
+             ('employee_id', '=', contract.employee_id.id),
              ('state', '=', 'done')])
 
         for input in last_payslip.line_ids:
             if input.code == code:
                 result += input.amount
-
+        
         return result
 
     # auxiliar de conteo
