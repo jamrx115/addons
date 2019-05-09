@@ -749,6 +749,24 @@ class CodeLeaveTypePayroll(models.Model):
             valor = 0.0
         return valor
 
+    # trae days de worked_days_line_ids
+    @api.multi
+    def get_days_from_workeddays(self, worked_days_line_ids, code, days_str):
+        if len(code) == 3:
+            if days_str == 'number_of_days_calendar':
+                valor = worked_days_line_ids.filtered(lambda r: r.code.startswith(code)).number_of_days_calendar
+            else:
+                valor = worked_days_line_ids.filtered(lambda r: r.code.startswith(code)).number_of_days
+        else:
+            if days_str == 'number_of_days_calendar':
+                valor = worked_days_line_ids.filtered(lambda r: r.code == code).number_of_days_calendar
+            else:
+                valor = worked_days_line_ids.filtered(lambda r: r.code == code).number_of_days
+
+        if not valor:
+            valor = 0.0
+        return valor
+
     # trae valores de line_ids
     @api.multi
     def get_currency(self, contract_obj):
