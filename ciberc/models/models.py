@@ -155,14 +155,14 @@ class LoginUserEmail(models.Model):
             pass
 
 # actualización a partes de horas
-class AccountAnalyticLine(models.Model):
-    _inherit = ['account.analytic.line']
+#class AccountAnalyticLine(models.Model):
+    #_inherit = ['account.analytic.line']
 
-    @api.model
-    def _default_user(self):
-        return self.env.context.get('user_id', self.env.user.id)
+    #@api.model
+    #def _default_user(self):
+        #return self.env.context.get('user_id', self.env.user.id)
 
-    user_id = fields.Many2one('res.users', string='User', default=_default_user, domain=lambda self: [('id', '=', self.env.uid)])
+    #user_id = fields.Many2one('res.users', string='User', default=_default_user, domain=lambda self: [('id', '=', self.env.uid)])
 
 # actualización de préstamos
 class HrLoanUpdated(models.Model):
