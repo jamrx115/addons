@@ -17,7 +17,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr','analytic'],
+    'depends': ['base','hr','analytic', 'hr_timesheet', 'resource'],
 
     # always loaded
     'data': [

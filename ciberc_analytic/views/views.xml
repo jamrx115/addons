@@ -2,5 +2,57 @@
 <openerp>
 
     <!-- ********************* account.analytic.line ******************** -->
+    <record id="hr_timesheet_line_tree_updated" model="ir.ui.view">
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="arch" type="xml">
+            <data>
+                <!-- modificaciones -->
+                <xpath expr="//field[@name='user_id']" position="attributes">
+                    <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='project_id']" position="attributes">
+                    <attribute name="options">{'no_open':True, 'no_quick_create': True, 'no_create_edit' : True}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <!-- nuevos campos -->
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="date_from" />
+                    <field name="date_to" />
+                </xpath>
+                <xpath expr="//field[@name='unit_amount']" position="after">
+                    <field name="state" invisible="1" />
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="hr_timesheet_line_tree_payslip_user" model="ir.ui.view">
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="groups_id" eval="[(6, 0, [ref('hr_payroll.group_hr_payroll_user')])]" />
+        <field name="arch" type="xml">
+            <data>
+                <!-- modificaciones -->
+                <xpath expr="//field[@name='state']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
+    <record id="hr_timesheet_line_tree_payslip_approver" model="ir.ui.view">
+        <field name="model">account.analytic.line</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+        <field name="groups_id" eval="[(6, 0, [ref('ciberc_payroll.group_ciberc_payroll_approver')])]" />
+        <field name="arch" type="xml">
+            <data>
+                <!-- modificaciones -->
+                <xpath expr="//field[@name='state']" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </xpath>
+            </data>
+        </field>
+    </record>
 
 </openerp>
