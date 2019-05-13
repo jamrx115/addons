@@ -9,6 +9,7 @@
                 <field name="x_bonificacion" />
                 <field name="x_renta_ex_patrono" />
                 <field name="x_isr" />
+                <field name="x_aplica_rec" />
                 <field name="x_medic_pre"  />
                 <field name="x_medic_prep" attrs="{'invisible':[('x_medic_pre', '==', False)]}"/>
                 <field name="x_pensi_volu" />

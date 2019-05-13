@@ -48,6 +48,8 @@ class ciberc_contract(models.Model):
     x_tipo_novedad_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad creacion del contrato', required=True)
     x_tipo_novedad_cierre_contrato_id = fields.Many2one('ciberc.tipo.novedad.contrato', string='Tipo novedad cierre del contrato')
 
+    x_aplica_rec  = fields.Boolean(string='Aplica recargos', default=False, help='Aplica para Colombia')
+
     # RTE FTE COLOMBIA
     x_porcent_ali = fields.Float(string='Porcentaje alimentación dependientes', help='Aplica para Colombia')
     x_viat_ocasi  = fields.Integer(string='Viáticos ocasionales reembolsables', help='Aplica para Colombia')
