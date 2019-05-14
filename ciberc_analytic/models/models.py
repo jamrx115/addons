@@ -34,9 +34,9 @@ class AccountAnalyticLineNew(models.Model):
 
     @api.model
     def _default_datefrom(self):
-        today_user = datetime.now(tz=self._user_tz())
-        today_utcz = utc_cero.fromutc(datetime.now())
-        return datetime.combine(today_utcz.date(), dtime(hour=today_utcz.hour))
+        user_time_zone = self._user_tz()
+        now_utcz = utc_cero.fromutc(datetime.now())
+        return datetime.combine(now_utcz.date(), dtime(hour=now_utcz.hour))
 
     @api.model
     def _default_dateto(self):
@@ -75,6 +75,9 @@ class AccountAnalyticLineNew(models.Model):
         else:
             self.unit_amount = 0
 
+        # check dates
+        self.verify_dates()
+
     @api.onchange('date_to')
     def _onchange_date_to(self):
         date_from = self.date_from
@@ -85,6 +88,29 @@ class AccountAnalyticLineNew(models.Model):
             self.unit_amount = self._get_number_of_hours(date_from, date_to, self.user_id.id)
         else:
             self.unit_amount = 0
+
+        # check dates
+        self.verify_dates()
+
+    def verify_dates(self):
+        cruce_1 = self.env['account.analytic.line'].search(
+            ['&','&', ('date_from', '<', self.date_from), ('date_to', '>=', self.date_from),
+                      ('user_id', '=', self.user_id.id)])
+        cruce_2 = self.env['account.analytic.line'].search(
+            ['&','&', ('date_from', '>=', self.date_from), ('date_to', '<=', self.date_to),
+                      ('user_id', '=', self.user_id.id)])
+        cruce_3 = self.env['account.analytic.line'].search(
+            ['&','&', ('date_from', '<', self.date_from), ('date_to', '>', self.date_to),
+                      ('user_id', '=', self.user_id.id)])
+        cruce_4 = self.env['account.analytic.line'].search(
+            ['&','&', ('date_from', '<=', self.date_to), ('date_to', '>=', self.date_to),
+                      ('user_id', '=', self.user_id.id)])
+
+        cruces = cruce_1 | cruce_2 | cruce_3 | cruce_4
+
+        if len(cruces) > 0:
+            self.date_from = None
+            self.date_to   = None
 
     date_from = fields.Datetime('Fecha inicial', required=True, default=_default_datefrom)
     date_to = fields.Datetime('Fecha final', required=True, default=_default_dateto)
