@@ -95,23 +95,38 @@ class AccountAnalyticLineNew(models.Model):
         self.verify_dates()
 
     def verify_dates(self):
-        cruce_1 = self.env['account.analytic.line'].search(
-            ['&','&', ('date_from', '<', self.date_from), ('date_to', '>=', self.date_from),
-                      ('user_id', '=', self.user_id.id)])
-        cruce_2 = self.env['account.analytic.line'].search(
-            ['&','&', ('date_from', '>=', self.date_from), ('date_to', '<=', self.date_to),
-                      ('user_id', '=', self.user_id.id)])
-        cruce_3 = self.env['account.analytic.line'].search(
-            ['&','&', ('date_from', '<', self.date_from), ('date_to', '>', self.date_to),
-                      ('user_id', '=', self.user_id.id)])
-        cruce_4 = self.env['account.analytic.line'].search(
-            ['&','&', ('date_from', '<=', self.date_to), ('date_to', '>=', self.date_to),
-                      ('user_id', '=', self.user_id.id)])
+        resource = self.env['resource.resource'].search([('user_id', '=', self.user_id.id)])
 
-        cruces = cruce_1 | cruce_2 | cruce_3 | cruce_4
+        if resource and resource.calendar_id:
+            # tiene contrato (se supone que no ingresa parte de horas si ya no pertenece a la empresa)
+            employee = self.env['hr.employee'].search([('resource_id', '=', resource.id)])
 
-        if len(cruces) > 0:
-            raise UserError("El registro ingresado se cruza con al menos otro")
+            # se verifica contra fecha de inicio de contrato
+            if fields.Datetime.from_string(self.date_from) < fields.Datetime.from_string(employee.joining_date):
+                raise UserError("El registro ingresado no es válido, verifique su fecha de vinculación")
+
+            # se verifica cruces de fechas con otros registros
+            cruce_1 = self.env['account.analytic.line'].search(
+                ['&','&', ('date_from', '<', self.date_from), ('date_to', '>=', self.date_from),
+                          ('user_id', '=', self.user_id.id)])
+            cruce_2 = self.env['account.analytic.line'].search(
+                ['&','&', ('date_from', '>=', self.date_from), ('date_to', '<=', self.date_to),
+                          ('user_id', '=', self.user_id.id)])
+            cruce_3 = self.env['account.analytic.line'].search(
+                ['&','&', ('date_from', '<', self.date_from), ('date_to', '>', self.date_to),
+                          ('user_id', '=', self.user_id.id)])
+            cruce_4 = self.env['account.analytic.line'].search(
+                ['&','&', ('date_from', '<=', self.date_to), ('date_to', '>=', self.date_to),
+                          ('user_id', '=', self.user_id.id)])
+
+            cruces = cruce_1 | cruce_2 | cruce_3 | cruce_4
+
+            if len(cruces) > 0:
+                raise UserError("El registro ingresado no es válido, se cruza con al menos otro")
+        else:
+            # no tiene contrato
+            self.date_from = None
+            raise UserError("El registro ingresado no es válido, no se encuentra contrato")
 
     def get_in_datelist(self):
         employee_tz = pytz.timezone(self.user_id.partner_id.tz)
