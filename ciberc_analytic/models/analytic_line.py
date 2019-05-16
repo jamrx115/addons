@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, time as dtime
 from dateutil.relativedelta import relativedelta
 from odoo.exceptions import UserError, AccessError
 
+import calendar
 import logging
 import time
 import pytz
@@ -36,7 +37,8 @@ class AccountAnalyticLineNew(models.Model):
     def _default_datefrom(self):
         user_time_zone = self._user_tz()
         now_utcz = utc_cero.fromutc(datetime.now())
-        return datetime.combine(now_utcz.date(), dtime(hour=now_utcz.hour))
+        #return datetime.combine(now_utcz.date(), dtime(hour=now_utcz.hour))
+        return datetime.combine(now_utcz.date(), dtime(hour=now_utcz.hour, minute=now_utcz.minute))
 
     @api.model
     def _default_dateto(self):
@@ -109,11 +111,52 @@ class AccountAnalyticLineNew(models.Model):
         cruces = cruce_1 | cruce_2 | cruce_3 | cruce_4
 
         if len(cruces) > 0:
-            self.date_from = None
-            self.date_to   = None
+            raise UserError("El registro ingresado se cruza con al menos otro")
+
+    def get_in_datelist(self):
+        employee_tz = pytz.timezone(self.user_id.partner_id.tz)
+        date_from = fields.Datetime.from_string(self.date_from)
+        date_to = fields.Datetime.from_string(self.date_to)
+
+        return [date_from, date_to]
+
+    def cut_by_months(self, parte_conservar):
+        employee_tz = pytz.timezone(self.user_id.partner_id.tz)
+        date_from = fields.Datetime.from_string(self.date_from)
+        date_to = fields.Datetime.from_string(self.date_to)
+
+        register = []
+
+        # agregando zona horaria utc cero explícita
+        auxiliar_utcz_datefrom = utc_cero.localize(date_from)
+        auxiliar_utcz_dateto   = utc_cero.localize(date_to)
+
+        # cambiando la zona horaria a la del usuario
+        auxiliar_utcu_datefrom = auxiliar_utcz_datefrom.astimezone(employee_tz)
+        auxiliar_utcu_dateto   = auxiliar_utcz_dateto.astimezone(employee_tz)
+
+        # comparaciones en utc usuario
+        if parte_conservar == 'mes_inicio':            
+            auxiliar_date_i = auxiliar_utcu_datefrom
+            auxiliar_date_f = timedelta(year=auxiliar_utcu_datefrom.year, month=auxiliar_utcu_datefrom.month, 
+                                day=calendar.monthrange(auxiliar_utcu_datefrom.year, auxiliar_utcu_datefrom.month)[1],
+                                hour=23, minute=59, second=59)
+            auxiliar_date_f = employee_tz.localize(auxiliar_date_f)
+        elif parte_conservar == 'mes_fin':
+            auxiliar_date_i = timedelta(year=auxiliar_utcu_dateto.year, month=auxiliar_utcu_dateto.month, day=1,
+                                hour=0, minute=0, second=0)
+            auxiliar_date_i = employee_tz.localize(auxiliar_date_i)
+            auxiliar_date_f = auxiliar_utcu_dateto
+        else:
+            auxiliar_date_i = auxiliar_utcu_datefrom
+            auxiliar_date_f = auxiliar_utcu_dateto
+
+        register = [datetime.combine(auxiliar_date_i.date(), auxiliar_date_i.time()),
+                    datetime.combine(auxiliar_date_f.date(), auxiliar_date_f.time())]
+        return register
 
     date_from = fields.Datetime('Fecha inicial', required=True, default=_default_datefrom)
-    date_to = fields.Datetime('Fecha final', required=True, default=_default_dateto)
+    date_to = fields.Datetime('Fecha final', required=True)
     state = fields.Selection([
         ('enviado', 'Esperando revisión nómina'),
         ('aprobado', 'Aprobado nómina')], 
