@@ -71,7 +71,7 @@ class AccountAnalyticLineNew(models.Model):
             date_to_with_delta = fields.Datetime.from_string(date_from) + timedelta(hours=1)
             self.date_to = str(date_to_with_delta)
 
-        # Compute and update the number of days
+        # Compute and update the number of hours
         if (date_to and date_from) and (date_from <= date_to):
             self.unit_amount = self._get_number_of_hours(date_from, date_to, self.user_id.id)
         else:
@@ -85,7 +85,7 @@ class AccountAnalyticLineNew(models.Model):
         date_from = self.date_from
         date_to = self.date_to
 
-        # Compute and update the number of days
+        # Compute and update the number of hours
         if (date_to and date_from) and (date_from <= date_to):
             self.unit_amount = self._get_number_of_hours(date_from, date_to, self.user_id.id)
         else:
@@ -155,8 +155,8 @@ class AccountAnalyticLineNew(models.Model):
                     datetime.combine(auxiliar_date_f.date(), auxiliar_date_f.time())]
         return register
 
-    date_from = fields.Datetime('Fecha inicial', required=True, default=_default_datefrom)
-    date_to = fields.Datetime('Fecha final', required=True)
+    date_from = fields.Datetime('Fecha inicial', required=True, index=True, default=_default_datefrom)
+    date_to = fields.Datetime('Fecha final', required=True, index=True)
     state = fields.Selection([
         ('enviado', 'Esperando revisión nómina'),
         ('aprobado', 'Aprobado nómina')], 
