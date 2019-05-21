@@ -454,8 +454,11 @@ class CodeLeaveTypePayroll(models.Model):
     @api.multi
     def sum_other(self, employee_p, date_from_payslip, date_to_payslip, rule, code):
         _logger.debug('***************')
-        #_logger.debug('rule %s', rule)
+        _logger.debug('rule %s', rule)
         _logger.debug('code %s', code)
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+
         date_from_payslip = fields.Datetime.from_string(date_from_payslip) # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
 
@@ -465,18 +468,34 @@ class CodeLeaveTypePayroll(models.Model):
         elif rule == 'AGUINALDO':
             date_from_bono = datetime(year=(date_from_payslip.year), month=12, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=11, day=30)  # tipo datetime
-        elif rule == 'PRIMA1':
+        elif (rule == 'PRIMA1') or (rule == 'PRIMALIQ' and date_to_payslip.month <= 6):
             date_from_bono = datetime(year=date_from_payslip.year, month=1, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=6, day=30)  # tipo datetime
-        elif rule == 'PRIMA2':
+        elif (rule == 'PRIMA2') or (rule == 'PRIMALIQ' and date_to_payslip.month > 6):
             date_from_bono = datetime(year=date_from_payslip.year, month=7, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=12, day=31)  # tipo datetime
+        elif rule == 'UANUAL_LAB':
+            contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')
+            aux_cmeses = 0.0
+            rango = []
+            for c in contracts:
+                if c.date_end:
+                    aux_cmeses += self.auxiliar_for_sum(c.date_start, c.date_end, 'MESES')
+                    fin = fields.Datetime.from_string(c.date_end)
+                    if aux_cmeses < 12:
+                        inicia = fields.Datetime.from_string(c.date_start)
+                    else:
+                        inicia = date_to_payslip - dateutil.relativedelta.relativedelta(months=12)
+                    rango = [inicia, fin] + rango
+                if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
+                    break
+            date_from_bono = datetime(year=rango[0].year,  month=rango[0].month,  day=1)  # tipo datetime
+            date_to_bono   = datetime(year=rango[-1].year, month=rango[-1].month, day=calendar.monthrange(rango[-1].year, month=rango[-1].month)[1])  # tipo datetime
         else:
             date_from_bono = datetime(year=date_from_payslip.year, month=1, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=12, day=31)  # tipo datetime
 
         result = 0.00
-        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
         contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
         payslip_ids = self.env['hr.payslip'].search(
             ['&', ('contract_id', '=', None), ('state', '=', 'done')],
@@ -488,14 +507,16 @@ class CodeLeaveTypePayroll(models.Model):
                  ('contract_id', '=', contract_id),
                  ('state', '=', 'done')])
 
-            payslip_ids = payslip_ids + payslip_aux
+            payslip_ids = payslip_aux + payslip_ids
 
+        
         for payslip in payslip_ids:
+            _logger.debug('')
             _logger.debug('fechas %s - %s', payslip.date_from, payslip.date_to)
             for input_line in payslip.line_ids:
                 if input_line.code == code:
                     result += input_line.amount
-                    _logger.debug('valor %s', input_line.amount)
+                    #_logger.debug('valor %s', input_line.amount)
                     _logger.debug('subtotal %s', result)
 
         _logger.debug('***************')
