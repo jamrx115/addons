@@ -3,6 +3,7 @@
 from odoo import models, fields, api, tools, _
 from datetime import datetime, timedelta
 
+import dateutil.relativedelta
 import logging
 import calendar
 import babel
@@ -331,14 +332,15 @@ class CodeLeaveTypePayroll(models.Model):
     def sum_wage(self, employee_p, date_from_payslip, date_to_payslip, rule, order):
         _logger.debug('***************')
         #_logger.debug('rule %s', rule)
-        _logger.debug('order %s', order)
-        result = 0
+        #_logger.debug('order %s', order)
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
+        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
+
         date_from_payslip = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
-
-        employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
         aux_year = date_from_payslip.year
         aux_meses = 0
+        result = 0
         dias = 0
 
         if rule == 'BONO14' or rule == 'AGUINALDO':
@@ -349,23 +351,39 @@ class CodeLeaveTypePayroll(models.Model):
             meses = [mn for mn in range(1, date_to_payslip.month + 1)]
         elif rule == 'PRIMA2':
             meses = [mn for mn in range(date_from_payslip.month, 13)]
+        elif rule == 'PRIMALIQ':
+            aux_year = date_to_payslip.year
+            if date_to_payslip.month <= 6:
+                meses = [mn for mn in range(1, date_to_payslip.month + 1)]
+            else:
+                meses = [mn for mn in range(7, date_to_payslip.month + 1)]
+        elif rule == 'UANUAL_LAB':
+            contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')
+            aux_cmeses = 0.0
+            meses = []
+            for c in contracts:
+                if c.date_end:
+                    aux_cmeses += self.auxiliar_for_sum(c.date_start, c.date_end, 'MESES')
+                    fin = fields.Datetime.from_string(c.date_end)
+                    if aux_cmeses < 12:
+                        inicia = fields.Datetime.from_string(c.date_start)
+                    else:
+                        inicia = date_to_payslip - dateutil.relativedelta.relativedelta(months=12)
+                    aux_year = inicia.year                    
+                    aux_ameses = [mn for mn in range(inicia.month, fin.month + 1)]
+                    meses = aux_ameses + meses
+                if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
+                    break
         else:
             meses = [mn for mn in range(date_from_payslip.month, date_to_payslip.month + 1)]
-
-        #_logger.debug('meses %s', meses)
 
         if meses:
             aux_meses = meses[0]
 
         for mes in meses:
-            if aux_meses > 12:
-                aux_year = date_to_payslip.year
             date_from_mes = datetime(year=aux_year, month=mes, day=1)  # tipo datetime
-            date_to_mes = datetime(year=aux_year, month=mes,
-                                   day=calendar.monthrange(date_to_payslip.year, mes)[1])  # tipo datetime
-
-            #_logger.debug('fechas %s - %s', date_from_mes, date_to_mes)
-
+            date_to_mes   = datetime(year=aux_year, month=mes, day=calendar.monthrange(aux_year, mes)[1])  # tipo datetime
+            
             payslip_ids = self.env['hr.payslip'].search(
                 ['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
                  ('employee_id', '=', employee.id),
@@ -373,8 +391,8 @@ class CodeLeaveTypePayroll(models.Model):
 
             for nomina in payslip_ids:
                 contract = self.env['hr.contract'].search([('id', '=', nomina.contract_id.id)])
-                date_from_payslip = fields.Datetime.from_string(nomina.date_from)
-                date_to_payslip = fields.Datetime.from_string(nomina.date_to)
+                date_from_p = fields.Datetime.from_string(nomina.date_from)
+                date_to_p = fields.Datetime.from_string(nomina.date_to)
 
                 if contract:
                     salario = contract.wage
@@ -383,33 +401,30 @@ class CodeLeaveTypePayroll(models.Model):
                     if contract.date_end:
                         contract_end = fields.Datetime.from_string(contract.date_end)  # tipo datetime
 
-                    if contract_start < date_from_payslip:
+                    if contract_start < date_from_p:
                         if contract_end:
-                            if date_to_payslip < contract_end:
-                                dias = ((date_to_payslip - date_from_payslip).days) + 1
+                            if date_to_p < contract_end:
+                                dias = ((date_to_p - date_from_p).days) + 1
                             else:
-                                dias = ((contract_end - date_from_payslip).days) + 1
+                                dias = ((contract_end - date_from_p).days) + 1
                         else:
-                            dias = ((date_to_payslip - date_from_payslip).days) + 1
+                            dias = ((date_to_p - date_from_p).days) + 1
                     else:
                         if contract_end:
-                            if date_to_payslip < contract_end:
-                                dias = ((date_to_payslip - contract_start).days) + 1
+                            if date_to_p < contract_end:
+                                dias = ((date_to_p - contract_start).days) + 1
                             else:
                                 dias = ((contract_end - contract_start).days) + 1
                         else:
-                            dias = ((date_to_payslip - contract_start).days) + 1
+                            dias = ((date_to_p - contract_start).days) + 1
                     
                     # correccion dias para redondear a 30
-                    if date_from_payslip.month == 2:
-                        if date_to_payslip.day == 28:
-                            _logger.debug('feb 28')
+                    if date_from_p.month == 2:
+                        if date_to_p.day == 28:
                             dias += 2
-                        if date_to_payslip.day == 29:
-                            _logger.debug('feb 29 ')
+                        if date_to_p.day == 29:
                             dias += 1
-                    if date_to_payslip.day == 31 and (dias >= 16):
-                        _logger.debug('mes 31')
+                    if date_to_p.day == 31 and (dias >= 16):
                         dias -= 1
                     
                     # calculando resutado
@@ -425,6 +440,8 @@ class CodeLeaveTypePayroll(models.Model):
                     _logger.debug('subtotal %s', result)
 
             aux_meses +=1
+            if aux_meses%13 == 0:
+                aux_year = aux_year + 1
 
         _logger.debug('***************')
 
