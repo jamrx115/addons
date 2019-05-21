@@ -443,6 +443,8 @@ class CodeLeaveTypePayroll(models.Model):
             if aux_meses%13 == 0:
                 aux_year = aux_year + 1
 
+        if order == 'MESES':
+            result = aux_cmeses
         _logger.debug('***************')
 
         return result
