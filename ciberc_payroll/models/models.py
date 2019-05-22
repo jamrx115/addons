@@ -331,17 +331,20 @@ class CodeLeaveTypePayroll(models.Model):
     @api.multi
     def sum_wage(self, employee_p, date_from_payslip, date_to_payslip, rule, order):
         _logger.debug('***************')
-        #_logger.debug('rule %s', rule)
-        #_logger.debug('order %s', order)
+        _logger.debug('rule %s', rule)
+        _logger.debug('order %s', order)
         tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
-
+        _logger.debug('employee %s', employee)
         date_from_payslip = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
         aux_year = date_from_payslip.year
         aux_meses = 0
         result = 0
         dias = 0
+
+        _logger.debug('date_from_payslip %s', date_from_payslip)
+        _logger.debug('date_to_payslip %s', date_to_payslip)
 
         if rule == 'BONO14' or rule == 'AGUINALDO':
             meses1 = [mn for mn in range(date_from_payslip.month, 13)]
@@ -374,8 +377,23 @@ class CodeLeaveTypePayroll(models.Model):
                     meses = aux_ameses + meses
                 if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
                     break
+        elif rule == 'UANUAL':
+            aux_year = date_to_payslip.year
+            contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')
+            date_end_contract = fields.Datetime.from_string(contracts[0].date_end)
+            aux_cmeses = self.auxiliar_for_sum(str(datetime(year=date_end_contract.year, month=1, day=1)), contracts[0].date_end, 'MESES')
+            meses = [mn for mn in range(1, date_end_contract.month + 1)]
         else:
-            meses = [mn for mn in range(date_from_payslip.month, date_to_payslip.month + 1)]
+            meses = [mn for mn in range(date_from_payslip.month, 13)]
+            aux_year_con = (date_from_payslip.year) + 1
+            aux_year_lim = date_to_payslip.year
+            while aux_year_con <= aux_year_lim:
+                if aux_year_con < aux_year_lim:
+                    aux_ameses = [mn for mn in range(1, 13)]
+                else:
+                    aux_ameses = [mn for mn in range(1, date_to_payslip.month + 1)]
+                meses = meses + aux_ameses
+                aux_year_con = aux_year_con + 1
 
         if meses:
             aux_meses = meses[0]
@@ -383,6 +401,9 @@ class CodeLeaveTypePayroll(models.Model):
         for mes in meses:
             date_from_mes = datetime(year=aux_year, month=mes, day=1)  # tipo datetime
             date_to_mes   = datetime(year=aux_year, month=mes, day=calendar.monthrange(aux_year, mes)[1])  # tipo datetime
+
+            _logger.debug('date_from_mes %s', date_from_mes)
+            _logger.debug('date_to_mes   %s', date_to_mes)
             
             payslip_ids = self.env['hr.payslip'].search(
                 ['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
@@ -474,6 +495,10 @@ class CodeLeaveTypePayroll(models.Model):
         elif (rule == 'PRIMA2') or (rule == 'PRIMALIQ' and date_to_payslip.month > 6):
             date_from_bono = datetime(year=date_from_payslip.year, month=7, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=12, day=31)  # tipo datetime
+        elif rule == 'UANUAL':
+            contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')            
+            date_from_bono = datetime(year=date_to_payslip.year, month=1, day=1)  # tipo datetime
+            date_to_bono = fields.Datetime.from_string(contracts[0].date_end)  # tipo datetime
         elif rule == 'UANUAL_LAB':
             contracts = self.env['hr.contract'].search([('employee_id', '=', employee.id)], order = 'date_start desc')
             aux_cmeses = 0.0
