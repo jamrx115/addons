@@ -113,6 +113,7 @@
                 <field name="create_date"/>
                 <field name="write_date"/>
             </xpath>
+            <xpath expr="//field[@name='credit_note']" position="replace" />
         </field>
     </record>
     
