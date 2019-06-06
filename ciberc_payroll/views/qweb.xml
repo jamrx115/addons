@@ -133,7 +133,7 @@
                         <tr t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
                             <t t-if="line.code!='BON37' and line.code!='BON'">
                                 <td><span t-field="line.name"/></td>
-                                <t t-if="line.code=='DIASTRABAJO' or line.code=='DIASPAGADOS'">
+                                <t t-if="line.code=='DIASTRABAJO' or line.code.startswith('DIASPAG')">
                                     <td><span t-esc="'%.2f'% line.total"/></td>
                                 </t>
                                 <t t-else="">

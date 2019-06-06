@@ -127,6 +127,10 @@
                                             <t t-set="dias_snclab" t-value="nomina.get_days_from_workeddays(nomina.worked_days_line_ids, 'SNCLAB', 'number_of_days')" />
                                             <t t-set="dias_pernre" t-value="nomina.get_days_from_workeddays(nomina.worked_days_line_ids, 'PERNRE', 'number_of_days')" />
                                             <t t-set="dias_norem" t-value="dias_aunoj+dias_snclab+dias_pernre" />
+                                            <t t-set="dias100" t-value="nomina.get_from_lineids(nomina.line_ids, 'DIASPAG100')" />
+                                            <t t-set="dias66" t-value="nomina.get_from_lineids(nomina.line_ids, 'DIASPAG66')" />
+                                            <t t-set="dias50" t-value="nomina.get_from_lineids(nomina.line_ids, 'DIASPAG50')" />
+                                            <t t-set="dias_pagados" t-value="dias100+dias66+dias50" />
                                             <t t-set="devengado" t-value="nomina.get_from_lineids(nomina.line_ids, 'SALARIOBASE')" />
                                             <t t-set="auxtransp" t-value="nomina.get_from_lineids(nomina.line_ids, 'AUXTRANSP')" />
                                             <t t-set="comisiones" t-value="nomina.get_from_lineids(nomina.line_ids, 'COMISIONES')" />
@@ -155,7 +159,7 @@
                                             <td><span t-field="nomina.employee_id.job_id"/></td><!--cargo-->
                                             <td><span t-field="nomina.contract_id.wage" 
                                                       t-field-options='{"widget": "monetary", "display_currency": moneda}'/></td><!--basico-->
-                                            <td><span t-esc="nomina.get_from_lineids(nomina.line_ids, 'DIASPAGADOS')" /></td>   <!--dias-->
+                                            <td><span t-esc="dias_pagados" /></td>   <!--dias 100+66+50-->
                                             <td><span t-esc="dias_vac"/></td><!--dias vac-->
                                             <td><span t-esc="dias_norem" /></td><!--dias norem-->
                                             <td><span t-esc="devengado" 
