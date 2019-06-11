@@ -330,9 +330,9 @@ class CodeLeaveTypePayroll(models.Model):
     # obtener sumatoria salarios o dias cancelados
     @api.multi
     def sum_wage(self, employee_p, date_from_payslip, date_to_payslip, rule, order):
-        _logger.debug('***************')
-        _logger.debug('rule %s', rule)
-        _logger.debug('order %s', order)
+        #_logger.debug('***************')
+        #_logger.debug('rule %s', rule)
+        #_logger.debug('order %s', order)
 
         tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
@@ -342,9 +342,6 @@ class CodeLeaveTypePayroll(models.Model):
         aux_meses = 0
         result = 0
         dias = 0
-
-        _logger.debug('date_from_payslip %s', date_from_payslip)
-        _logger.debug('date_to_payslip %s', date_to_payslip)
 
         if rule == 'BONO14' or rule == 'AGUINALDO':
             meses1 = [mn for mn in range(date_from_payslip.month, 13)]
@@ -366,15 +363,33 @@ class CodeLeaveTypePayroll(models.Model):
             meses = []
             for c in contracts:
                 if c.date_end:
-                    aux_cmeses += self.auxiliar_for_sum(c.date_start, c.date_end, 'MESES')
+                    temp = self.auxiliar_for_sum(c.date_start, c.date_end, 'MESES_EXACTOS_ROUND')
+                    aux_cmeses += temp
                     fin = fields.Datetime.from_string(c.date_end)
+                    if fin.day != calendar.monthrange(fin.year, fin.month)[1]:
+                        fin = fin.replace(day=1) - dateutil.relativedelta.relativedelta(days=1)
+                    #_logger.debug('aux_cmeses %s', aux_cmeses)
                     if aux_cmeses < 12:
                         inicia = fields.Datetime.from_string(c.date_start)
+                        #_logger.debug('inicia 1 %s fin 1 %s', inicia, fin)
+                        aux_year = inicia.year                    
+                        aux_ameses = [mn for mn in range(inicia.month, fin.month + 1)]
+                        meses = aux_ameses + meses
+                        #_logger.debug('meses p %s', meses)
                     else:
-                        inicia = date_to_payslip - dateutil.relativedelta.relativedelta(months=12)
-                    aux_year = inicia.year                    
-                    aux_ameses = [mn for mn in range(inicia.month, fin.month + 1)]
-                    meses = aux_ameses + meses
+                        #_logger.debug('')
+                        resto_round = int(12 - (aux_cmeses-temp))
+                        aux_cmeses = 12
+                        fecha_aux = datetime(day=1, month=meses[0], year=aux_year)
+                        #_logger.debug('fecha_aux %s', fecha_aux)
+                        inicia = fecha_aux - dateutil.relativedelta.relativedelta(months=resto_round)
+                        #_logger.debug('inicia 2 %s fin %s', inicia, fin)
+                        aux_year = inicia.year                    
+                        aux_ameses = [mn for mn in range(inicia.month, fin.month + 1)]
+                        meses = aux_ameses + meses
+                        #_logger.debug('meses f %s', meses)
+                        break
+                        
                 if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
                     break
         elif rule == 'UANUAL':
@@ -406,9 +421,6 @@ class CodeLeaveTypePayroll(models.Model):
                 date_from_mes = datetime(year=aux_year, month=mes, day=1)  # tipo datetime
                 date_to_mes   = datetime(year=aux_year, month=mes, day=calendar.monthrange(aux_year, mes)[1])  # tipo datetime
 
-                _logger.debug('date_from_mes %s', date_from_mes)
-                _logger.debug('date_to_mes   %s', date_to_mes)
-                
                 payslip_ids = self.env['hr.payslip'].search(
                     ['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
                      ('employee_id', '=', employee.id),
@@ -455,20 +467,20 @@ class CodeLeaveTypePayroll(models.Model):
                         # calculando resutado
                         if order == 'WAGE':
                             result += ((salario / 30) * dias)
-                            _logger.debug('')
-                            _logger.debug('fechas %s - %s salario %s', nomina.date_from, nomina.date_to, ((salario / 30) * dias))
+                            #_logger.debug('')
+                            #_logger.debug('fechas %s - %s salario %s', nomina.date_from, nomina.date_to, ((salario / 30) * dias))
                         else:
                             result += dias
-                            _logger.debug('')
-                            _logger.debug('fechas %s - %s valor dias %s', nomina.date_from, nomina.date_to, dias)
+                            #_logger.debug('')
+                            #_logger.debug('fechas %s - %s valor dias %s', nomina.date_from, nomina.date_to, dias)
 
-                        _logger.debug('subtotal %s', result)
+                        #_logger.debug('subtotal %s', result)
 
                 aux_meses +=1
                 if aux_meses%13 == 0:
                     aux_year = aux_year + 1
 
-        _logger.debug('***************')
+        #_logger.debug('***************')
 
         return result
 
@@ -476,9 +488,9 @@ class CodeLeaveTypePayroll(models.Model):
     # se usa en aguinaldo GT bono14 GT, cesantias CO, primas CO
     @api.multi
     def sum_other(self, employee_p, date_from_payslip, date_to_payslip, rule, code):
-        _logger.debug('***************')
-        _logger.debug('rule %s', rule)
-        _logger.debug('code %s', code)
+        #_logger.debug('***************')
+        #_logger.debug('rule %s', rule)
+        #_logger.debug('code %s', code)
         tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
 
@@ -507,46 +519,64 @@ class CodeLeaveTypePayroll(models.Model):
             rango = []
             for c in contracts:
                 if c.date_end:
-                    aux_cmeses += self.auxiliar_for_sum(c.date_start, c.date_end, 'MESES')
+                    temp = self.auxiliar_for_sum(c.date_start, c.date_end, 'MESES_EXACTOS_ROUND')
+                    aux_cmeses += temp
                     fin = fields.Datetime.from_string(c.date_end)
+                    if fin.day != calendar.monthrange(fin.year, fin.month)[1]:
+                        fin = fin.replace(day=1) - dateutil.relativedelta.relativedelta(days=1)
+                    #_logger.debug('')
                     if aux_cmeses < 12:
                         inicia = fields.Datetime.from_string(c.date_start)
+                        rango = [inicia, fin] + rango
                     else:
-                        inicia = date_to_payslip - dateutil.relativedelta.relativedelta(months=12)
-                    rango = [inicia, fin] + rango
+                        resto_round = int(12 - (aux_cmeses-temp))
+                        aux_cmeses = 12
+                        inicia = rango[0] - dateutil.relativedelta.relativedelta(months=resto_round)
+                        rango = [inicia, fin] + rango
+                        break
                 if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
                     break
+
+            #_logger.debug('rango %s', rango)
+
             date_from_bono = datetime(year=rango[0].year,  month=rango[0].month,  day=1)  # tipo datetime
             date_to_bono   = datetime(year=rango[-1].year, month=rango[-1].month, day=calendar.monthrange(rango[-1].year, month=rango[-1].month)[1])  # tipo datetime
         else:
             date_from_bono = datetime(year=date_from_payslip.year, month=1, day=1)  # tipo datetime
             date_to_bono = datetime(year=date_to_payslip.year, month=12, day=31)  # tipo datetime
 
+        #_logger.debug('date_from_bono %s', date_from_bono)
+        #_logger.debug('date_to_bono %s', date_to_bono)
+        #_logger.debug('')
+
         result = 0.00
         contract_ids = self.get_contract(employee, date_from_bono, date_to_bono)  # tipo [int]
+        #_logger.debug('contract_ids %s', contract_ids)
         payslip_ids = self.env['hr.payslip'].search(
             ['&', ('contract_id', '=', None), ('state', '=', 'done')],
             limit=0)  # recordset vacío para concatenar
 
         for contract_id in contract_ids:
+            c = self.env['hr.contract'].browse(contract_id)
+            #_logger.debug('fechas c %s a %s', c.date_start, c.date_end)
             payslip_aux = self.env['hr.payslip'].search(
                 ['&', '&', '&', ('date_from', '>=', date_from_bono), ('date_to', '<=', date_to_bono),
                  ('contract_id', '=', contract_id),
                  ('state', '=', 'done')])
-
+            #_logger.debug('payslip_aux %s', payslip_aux)
             payslip_ids = payslip_aux + payslip_ids
-
+            #_logger.debug('payslip_ids %s', payslip_ids)
         
         for payslip in payslip_ids:
-            _logger.debug('')
-            _logger.debug('fechas %s - %s', payslip.date_from, payslip.date_to)
+            #_logger.debug('')
+            #_logger.debug('fechas %s - %s', payslip.date_from, payslip.date_to)
             for input_line in payslip.line_ids:
                 if input_line.code == code:
                     result += input_line.amount
                     #_logger.debug('valor %s', input_line.amount)
-                    _logger.debug('subtotal %s', result)
+                    #_logger.debug('subtotal %s', result)
 
-        _logger.debug('***************')
+        #_logger.debug('***************')
         return result
 
     @api.multi
@@ -969,6 +999,14 @@ class CodeLeaveTypePayroll(models.Model):
     def get_currency(self, contract_obj):
         valor = contract_obj.x_currency_id
         return valor
+
+    # para obtener los dias que tiene derecho anuales
+    def get_annual_holiday(self, contract):
+        tipo_novedad_contrato_vinculacion = self.env['ciberc.tipo.novedad.contrato'].search([('name', '=', 'Vinculación laboral')])
+        contratos = self.env['hr.contract'].search([('employee_id', '=', contract.employee_id.id)], order='date_start')
+        for c in contratos:
+            if c.x_tipo_novedad_contrato_id.id == tipo_novedad_contrato_vinculacion.id:
+                return c.annual_holiday
 
 # clase creada por alltic que permite obtener datos para reportes
 class HrEmployeePayslip(models.Model):
