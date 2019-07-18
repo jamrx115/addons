@@ -311,7 +311,7 @@ class HolidaysUpdated(models.Model):
                     if leaves and leaves[0].double_validation:
                         leaves.action_validate()
             else: # holiday.type == 'add'
-                template = self.env.ref('ciberc_holidays.validate_template')
+                template = self.env.ref('ciberc_holidays.approve_template')
                 self.env['mail.template'].browse(template.id).send_mail(self.id)
         return True
 
