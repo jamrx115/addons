@@ -37,90 +37,141 @@
                 <t t-elif="'Bono 14' in o.struct_id.name">
                     <h2>Recibo de Bono 14</h2>
                 </t>
+                <t t-elif="'Vacaciones' in o.struct_id.name and 'COLOMBIA' in o.struct_id.company_id.name">
+                    <h2>Liquidación de vacaciones</h2>
+                </t>
                 <t t-else="">
                     <h2>Recibo</h2>
                 </t>
 
+                <t t-set="vacations_holiday" t-value="o.get_holidays_vacations(o.employee_id, o.worked_days_line_ids, o.date_from, o.date_to)" />
+
                 <t t-set="moneda" t-value="o.get_currency(o.contract_id)" />
 
-                <div>
-                    <table class="table table-condensed table-bordered">
-                        <tr>
-                            <td colspan="2"><strong>Referencia</strong></td>
-                            <td colspan="2"><span t-field="o.number"/></td>
-                        </tr>
-                    </table>
-                    <table class="table table-condensed table-bordered">
-                        <tr>
-                            <td><strong>Nombre</strong></td>
-                            <td><span t-field="o.employee_id"/></td>
-                            <td><strong>DPI/PASS</strong></td>
-                            <td><span t-field="o.employee_id.identification_id"/> /
-                                <span t-field="o.employee_id.passport_id"/></td>
-                        </tr>
-                        <tr>
-                            <t t-set="mes_i" t-value="time.strftime('%m %Y',time.strptime(o.date_from,'%Y-%m-%d'))" />
-                            <t t-set="mes_f" t-value="time.strftime('%m %Y',time.strptime(o.date_to,'%Y-%m-%d'))" />
+                <t t-if="'Vacaciones' in o.struct_id.name and 'COLOMBIA' in o.struct_id.company_id.name">
+                    <t t-set="vacations_period" t-value="o.get_vacations_period(o.worked_days_line_ids, o.employee_id)" />
+                    <div>
+                        <table class="table table-condensed table-bordered">
+                            <tr>
+                                <td ><i>Nombre</i></td>
+                                <td colspan="2"><b><span t-field="o.employee_id"/></b></td>
+                            </tr>
+                            <tr>
+                                <td ><i>No. de cédula</i></td>
+                                <td colspan="2"><b><span t-field="o.employee_id.identification_id"/></b></td>
+                            </tr>
+                            <tr>
+                                <td ><i>Cargo</i></td>
+                                <td colspan="2"><span t-field="o.employee_id.job_id"/></td>
+                            </tr>
+                            <tr>
+                                <td ><i>Periodo a liquidar</i></td>
+                                <td colspan="2">Del <span t-esc="vacations_period[0][0]"/></td>
+                            </tr>
+                            <tr>
+                                <td ><i>Fecha a disfrutar desde</i></td>
+                                <td colspan="2"><span t-field="o.date_from" t-field-options="{'format': 'EEEE'}"/>, <span t-field="o.date_from" t-field-options="{'format': 'dd'}"/> de <span t-field="o.date_from" t-field-options="{'format': 'MMMM'}"/> de <span t-field="o.date_from" t-field-options="{'format': 'yyyy'}"/></td>
+                            </tr>
+                            <tr>
+                                <td ><i>Fecha a disfrutar hasta</i></td>
+                                <td colspan="2"><span t-field="o.date_to" t-field-options="{'format': 'EEEE'}"/>, <span t-field="o.date_to" t-field-options="{'format': 'dd'}"/> de <span t-field="o.date_to" t-field-options="{'format': 'MMMM'}"/> de <span t-field="o.date_to" t-field-options="{'format': 'yyyy'}"/></td>
+                            </tr>
+                            <tr>
+                                <t t-set="inicio_labores" t-value="time.strftime('%A, %d de %B de %Y',time.strptime(vacations_holiday[0].date_return,'%Y-%m-%d %H:%M:%S'))" />
+                                <td ><i>Inicio labores</i></td>
+                                <td colspan="2"><span t-esc="inicio_labores"/></td>
+                            </tr>
+                            <tr>
+                                <td ><i>Días hábiles</i></td>
+                                <td colspan="2"><span t-esc="-1*vacations_holiday[0].number_of_days"/></td>
+                            </tr>
+                            <tr>
+                                <td ><i>Días a liquidar</i></td>
+                                <td colspan="2"><span t-esc="-1*vacations_holiday[0].number_of_days_calendar"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div>
+                        <table class="table table-condensed table-bordered">
+                            <tr>
+                                <td colspan="2"><strong>Referencia</strong></td>
+                                <td colspan="2"><span t-field="o.number"/></td>
+                            </tr>
+                        </table>
+                        <table class="table table-condensed table-bordered">
+                            <tr>
+                                <td><strong>Nombre</strong></td>
+                                <td><span t-field="o.employee_id"/></td>
+                                <td><strong>DPI/PASS</strong></td>
+                                <td><span t-field="o.employee_id.identification_id"/> /
+                                    <span t-field="o.employee_id.passport_id"/></td>
+                            </tr>
+                            <tr>
+                                <t t-set="mes_i" t-value="time.strftime('%m %Y',time.strptime(o.date_from,'%Y-%m-%d'))" />
+                                <t t-set="mes_f" t-value="time.strftime('%m %Y',time.strptime(o.date_to,'%Y-%m-%d'))" />
 
-                            <td><strong>Periodo</strong></td>
+                                <td><strong>Periodo</strong></td>
 
-                            <t t-if="mes_i == mes_f">
-                                <td>
-                                    <span t-field="o.date_from" t-field-options="{'format': 'dd'}"/> al
-                                    <span t-field="o.date_to" t-field-options="{'format': 'dd MMMM yyyy'}"/></td>
-                            </t>
-                            <t t-else="">
-                                <td>
-                                    <span t-field="o.date_from" t-field-options="{'format': 'dd MMMM yyyy'}"/> a
-                                    <span t-field="o.date_to" t-field-options="{'format': 'dd MMMM yyyy'}"/></td>
-                            </t>
-                            <td><strong>Nit</strong></td>
-                            <td><span t-field="o.employee_id.x_nit"/></td>
-                        </tr>
-                        <tr>
-                            <!-- parte 1 -->
-                            <td><strong>Puesto</strong></td>
-                            <t t-if="'Bono 14' in o.struct_id.name or 'Aguinaldo' in o.struct_id.name">
-                                <td colspan="3"><span t-field="o.employee_id.job_id"/></td>
-                            </t>
-                            <t t-else="">
-                                <td><span t-field="o.employee_id.job_id"/></td>
-                            </t>
-                            <!-- parte 2 -->
-                            <t t-if="'Bono 14' in o.struct_id.name or 'Aguinaldo' in o.struct_id.name">
-                            </t>
-                            <t t-else="">
-                                <t t-if="'Local Guatemala' in o.struct_id.name">
-                                    <td><strong>Sueldo ordinario (mensual)</strong></td>
-                                </t>
-                                <t t-elif="'Local Colombia' in o.struct_id.name">
-                                    <td><strong>Sueldo basico (mensual)</strong></td>
-                                </t>
-                                <t t-elif="'Servicios Profesionales' in o.struct_id.name">
-                                    <td><strong>Honorario (mensual)</strong></td>
+                                <t t-if="mes_i == mes_f">
+                                    <td>
+                                        <span t-field="o.date_from" t-field-options="{'format': 'dd'}"/> al
+                                        <span t-field="o.date_to" t-field-options="{'format': 'dd MMMM yyyy'}"/></td>
                                 </t>
                                 <t t-else="">
-                                    <td><strong>Sueldo mensual</strong></td>
+                                    <td>
+                                        <span t-field="o.date_from" t-field-options="{'format': 'dd MMMM yyyy'}"/> a
+                                        <span t-field="o.date_to" t-field-options="{'format': 'dd MMMM yyyy'}"/></td>
                                 </t>
-                                <td><span t-esc="o.contract_id.wage" t-esc-options='{"widget": "monetary", "display_currency": moneda}'/></td>
-                            </t>                                
-                        </tr>
-                        <tr>
-                            <td><strong>Departamento</strong></td>
-                            <td><span t-field="o.employee_id.department_id.name"/></td>
-                            <td><strong>Forma de pago</strong></td>
-                            <td>Depósito en banco</td>
-                        </tr>
-                        <t t-if="'Liquid' in o.struct_id.name">
-                            <tr>
-                                <td> <strong>Inicio contrato</strong> </td>
-                                <td> <span t-field="o.employee_id.joining_date" t-field-options="{'format': 'dd MMMM yyyy'}"/> </td>
-                                <td> <strong>Fin contrato</strong> </td>
-                                <td> <span t-field="o.contract_id.date_end" t-field-options="{'format': 'dd MMMM yyyy'}"/> </td>
+                                <td><strong>Nit</strong></td>
+                                <td><span t-field="o.employee_id.x_nit"/></td>
                             </tr>
-                        </t>
-                    </table>
-                </div>
+                            <tr>
+                                <!-- parte 1 -->
+                                <td><strong>Puesto</strong></td>
+                                <t t-if="'Bono 14' in o.struct_id.name or 'Aguinaldo' in o.struct_id.name">
+                                    <td colspan="3"><span t-field="o.employee_id.job_id"/></td>
+                                </t>
+                                <t t-else="">
+                                    <td><span t-field="o.employee_id.job_id"/></td>
+                                </t>
+                                <!-- parte 2 -->
+                                <t t-if="'Bono 14' in o.struct_id.name or 'Aguinaldo' in o.struct_id.name">
+                                </t>
+                                <t t-else="">
+                                    <t t-if="'Local Guatemala' in o.struct_id.name">
+                                        <td><strong>Sueldo ordinario (mensual)</strong></td>
+                                    </t>
+                                    <t t-elif="'Local Colombia' in o.struct_id.name">
+                                        <td><strong>Sueldo basico (mensual)</strong></td>
+                                    </t>
+                                    <t t-elif="'Servicios Profesionales' in o.struct_id.name">
+                                        <td><strong>Honorario (mensual)</strong></td>
+                                    </t>
+                                    <t t-else="">
+                                        <td><strong>Sueldo mensual</strong></td>
+                                    </t>
+                                    <td><span t-esc="o.contract_id.wage" t-esc-options='{"widget": "monetary", "display_currency": moneda}'/></td>
+                                </t>                                
+                            </tr>
+                            <tr>
+                                <td><strong>Departamento</strong></td>
+                                <td><span t-field="o.employee_id.department_id.name"/></td>
+                                <td><strong>Forma de pago</strong></td>
+                                <td>Depósito en banco</td>
+                            </tr>
+                            <t t-if="'Liquid' in o.struct_id.name">
+                                <tr>
+                                    <td> <strong>Inicio contrato</strong> </td>
+                                    <td> <span t-field="o.employee_id.joining_date" t-field-options="{'format': 'dd MMMM yyyy'}"/> </td>
+                                    <td> <strong>Fin contrato</strong> </td>
+                                    <td> <span t-field="o.contract_id.date_end" t-field-options="{'format': 'dd MMMM yyyy'}"/> </td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </t>
 
                 <table class="table table-condensed">
                     <thead>
@@ -133,7 +184,7 @@
                         <tr t-foreach="o.line_ids.filtered(lambda line: line.appears_on_payslip)" t-as="line">
                             <t t-if="line.code!='BON37' and line.code!='BON'">
                                 <td><span t-field="line.name"/></td>
-                                <t t-if="line.code=='DIASTRABAJO' or line.code.startswith('DIASPAG')">
+                                <t t-if="line.code.startswith('DIAS')">
                                     <td><span t-esc="'%.2f'% line.total"/></td>
                                 </t>
                                 <t t-else="">
@@ -144,13 +195,32 @@
                     </tbody>
                 </table>
 
+                <t t-if="'Vacaciones' in o.struct_id.name and 'COLOMBIA' in o.struct_id.company_id.name">
+                    <t t-set="vacations_period" t-value="o.get_vacations_period(o.worked_days_line_ids, o.employee_id)" />
+                    <table class="table table-condensed table-bordered">
+                        <tr>
+                            <td><strong>Nota</strong>: Saldo de vacaciones del periodo <span t-esc="vacations_period[0][1]"/> <span t-esc="vacations_holiday[0].get_remaining_days(vacations_holiday[0].holiday_status_id, o.employee_id)"/> días hábiles</td>
+                        </tr>
+                    </table>
+                </t>
+
                 <table class="table table-condensed table-bordered">
-                    <tr>
-                        <td><strong>Firma de recibido</strong></td>
-                        <td style="min-width:200px"></td>
-                        <td><strong>Fecha</strong></td>
-                        <td style="min-width:100px"></td>
-                    </tr>
+                    <t t-if="'Vacaciones' in o.struct_id.name and 'COLOMBIA' in o.struct_id.company_id.name">
+                        <tr>
+                            <td><strong>El Trabajador</strong></td>
+                            <td style="min-width:200px"></td>
+                            <td><strong>El Empleador</strong></td>
+                            <td style="min-width:200px"></td>
+                        </tr>
+                    </t>
+                    <t t-else="">
+                        <tr>
+                            <td><strong>Firma de recibido</strong></td>
+                            <td style="min-width:200px"></td>
+                            <td><strong>Fecha</strong></td>
+                            <td style="min-width:100px"></td>
+                        </tr>
+                    </t>
                 </table>
 
                 <t t-if="'Local Guatemala' in o.struct_id.name">
