@@ -372,8 +372,12 @@ class CodeLeaveTypePayroll(models.Model):
                     if aux_cmeses < 12:
                         inicia = fields.Datetime.from_string(c.date_start)
                         #_logger.debug('inicia 1 %s fin 1 %s', inicia, fin)
-                        aux_year = inicia.year                    
-                        aux_ameses = [mn for mn in range(inicia.month, fin.month + 1)]
+                        aux_year = inicia.year
+                        if fin.year == aux_year:
+                            aux_ameses = [mn for mn in range(inicia.month, fin.month + 1)]
+                        else:
+                            aux_ameses  = [mn for mn in range(inicia.month, 12 + 1)]
+                            aux_ameses += [mn for mn in range(1, fin.month + 1)]
                         meses = aux_ameses + meses
                         #_logger.debug('meses p %s', meses)
                     else:
@@ -581,7 +585,7 @@ class CodeLeaveTypePayroll(models.Model):
 
     @api.multi
     def days_by_year(self, employee_p, date_from_payslip, date_to_payslip):
-        _logger.debug('***************')
+        #_logger.debug('***************')
         employee = self.env['hr.employee'].browse(employee_p)  # tipo hr_employee
         date_from_payslip = fields.Datetime.from_string(date_from_payslip)  # tipo datetime
         date_to_payslip = fields.Datetime.from_string(date_to_payslip)  # tipo datetime
@@ -591,8 +595,8 @@ class CodeLeaveTypePayroll(models.Model):
         dias_anual = 0
         dias = 0
 
-        _logger.debug('date_from_payslip %s', date_from_payslip)
-        _logger.debug('date_to_payslip %s', date_to_payslip)
+        #_logger.debug('date_from_payslip %s', date_from_payslip)
+        #_logger.debug('date_to_payslip %s', date_to_payslip)
 
 
         meses = [mn for mn in range(date_from_payslip.month, 13)]
@@ -613,9 +617,9 @@ class CodeLeaveTypePayroll(models.Model):
             date_from_mes = datetime(year=aux_year, month=mes, day=1)  # tipo datetime
             date_to_mes   = datetime(year=aux_year, month=mes, day=calendar.monthrange(aux_year, mes)[1])  # tipo datetime
 
-            _logger.debug('---')
-            _logger.debug('date_from_mes %s', date_from_mes)
-            _logger.debug('date_to_mes   %s', date_to_mes)
+            #_logger.debug('---')
+            #_logger.debug('date_from_mes %s', date_from_mes)
+            #_logger.debug('date_to_mes   %s', date_to_mes)
             
             payslip_ids = self.env['hr.payslip'].search(
                 ['&', '&', '&', ('date_from', '>=', date_from_mes), ('date_to', '<=', date_to_mes),
@@ -662,9 +666,9 @@ class CodeLeaveTypePayroll(models.Model):
                     
                     # calculando resutado
                     dias_anual += dias
-                    _logger.debug('')
-                    _logger.debug('fechas %s - %s valor dias %s', nomina.date_from, nomina.date_to, dias)
-                    _logger.debug('acumulado %s', dias_anual)
+                    #_logger.debug('')
+                    #_logger.debug('fechas %s - %s valor dias %s', nomina.date_from, nomina.date_to, dias)
+                    #_logger.debug('acumulado %s', dias_anual)
 
             if (aux_meses%12 == 0) or (aux_meses == len(meses)+meses[0]-1):
                 result = result + [dias_anual]
@@ -675,8 +679,8 @@ class CodeLeaveTypePayroll(models.Model):
             if aux_meses%13 == 0:
                 aux_year = aux_year + 1
 
-        _logger.debug('result   %s', result)
-        _logger.debug('***************')
+        #_logger.debug('result   %s', result)
+        #_logger.debug('***************')
         return result
 
     # obtener datos de pagos (line_ids) en ultima quincena
@@ -714,11 +718,20 @@ class CodeLeaveTypePayroll(models.Model):
             sub = delta.months + round((delta.days * 1.0 / 30.0),2)
         elif tiempo == 'MESES_EXACTOS_ROUND':
             if date_from.day <= 15:
-                date_from = datetime(year=date_from.year, month=date_from.month, day=15)
+                # si inicia en quincena 1 -> pasa a iniciar el 1
+                date_from = datetime(year=date_from.year, month=date_from.month, day=1)
             else:
-                date_from = datetime(year=date_from.year, month=date_from.month, day=calendar.monthrange(date_from.year, date_from.month)[1])
+                # si inicia en quincena 2 -> pasa a iniciar el 15
+                date_from = datetime(year=date_from.year, month=date_from.month, day=15)
 
-            delta = dateutil.relativedelta.relativedelta(date_to, date_from)            
+            if date_to.day <= 15:
+                # si finaliza en quincena 1 -> pasa a finalizar el 15
+                date_to = datetime(year=date_to.year, month=date_to.month, day=15).date()
+            else:
+                # si finaliza en quincena 2 -> pasa a finalizar el ultimo día del mes
+                date_to = datetime(year=date_to.year, month=date_to.month, day=calendar.monthrange(date_to.year, date_to.month)[1]).date()
+
+            delta = dateutil.relativedelta.relativedelta(date_to, date_from)
             dias = delta.days
 
             ult_dia_mes = calendar.monthrange(date_to.year, date_to.month)[1]
